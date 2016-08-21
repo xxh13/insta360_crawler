@@ -15,10 +15,10 @@ class SearchIndexAdmin(admin.ModelAdmin):
     list_display = ('id','date','key','baidu_index','date_created')
 
 class CompetitorSalesAdmin(admin.ModelAdmin):
-    list_display = ('id','date','commodity','taobao_sales','taobao_total_sales','date_created')
+    list_display = ('id','date','commodity','taobao_sales','taobao_total_sales','jd_sales','jd_total_sales','date_created')
 
 class UserDistributionAdmin(admin.ModelAdmin):
-    list_display = ('id','date','location','active_user','is_native','date_created')
+    list_display = ('id','date','location','active_user','active_rate','new_user','new_rate','launch_data','launch_rate','is_native','date_created')
 
 class ErrorConditionAdmin(admin.ModelAdmin):
     list_display = ('id','date','total_error','date_created')

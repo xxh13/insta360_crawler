@@ -119,6 +119,7 @@ class BaiduBrowser(object):
         )
         # 获取api的结果信息，这里面保存了后面日期节点的一些加密值
         all_index_info = self.api.get_all_index_html(url)
+        print all_index_info
         indexes_enc = all_index_info['data'][type_name][0]['userIndexes_enc']
         enc_list = indexes_enc.split(',')
 

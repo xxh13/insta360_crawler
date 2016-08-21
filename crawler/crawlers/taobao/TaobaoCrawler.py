@@ -35,7 +35,7 @@ class TaobaoCrawler:
                 self.commodityList = []
                 self.start()
                 sales = self.getTotalSales()
-                today = datetime.datetime.now().strftime('%Y%m%d')
+                today = datetime.datetime.now().strftime('%Y-%m-%d')
                 temp = {'commodity': product, 'taobao_total_sales': sales, 'date':today}
                 result.append(temp)
             jsonResult = json.dumps(result)
@@ -50,22 +50,22 @@ class TaobaoCrawler:
                 pattern = re.compile('g_page_config = {.*?g_srp_loadCss', re.S)
                 items = re.findall(pattern, content)
                 jsonResult = items[0][16:-19]
-                print jsonResult
+                # print jsonResult
                 result = json.loads(jsonResult, encoding="utf-8")
-                print result
+                # print result
                 self.totalPage = result['mods']['pager']['data']['totalPage']
-                print self.totalPage
+                # print self.totalPage
             except urllib2.URLError, e:
                 if hasattr(e, "code"):
                     print e.code
                 if hasattr(e, "reason"):
                     print e.reason
 
-            if self.totalPage > 5 :
-                self.totalPage = 5
+            if self.totalPage > 3 :
+                self.totalPage = 3
             count = 1
             for i in range(1, self.totalPage+1):
-                print "page ",i ,":"
+                # print "page ",i ,":"
                 if i != 1:
                     try:
                         request = urllib2.Request(self.url+"&s="+str((i-1)*44), headers=self.headers)
@@ -74,7 +74,7 @@ class TaobaoCrawler:
                         pattern = re.compile('g_page_config = {.*?g_srp_loadCss', re.S)
                         items = re.findall(pattern, content)
                         jsonResult = items[0][16:-19]
-                        print jsonResult
+                        # print jsonResult
                         result = json.loads(jsonResult, encoding="utf-8")
                     except urllib2.URLError, e:
                         if hasattr(e, "code"):
@@ -95,8 +95,8 @@ class TaobaoCrawler:
                         commodity.setIsTmall(True)
                     if shopKeeper!="":
                         self.commodityList.append(commodity)
-                    print count
-                    commodity.show()
+                    # print count
+                    # commodity.show()
                     count += 1
             if self.product =='insta360 Nano':
                 self.filterNano()
@@ -121,7 +121,6 @@ class TaobaoCrawler:
                     del self.commodityList[i]
                     i -= 1
                 i += 1
-            print len(self.commodityList)
 
         def distinct(self):
             i = 0
@@ -168,7 +167,7 @@ class TaobaoCrawler:
         def showList(self):
             count = 1
             for commodity in self.commodityList:
-                print count
+                # print count
                 commodity.show()
                 count += 1
 
@@ -210,8 +209,6 @@ class TaobaoCrawler:
             headers['Connection'] = 'keep-alive'
             count = 1
             for commodity in self.commodityList:
-                print count
-                print commodity.id
                 shop = commodity.shopKeeper
                 headers['Referer'] = "http://h5.m.taobao.com/awp/core/detail.htm?id=" + str(commodity.id)
                 url = "http://api.m.taobao.com/h5/mtop.taobao.detail.getdetail/6.0/?appKey=12574478&t=1470231466683&sign=373d61685735e4e01e3a8d3593fdbd6c&api=mtop.taobao.detail.getdetail&v=6.0&ttid=2013%40taobao_h5_1.0.0&type=jsonp&dataType=jsonp&callback=mtopjsonp1&data=%7B%22itemNumId%22%3A%22" + str(commodity.id) + "%22%2C%22exParams%22%3A%22%7B%5C%22id%5C%22%3A%5C%22"+ str(commodity.id) +"%5C%22%7D%22%7D"
@@ -219,22 +216,21 @@ class TaobaoCrawler:
                 try:
                     response = urllib2.urlopen(request)
                     jsonData = response.read()
-                    print "result", jsonData
+                    # print "result", jsonData
                     result = json.loads(jsonData[11:-1], encoding="utf-8")
                     result1 = json.loads(result['data']['apiStack'][0]['value'], encoding="utf-8")
                     sales = result1['item']['sellCount']
-                    print result['data']['seller']['shopName']
+                    # print result['data']['seller']['shopName']
                     shop = result['data']['seller']['shopName']
                 except:
                     sales = 0
-                    print "Fail",commodity.id
-                print sales
+                    # print "Fail",commodity.id
+                # print sales
                 commodity.setSales(int(sales))
                 commodity.setShop(shop)
                 if count%40 == 0:
                     time.sleep(5)
                 count += 1
-                print
 
         def sort(self):
             self.commodityList.sort(key = lambda commodity: commodity.sales, reverse=True)

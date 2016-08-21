@@ -104,16 +104,23 @@ class UmengCrawler:
     def getTotalError(self, start_date, end_date):
         self.headers['Referer'] = 'http://mobile.umeng.com/apps/cf41008f4de85e761c647675/error_types/trend'
         request = urllib2.Request('http://mobile.umeng.com/apps/cf41008f4de85e761c647675/reports/load_chart_data?start_date=' + start_date + '&end_date=' + end_date + '&stats=error_count', headers=self.headers)
+        result = []
         try:
             response = urllib2.urlopen(request)
             jsonData = response.read()
-            result = json.loads(jsonData, encoding="utf-8")
-            return result['stats'][0]['data']
+            res = json.loads(jsonData, encoding="utf-8")
+            data =  res['stats'][0]['data']
+            dates = res['dates']
+            for index in range(len(dates)):
+                temp = {'date':dates[index], 'total_error':data[index]}
+                result.append(temp)
         except urllib2.URLError, e:
             if hasattr(e, "code"):
                 print e.code
             if hasattr(e, "reason"):
                 print e.reason
+        jsonResult = json.dumps(result)
+        return jsonResult
 
     def getErrorDetail(self, start_date, end_date):
         # start_date 必须在今天的前15天之后
@@ -162,6 +169,7 @@ class UmengCrawler:
                 print e.reason
         except KeyError:
             return {}
+
     def getUserDistribution(self, start_date, end_date):
         start = datetime.datetime.strptime(start_date, '%Y-%m-%d').date()
         end = datetime.datetime.strptime(end_date, '%Y-%m-%d').date()
@@ -170,11 +178,11 @@ class UmengCrawler:
             date = (end - datetime.timedelta(days=i)).strftime('%Y-%m-%d')
             city = self.getUserCityDistribution(date, date)
             for item in city:
-                temp = {'date':date, 'location':item['date'], 'active_user':item['active_data'], 'is_native':1}
+                temp = {'date':date, 'location':item['date'], 'active_user':item['active_data'], 'active_rate':item['active_rate'], 'new_user':item['install_data'], 'new_rate':item['install_rate'], 'launch_data':item['launch_data'], 'launch_rate':item['launch_rate'], 'is_native':1}
                 result.append(temp)
             country = self.getUserCountryDistribution(date, date)
             for item in country:
-                temp = {'date':date, 'location':item['date'], 'active_user':item['active_data'], 'is_native':0}
+                temp = {'date':date, 'location':item['date'], 'active_user':item['active_data'], 'active_rate':item['active_rate'], 'new_user':item['install_data'], 'new_rate':item['install_rate'], 'launch_data':item['launch_data'], 'launch_rate':item['launch_rate'], 'is_native':0}
                 result.append(temp)
         jsonResult = json.dumps(result)
         return jsonResult
@@ -187,8 +195,10 @@ class UmengCrawler:
         end = datetime.datetime.strptime(end_date, '%Y-%m-%d').date()
         for i in range((end - start).days + 1):
             date = (end - datetime.timedelta(days=i)).strftime('%Y-%m-%d')
-            duration = self.getDuration(date)
-            # print date,' ',newUser[i]['data'],' ',activeUser[i]['data'],' ',duration
+            durationStr = self.getDuration(date)
+            temp = durationStr.split(':')
+            duration = int(temp[0])*3600 + int(temp[1])*60 + int(temp[2])
+            print date,newUser[i]['data'],activeUser[i]['data'],duration
             temp = {'date':date, 'new_user':newUser[i]['data'], 'active_user':activeUser[i]['data'], 'duration':duration}
             result.append(temp)
         jsonResult = json.dumps(result)

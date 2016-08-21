@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>购买导流链接生成器</title>
+
+  <link href="//cdn.muicss.com/mui-0.6.9/css/mui.min.css" rel="stylesheet" type="text/css" />
+
+  <style type="text/css">
+    body {
+      font-family: "Microsoft YaHei"
+    }
+
+    .show {
+      display: inline;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <div class="mui-container">
+
+    <h2>购买导流链接生成器</h2>
+    <form id="target">
+
+      <div class="mui-textfield">
+        <label for="source">链接标题</label>
+        <input type="text" id="source" name="source" placeholder="链接标题">
+      </div>
+
+      <div class="mui-select">
+        <label>跳转目的链接</label>
+        <select id="select" name="type">
+                <option value="auto">自动区分</option>
+                <option value="custom">自定义</option>
+            </select>
+      </div>
+
+      <div class="mui-textfield custom-url-field hidden">
+        <label></label>
+        <input type="text" id="custom-url" name="url" value="http://">
+      </div>
+
+      <div class="mui-textfield">
+          <button type="submit" class="mui-btn mui-btn--raised mui--pull-right" value="生成链接">Submit</button>
+          <div class="mui--clearfix"></div>
+      </div>
+
+    </form>
+
+
+    <form class="result hidden">
+        <h2>生成结果</h2>
+        <div class="mui-row">
+            <div class="mui-col-md-10">
+                <div class="mui-textfield">
+                    <label for="source">链接地址</label>
+                    <input type="text" id="link-text" value="" placeholder="生成的链接" name="link-text">
+                </div>
+            </div>
+
+            <div class="mui-col-md-2 mui--text-right">
+                <a id="link-url" href="" target="_blank" class="mui-btn mui-btn--small mui-btn--primary mui-btn--raised">测试链接</a>
+                <button class="mui-btn mui-btn--small mui-btn--primary mui-btn--raised" id="copy">复制</button>
+            </div>
+        </div>
+    </form>
+
+  </div>
+
+  <script src="http://cdn.hcharts.cn/jquery/jquery-1.8.3.min.js"></script>
+  <script src="//cdn.bootcss.com/zclip/1.1.2/jquery.zclip.js"></script>
+  <script src="//cdn.muicss.com/mui-0.6.9/js/mui.min.js"></script>
+  <script>
+
+    $('#target').submit(function(ev) {
+
+        ev.preventDefault()
+
+        var source = $("#source").val()
+        var select = $("#select").val()
+        var para = "?source=" + source
+
+        if(select == "custom") {
+            var url = $("#custom-url").val()
+            para = para + "&url=" + encodeURI(url)
+        }
+
+        result = $.ajax({url:"http://nano.api.hk.insta360.com/nano/index/record_buy_link_name"+para,async:false});
+        data = JSON.parse(result.responseText)
+
+        if(data && data.buylink){
+            $("#link-text").val(data.buylink);
+            $("#link-url").attr("href",data.buylink);
+            $('.result').show()
+        }
+
+      });
+
+    $("#select").change(function() {
+        var val = $(this).val()
+        if(val == "custom") {
+            $(".custom-url-field").show()
+        } else {
+           $(".custom-url-field").hide()
+        }
+    });
+
+    $('#copy').zclip({
+        path: "//cdn.bootcss.com/zclip/1.1.2/ZeroClipboard.swf",
+        copy: function(){
+            return $('#link-url').attr("href");
+        },
+        afterCopy: function () {
+            alert("已成功复制！");
+        }
+    });
+
+</script>
+</body>
+
+</html>
