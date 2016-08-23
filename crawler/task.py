@@ -66,7 +66,7 @@ def get_baidu_index():
 def get_taobao_sales():
     result = ''
     while True:
-        try:  # 外包一层try
+        try:
             crawler = TaobaoCrawler()
             result = crawler.main()
             break
@@ -76,10 +76,10 @@ def get_taobao_sales():
     data = json.loads(result)
     for item in data:
         date = item['date']
-        temp = datetime.datetime.strptime(date, '%Y-%m-%d').date()
-        yesterday = (temp - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
+        # temp = datetime.datetime.strptime(date, '%Y-%m-%d').date()
+        # yesterday = (temp - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
         commodity = item['commodity']
-        old = CompetitorSales.objects.filter(date=yesterday, commodity=commodity).first()
+        old = CompetitorSales.objects.filter(date__lt=date, commodity=commodity).order_by('-date').first()
         if (old != None):
             if item['taobao_total_sales'] < old.taobao_total_sales * 0.7:
                 item['taobao_sales'] = item['taobao_total_sales']
@@ -97,7 +97,7 @@ def get_taobao_sales():
 def get_jd_sales():
     result = ''
     while True:
-        try:  # 外包一层try
+        try:
             crawler = JDCrawler()
             result = crawler.main()
             break
@@ -107,12 +107,17 @@ def get_jd_sales():
     data = json.loads(result)
     for item in data:
         date = item['date']
-        temp = datetime.datetime.strptime(date, '%Y-%m-%d').date()
-        yesterday = (temp - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
+        # temp = datetime.datetime.strptime(date, '%Y-%m-%d').date()
+        # yesterday = (temp - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
         commodity = item['commodity']
-        old = CompetitorSales.objects.filter(date=yesterday, commodity=commodity).first()
+        old = CompetitorSales.objects.filter(date__lt=date, commodity=commodity).order_by('-date').first()
         if (old != None):
-            item['jd_sales'] = item['jd_total_sales'] - old.jd_total_sales
+            if item['jd_total_sales'] < old.jd_total_sales * 0.7:
+                item['jd_sales'] = item['jd_total_sales']
+            elif item['jd_total_sales'] >= old.taobao_total_sales:
+                item['jd_sales'] = item['jd_total_sales'] - old.jd_total_sales
+            else:
+                item['jd_sales'] = 0
         else:
             item['jd_sales'] = item['jd_total_sales']
         CompetitorSales.objects.update_or_create(date=item['date'], commodity=item['commodity'], defaults = item)

@@ -15,7 +15,7 @@ from models import UseCondition
 from models import ErrorCondition
 from models import SearchIndex
 from models import CompetitorSales
-from task import get_user_distribution as t
+# from task import get_taobao_sales as t
 
 @csrf_exempt
 def sales_status(request):
@@ -443,7 +443,7 @@ def test(request):
     if request.method == 'POST':
         return HttpResponse('Task submitted.')
     elif request.method == 'GET':
-        t()
+        # t()
         return HttpResponse('Task submitted.')
     else:
         return HttpResponse('Error.')
