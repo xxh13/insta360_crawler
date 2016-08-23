@@ -80,7 +80,7 @@ class JDCrawler:
                     id = element.get_attribute("data-sku")
                     commodity = Commodity(name, price, comment, link, id)
                     self.commodityList.append(commodity)
-                    print count
+                    # print count
                     # commodity.show()
                     count += 1
             if self.product =='insta360 Nano':
@@ -153,7 +153,7 @@ class JDCrawler:
         def showList(self):
             count = 1
             for commodity in self.commodityList:
-                print count
+                # print count
                 commodity.show()
                 count += 1
 

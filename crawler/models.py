@@ -84,7 +84,7 @@ class ElectronicSales(models.Model):
     location = models.CharField(max_length=200)
     view = models.IntegerField(default=0)
     visitor = models.IntegerField(default=0)
-    payment = models.IntegerField(default=0)
+    payment = models.FloatField(default=0.0)
     number = models.IntegerField(default=0)
     buyer = models.IntegerField(default=0)
     date_created = models.DateTimeField(auto_now_add=True)
@@ -92,6 +92,17 @@ class ElectronicSales(models.Model):
     def __unicode__(self):
         return str(self.id)
 
+
+class Log(models.Model):
+    username = models.CharField(max_length=200)
+    week = models.DateField(auto_now=False, auto_now_add=False)
+    table = models.CharField(max_length=200)
+    operator = models.CharField(max_length=200)
+    location = models.CharField(max_length=200)
+    date_created = models.DateTimeField(auto_now_add=True)
+
+    def __unicode__(self):
+        return str(self.id)
 
 # class Content(models.Model):
 #     image = models.CharField(max_length=200)

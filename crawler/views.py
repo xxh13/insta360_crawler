@@ -15,6 +15,7 @@ from models import UseCondition
 from models import ErrorCondition
 from models import SearchIndex
 from models import CompetitorSales
+from models import Log
 # from task import get_taobao_sales as t
 
 @csrf_exempt
@@ -23,13 +24,30 @@ def sales_status(request):
         body = json.loads(request.body, encoding='utf-8')
         data = body['data']
         week = body['week']
+        username =body['username']
+        table = '国内销售'
         is_native = body['is_native']
+        if is_native == 0:
+            table = '海外销售'
         week_date = datetime.datetime.strptime(week, '%Y-%m-%d').date()
         next_week = (week_date + datetime.timedelta(days=7)).strftime('%Y-%m-%d')
-        SalesStatus.objects.filter(week=week, is_native=is_native).delete()
+        old = SalesStatus.objects.filter(week=week, is_native=is_native).values('location')
+        s = set()
+        for item in old:
+            s.add(item['location'])
         for item in data:
-            SalesStatus.objects.update_or_create(week=item['week'], location=item['location'], defaults=item)
+            result = SalesStatus.objects.update_or_create(week=item['week'], location=item['location'], defaults=item)
+            if result[1]:
+                operator = 'add'
+            else:
+                operator = 'update'
+            Log.objects.create(username=username,week=item['week'],table=table,location=item['location'],operator=operator)
             SalesStatus.objects.update_or_create(week=next_week, location=item['location'], is_native=is_native)
+            if item['location'] in s:
+                s.remove(item['location'])
+        for i in s:
+            SalesStatus.objects.filter(week=week, is_native=is_native, location=i).delete()
+            Log.objects.create(username=username,week=week,table=table,location=i,operator='delete')
         return HttpResponse('Task submitted.')
     elif request.method == 'GET':
         para = request.GET
@@ -119,12 +137,28 @@ def electronic_sales(request):
         body = json.loads(request.body, encoding='utf-8')
         data = body['data']
         week = body['week']
+        username =body['username']
+        table = '电商销售'
         week_date = datetime.datetime.strptime(week, '%Y-%m-%d').date()
         next_week = (week_date + datetime.timedelta(days=7)).strftime('%Y-%m-%d')
-        ElectronicSales.objects.filter(week=week).delete()
+        old = ElectronicSales.objects.filter(week=week).values('location')
+        s = set()
+        for item in old:
+            s.add(item['location'])
+        # ElectronicSales.objects.filter(week=week).delete()
         for item in data:
-            ElectronicSales.objects.update_or_create(week=item['week'], location=item['location'], defaults=item)
+            result = ElectronicSales.objects.update_or_create(week=item['week'], location=item['location'], defaults=item)
+            if result[1]:
+                operator = 'add'
+            else:
+                operator = 'update'
+            Log.objects.create(username=username,week=item['week'],table=table,location=item['location'],operator=operator)
             ElectronicSales.objects.update_or_create(week=next_week, location=item['location'])
+            if item['location'] in s:
+                s.remove(item['location'])
+        for i in s:
+            ElectronicSales.objects.filter(week=week, location=i).delete()
+            Log.objects.create(username=username, week=week, table=table, location=i, operator='delete')
         return HttpResponse('Task submitted.')
     elif request.method == 'GET':
         para = request.GET
@@ -424,11 +458,12 @@ def login(request):
         user = authenticate(username=username, password=password)
         if user is not None:
             if user.is_active:
+                username = user.get_username()
                 res = []
                 groups = user.groups.all()
                 for group in groups:
                     res.append(group.name)
-                return JsonResponse({'result':True, 'group':res},safe=False)
+                return JsonResponse({'result':True,'username':username, 'group':res},safe=False)
             else:
                 return JsonResponse({'result':False},safe=False)
 

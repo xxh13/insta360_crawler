@@ -6,6 +6,7 @@ from .models import UserDistribution
 from .models import SalesStatus
 from .models import ElectronicSales
 from .models import ErrorCondition
+from .models import Log
 
 # Register your models here.
 class UseConditionAdmin(admin.ModelAdmin):
@@ -29,6 +30,9 @@ class SalesStatusAdmin(admin.ModelAdmin):
 class ElectronicSalesAdmin(admin.ModelAdmin):
     list_display = ('id', 'week', 'location', 'view', 'visitor', 'payment', 'number', 'buyer', 'date_created')
 
+class LogAdmin(admin.ModelAdmin):
+    list_display = ('id', 'week', 'username', 'table', 'operator', 'location', 'date_created')
+
 admin.site.register(UseCondition, UseConditionAdmin)
 admin.site.register(SearchIndex, SearchIndexAdmin)
 admin.site.register(CompetitorSales, CompetitorSalesAdmin)
@@ -36,3 +40,4 @@ admin.site.register(UserDistribution, UserDistributionAdmin)
 admin.site.register(ErrorCondition, ErrorConditionAdmin)
 admin.site.register(SalesStatus, SalesStatusAdmin)
 admin.site.register(ElectronicSales, ElectronicSalesAdmin)
+admin.site.register(Log, LogAdmin)
