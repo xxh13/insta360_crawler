@@ -7,10 +7,8 @@ from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.support.ui import WebDriverWait
 import datetime
 import time
-import urllib2
 import json
 from Commodity import Commodity
-import re
 
 
 class JDCrawler:
