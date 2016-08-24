@@ -9,7 +9,7 @@ import uuid
 class UseCondition(models.Model):
     new_user = models.IntegerField(default=0)
     active_user = models.IntegerField(default=0)
-    duration = models.CharField(max_length=200)
+    duration = models.IntegerField(default=0)
     date = models.DateField(auto_now=False, auto_now_add=False)
     date_created = models.DateTimeField(auto_now_add=True)
 
@@ -31,6 +31,8 @@ class CompetitorSales(models.Model):
     commodity = models.CharField(max_length=200)
     taobao_sales = models.IntegerField(default=0)
     taobao_total_sales = models.IntegerField(default=0)
+    jd_sales = models.IntegerField(default=0)
+    jd_total_sales = models.IntegerField(default=0)
     date = models.DateField(auto_now=False, auto_now_add=False)
     date_created = models.DateTimeField(auto_now_add=True)
 
@@ -40,6 +42,11 @@ class CompetitorSales(models.Model):
 class UserDistribution(models.Model):
     location = models.CharField(max_length=200)
     active_user = models.IntegerField(default=0)
+    active_rate = models.FloatField(default=0.0)
+    new_user = models.IntegerField(default=0)
+    new_rate = models.FloatField(default=0.0)
+    launch_data = models.IntegerField(default=0)
+    launch_rate = models.FloatField(default=0.0)
     date = models.DateField(auto_now=False, auto_now_add=False)
     is_native = models.IntegerField(default=0)
     date_created = models.DateTimeField(auto_now_add=True)
@@ -77,7 +84,7 @@ class ElectronicSales(models.Model):
     location = models.CharField(max_length=200)
     view = models.IntegerField(default=0)
     visitor = models.IntegerField(default=0)
-    payment = models.IntegerField(default=0)
+    payment = models.FloatField(default=0.0)
     number = models.IntegerField(default=0)
     buyer = models.IntegerField(default=0)
     date_created = models.DateTimeField(auto_now_add=True)
@@ -85,6 +92,17 @@ class ElectronicSales(models.Model):
     def __unicode__(self):
         return str(self.id)
 
+
+class Log(models.Model):
+    username = models.CharField(max_length=200)
+    week = models.DateField(auto_now=False, auto_now_add=False)
+    table = models.CharField(max_length=200)
+    operator = models.CharField(max_length=200)
+    location = models.CharField(max_length=200)
+    date_created = models.DateTimeField(auto_now_add=True)
+
+    def __unicode__(self):
+        return str(self.id)
 
 # class Content(models.Model):
 #     image = models.CharField(max_length=200)
