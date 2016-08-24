@@ -11,7 +11,7 @@ class UmengCrawler:
         cap["phantomjs.page.settings.resourceTimeout"] = 1000
         cap["phantomjs.page.settings.loadImages"] = False
         cap["phantomjs.page.settings.localToRemoteUrlAccessEnabled"] = True
-        self.driver = webdriver.PhantomJS(desired_capabilities=cap)
+        self.driver = webdriver.PhantomJS(desired_capabilities=cap, service_args=['--ignore-ssl-errors=true','--ssl-protocol=any', '--web-security=true'])
         # self.driver = webdriver.Chrome()
         self.host = 'mobile.umeng.com'
         self.username = 'develop@arashivision.com'
