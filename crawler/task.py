@@ -29,13 +29,17 @@ def get_use_condition():
     end_date = today.strftime('%Y-%m-%d')
     start_date = (today - datetime.timedelta(days=6)).strftime('%Y-%m-%d')
     result = ''
+    count = 0
     while True:
         try:
+            count += 1
             crawler = UmengCrawler()
             result = crawler.getUseCondition(start_date, end_date)
             break
         except:
             print 'error'
+            if count >= 3:
+                break
             time.sleep(5)
     data = json.loads(result)
     for item in data:
@@ -49,12 +53,16 @@ def get_baidu_index():
     end_date = today.strftime('%Y-%m-%d')
     start_date = (today - datetime.timedelta(days=6)).strftime('%Y-%m-%d')
     result = ''
+    count = 0
     while True:
         try:
+            count += 1
             result = baidu_index(start_date, end_date)
             break
         except:
             print 'error'
+            if count >= 3:
+                break
             time.sleep(5)
     data = json.loads(result)
     for item in data:
@@ -65,13 +73,17 @@ def get_baidu_index():
 @shared_task
 def get_taobao_sales():
     result = ''
+    count = 0
     while True:
         try:
+            count += 1
             crawler = TaobaoCrawler()
             result = crawler.main()
             break
         except:
             print 'error'
+            if count >= 3:
+                break
             time.sleep(5)
     data = json.loads(result)
     for item in data:
@@ -96,13 +108,17 @@ def get_taobao_sales():
 @shared_task
 def get_jd_sales():
     result = ''
+    count = 0
     while True:
         try:
+            count += 1
             crawler = JDCrawler()
             result = crawler.main()
             break
         except:
             print 'error'
+            if count >= 3:
+                break
             time.sleep(5)
     data = json.loads(result)
     for item in data:
@@ -130,13 +146,17 @@ def get_error():
     end_date = today.strftime('%Y-%m-%d')
     start_date = (today - datetime.timedelta(days=6)).strftime('%Y-%m-%d')
     result = ''
+    count = 0
     while True:
         try:
+            count += 1
             crawler = UmengCrawler()
             result = crawler.getTotalError(start_date, end_date)
             break
         except:
             print 'error'
+            if count >= 3:
+                break
             time.sleep(5)
     data = json.loads(result)
     for item in data:
@@ -150,13 +170,17 @@ def get_user_distribution():
     end_date = today.strftime('%Y-%m-%d')
     start_date = (today - datetime.timedelta(days=6)).strftime('%Y-%m-%d')
     result = ''
+    count = 0
     while True:
         try:
+            count += 1
             crawler = UmengCrawler()
             result = crawler.getUserDistribution(start_date, end_date)
             break
         except:
             print 'error'
+            if count >= 3:
+                break
             time.sleep(5)
     data = json.loads(result)
     for item in data:
