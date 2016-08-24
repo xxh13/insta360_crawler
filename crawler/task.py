@@ -28,7 +28,7 @@ def get_use_condition():
     today = datetime.datetime.today()
     end_date = today.strftime('%Y-%m-%d')
     start_date = (today - datetime.timedelta(days=6)).strftime('%Y-%m-%d')
-    result = ''
+    result = '[]'
     count = 0
     while True:
         try:
@@ -52,7 +52,7 @@ def get_baidu_index():
     today = datetime.datetime.today()
     end_date = today.strftime('%Y-%m-%d')
     start_date = (today - datetime.timedelta(days=6)).strftime('%Y-%m-%d')
-    result = ''
+    result = '[]'
     count = 0
     while True:
         try:
@@ -72,7 +72,7 @@ def get_baidu_index():
 
 @shared_task
 def get_taobao_sales():
-    result = ''
+    result = '[]'
     count = 0
     while True:
         try:
@@ -107,7 +107,7 @@ def get_taobao_sales():
 
 @shared_task
 def get_jd_sales():
-    result = ''
+    result = '[]'
     count = 0
     while True:
         try:
@@ -145,7 +145,7 @@ def get_error():
     today = datetime.datetime.today()
     end_date = today.strftime('%Y-%m-%d')
     start_date = (today - datetime.timedelta(days=6)).strftime('%Y-%m-%d')
-    result = ''
+    result = '[]'
     count = 0
     while True:
         try:
@@ -169,7 +169,7 @@ def get_user_distribution():
     today = datetime.datetime.today()
     end_date = today.strftime('%Y-%m-%d')
     start_date = (today - datetime.timedelta(days=6)).strftime('%Y-%m-%d')
-    result = ''
+    result = '[]'
     count = 0
     while True:
         try:
