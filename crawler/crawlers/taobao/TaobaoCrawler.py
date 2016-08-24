@@ -3,9 +3,6 @@ import socket
 
 timeout = 9999
 socket.setdefaulttimeout(timeout)
-from selenium import webdriver
-from selenium.common.exceptions import NoSuchElementException
-from selenium.webdriver.support.ui import WebDriverWait
 import datetime
 import time
 import urllib2
