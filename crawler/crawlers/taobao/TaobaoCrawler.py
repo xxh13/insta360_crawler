@@ -16,7 +16,7 @@ class TaobaoCrawler:
             self.product = 'insta360 Nano'
             self.keyword = self.product.replace(' ','+')
             self.date = time.strftime('%Y%m%d', time.localtime(time.time()))
-            self.url = "https://s.taobao.com/search?q="+self.keyword+"&imgfile=&js=1&stats_click=search_radio_all%3A1&initiative_id=staobaoz_"+self.date+"&ie=utf8"+"sort=sale-desc"
+            self.url = "https://s.taobao.com/search?q="+self.keyword+"&imgfile=&js=1&stats_click=search_radio_all%3A1&initiative_id=staobaoz_"+self.date+"&ie=utf8"+"&sort=sale-desc"
             self.commodityList = []
             self.totalPage = 0
             user_agent = 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:47.0) Gecko/20100101 Firefox/47.0'
