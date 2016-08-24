@@ -41,7 +41,7 @@ SECRET_KEY = 'i+289e(fnb$@1ruz3gzu)uao%05nuuaqnt_@e+r1q!@cc8+o(l'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG = True
-DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
+DEBUG = os.environ.get('DJANGO_DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = ["*"]
 
@@ -100,27 +100,30 @@ WSGI_APPLICATION = 'internal_insta360.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        # 'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        'NAME': os.path.join(BASE_DIR, os.environ.get('DJANGO_DB', 'db.sqlite3')),
+if DEBUG:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            # 'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+            'NAME': os.path.join(BASE_DIR, os.environ.get('DJANGO_DB', 'db.sqlite3')),
+        }
     }
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.mysql',
-    #     'NAME': 'internal_insta360',
-    #     'USER': 'root',
-    #     'PASSWORD': 'mysql',
-    #     'HOST': '127.0.0.1',
-    #     'PORT': '3306',
-    #     'OPTIONS': {
-    #         'init_command': 'SET default_storage_engine=INNODB,character_set_connection=utf8,collation_connection=utf8_unicode_ci',
-    #     },
-    #
-    # }
-}
-
-
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': 'insta360_internal',
+            'USER': 'ins_internal',
+            'PASSWORD': 'insta360_internal',
+            'HOST': 'rm-j6cxs806gmf79r5x1.mysql.rds.aliyuncs.com',
+            'PORT': '3306',
+            'OPTIONS': {
+                'init_command': 'SET default_storage_engine=INNODB,character_set_connection=utf8,collation_connection=utf8_unicode_ci',
+            },
+        
+        }
+    }
+    
 # Password validation
 # https://docs.djangoproject.com/en/1.9/ref/settings/#auth-password-validators
 
