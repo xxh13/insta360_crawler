@@ -21,7 +21,7 @@ class BaiduBrowser(object):
         else:
             browser_driver_name = config.browser_driver
         browser_driver_class = getattr(webdriver, browser_driver_name)
-        self.browser = browser_driver_class()
+        self.browser = browser_driver_class(service_args=['--ignore-ssl-errors=true','--ssl-protocol=any', '--web-security=true'])
         # 设置超时时间
         self.browser.set_page_load_timeout(50)
         # 设置脚本运行超时时间
