@@ -7,7 +7,7 @@ import json
 from datetime import datetime, timedelta
 
 from selenium import webdriver
-
+from selenium.common.exceptions import WebDriverException
 import config
 from api import Api
 from utils.log import logger
@@ -215,8 +215,10 @@ class BaiduBrowser(object):
         ps_obj = self.browser.find_element_by_id('TANGRAM__PSP_3__password')
         ps_obj.send_keys(password)
         sub_obj = self.browser.find_element_by_id('TANGRAM__PSP_3__submit')
-        sub_obj.click()
-
+        try:
+            sub_obj.click()
+        except WebDriverException, e:
+            print e
         # 如果页面的url没有改变，则继续等待
         while self.browser.current_url == login_url:
             time.sleep(1)
