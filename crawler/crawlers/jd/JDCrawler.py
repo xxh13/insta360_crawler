@@ -164,9 +164,9 @@ class JDCrawler:
         def sort(self):
             self.commodityList.sort(key = lambda commodity: commodity.sales, reverse=True)
 
-#
-# if __name__ == "__main__":
-#     reload(sys)
-#     sys.setdefaultencoding('utf-8')
-#     jd = JDCrawler()
-#     jd.main()
+
+if __name__ == "__main__":
+    reload(sys)
+    sys.setdefaultencoding('utf-8')
+    jd = JDCrawler()
+    jd.main()

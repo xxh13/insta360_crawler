@@ -46,3 +46,6 @@ def baidu_index(start_date,end_date):
             print traceback.format_exc()
     jsonResult = json.dumps(data_list)
     return jsonResult
+
+if __name__=="__main__":
+    baidu_index('2016-08-08', '2016-08-12')
