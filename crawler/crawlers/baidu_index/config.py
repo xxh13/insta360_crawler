@@ -42,7 +42,7 @@ end_date = '2016-07-05'
 # 输出的文件夹路径，可以自定义
 out_file_path = './data/out'
 # 关键词任务的文件路径，可以自定义
-keywords_task_file_path = 'crawler/crawlers/baidu_index/task.txt'
+keywords_task_file_path = 'task.txt'
 
 # 要获取趋势的类别，默认是三种趋势都获取。all代表整体趋势，pc代表PC趋势, wise代表移动趋势
 index_type_list = ['all']  #, 'pc', 'wise'

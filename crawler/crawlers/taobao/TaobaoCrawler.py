@@ -231,3 +231,8 @@ class TaobaoCrawler:
 
         def sort(self):
             self.commodityList.sort(key = lambda commodity: commodity.sales, reverse=True)
+
+
+if __name__=="__main__":
+    crawler = TaobaoCrawler()
+    print crawler.main()

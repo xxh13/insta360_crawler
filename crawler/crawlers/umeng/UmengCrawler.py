@@ -1,24 +1,19 @@
 #-*- coding: UTF-8 -*-
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
-import datetime
-import urllib2
+from selenium.common.exceptions import WebDriverException
+import datetime, time
+import urllib2, urllib
+import re
 import json
-
+import cookielib
 class UmengCrawler:
     def __init__(self):
-        cap = webdriver.DesiredCapabilities.PHANTOMJS
-        cap["phantomjs.page.settings.resourceTimeout"] = 1000
-        cap["phantomjs.page.settings.loadImages"] = False
-        cap["phantomjs.page.settings.localToRemoteUrlAccessEnabled"] = True
-        self.driver = webdriver.PhantomJS(desired_capabilities=cap, service_args=['--ignore-ssl-errors=true','--ssl-protocol=any', '--web-security=true'])
-        # self.driver = webdriver.Chrome()
         self.host = 'mobile.umeng.com'
         self.username = 'develop@arashivision.com'
         self.password = ')8x3CpA$'
         self.user_agent = 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:47.0) Gecko/20100101 Firefox/47.0'
         self.cookie = ''
-
         self.headers = {}
         self.headers['User-Agent'] = self.user_agent
         self.headers['Host'] = self.host
@@ -31,29 +26,37 @@ class UmengCrawler:
         self.start()
 
     def start(self):
-        self.driver.get("https://i.umeng.com/")
+        request = urllib2.Request('https://i.umeng.com')
+        response = urllib2.urlopen(request)
+        page = response.read()
+        pattern = re.compile("token: '.*'", re.S)
+        items = re.findall(pattern, page)
+        token = items[0][8:40]
+        pattern = re.compile("sessionid: '.*'", re.S)
+        items = re.findall(pattern, page)
+        sessionid = items[0][12:52]
+        date = str(int(time.time()))
+        cookie = cookielib.CookieJar()
+        handler = urllib2.HTTPCookieProcessor(cookie)
+        opener = urllib2.build_opener(handler)
 
-        element = self.driver.find_element_by_xpath("//*[@id='ump']/div[1]/div/form/div[1]/ul/li[1]/div/label/input")
-        element.clear()
-        element.send_keys(self.username)
-
-        element = self.driver.find_element_by_xpath("//*[@id='ump']/div[1]/div/form/div[1]/ul/li[2]/label/input")
-        element.clear()
-        element.send_keys(self.password)
-
-        element = self.driver.find_element_by_id("submitForm")
-        element.click()
-
-        wait = WebDriverWait(self.driver, 10)
-        element = wait.until(
-            lambda x: x.find_element_by_xpath("//*[@id='app']/div/div/main/div/div[1]/div/div/a[2]"))
-        element.click()
-
-        cookies = self.driver.get_cookies()
-        for cookie in cookies:
-            # print cookie['name'] + ' : ' + cookie['value']
-            self.cookie = self.cookie + cookie['name'] + '=' + cookie['value'] + ';'
-        self.driver.quit()
+        values = {'token': token, 'username': self.username, 'password': self.password, 'website':'umengplus', 'sig':'','sessionid':'','app_id':'','url':''}
+        headers = {}
+        headers['User-Agent'] = self.user_agent
+        headers['Host'] = 'i.umeng.com'
+        headers['X-Requested-With'] = 'XMLHttpRequest'
+        headers['Connection'] = 'keep-alive'
+        headers['Referer'] = 'https://i.umeng.com/'
+        headers['Accept'] = '*/*'
+        headers['Content-Length'] = '141'
+        headers['Accept-Language'] = 'zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3'
+        headers['Cookie'] = '"_uab_collina=147003374645454333577887; CNZZDATA1258498910=1811473854-1470033345-%7C' + date + '; l=Al5e4Lp4E3ELprr25VQtL1jijv-gjSKb; isg=AsDAv10dgz1iZH8ZBR9Gkm3Jkk61t6QTerYlFDpRHltstWLf4lv0o0RPu4eZ; cna=m6slEI92cRUCATo8eHdZ2zu1; pgv_pvi=9910472704; _ga=GA1.2.425559374.1470034774; um_lang=zh; cn_1259864772_dplus=%7B%22distinct_id%22%3A%20%221564f05caab5bc-0dfe620d9c6d14-13666c4a-1fa400-1564f05caac623%22%2C%22%E6%98%AF%E5%90%A6%E7%99%BB%E5%BD%95%22%3A%20false%2C%22%24_sessionid%22%3A%200%2C%22%24_sessionTime%22%3A%201471500672%2C%22%24dp%22%3A%200%2C%22%24_sessionPVTime%22%3A%201471500672%2C%22initial_view_time%22%3A%20%221470385261%22%2C%22initial_referrer%22%3A%20%22http%3A%2F%2Fmobile.umeng.com%2Fapps%2F7e71006215a55f0ed1313175%2Freports%2Frealtime_summary%22%2C%22initial_referrer_domain%22%3A%20%22mobile.umeng.com%22%2C%22%24recent_outside_referrer%22%3A%20%22%24direct%22%7D; UMPLUSCENTER=' + sessionid + '; __ufrom=https://i.umeng.com/user/products; pgv_si=s1276146688; cn_a61627694930aa9c80cf_dplus=%7B%22distinct_id%22%3A%20%2215644d6da2f6c4-0ab3e3fe06fb2c-13666c4a-1fa400-15644d6da30649%22%2C%22%24_sessionid%22%3A%201%2C%22%24_sessionTime%22%3A%201472107624%2C%22%24dp%22%3A%200%2C%22%24_sessionPVTime%22%3A%201472107624%2C%22initial_view_time%22%3A%20%221470033345%22%2C%22initial_referrer%22%3A%20%22%24direct%22%2C%22initial_referrer_domain%22%3A%20%22%24direct%22%2C%22%24recent_outside_referrer%22%3A%20%22%24direct%22%2C%22%E7%94%A8%E6%88%B7%E5%90%8D%22%3A%20%22develop%40arashivision.com%22%7D; umengplus_name=develop%40arashivision.com; umplusuuid=47df653d80020a28ea83af935ad8d6e0; umplusappid=umcenter"'
+        data = urllib.urlencode(values)
+        request = urllib2.Request(url='https://i.umeng.com/login/ajax_do',data=data,headers=headers)
+        result = opener.open(request)
+        print result.read()
+        for c in cookie:
+            self.cookie = self.cookie + c.name + '=' + c.value + ';'
         self.headers['Cookie'] = self.cookie
 
     def getNewUser(self, start_date, end_date):
@@ -203,3 +206,7 @@ class UmengCrawler:
             result.append(temp)
         jsonResult = json.dumps(result)
         return jsonResult
+
+if __name__=="__main__":
+    crawler = UmengCrawler()
+    print crawler.getUseCondition('2016-08-08','2016-08-12')
