@@ -1,5 +1,8 @@
 #-*- coding: UTF-8 -*-
 import socket, sys
+import sys
+reload(sys)
+sys.setdefaultencoding("utf-8")
 timeout = 99999999
 socket.setdefaulttimeout(timeout)
 from selenium import webdriver
