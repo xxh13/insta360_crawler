@@ -430,14 +430,14 @@ def competitor_data(request):
             temp = collections.OrderedDict()
             if source == 'all':
                 for item in res_temp:
-                    temp[item.commodity + ' 淘宝'] = item.taobao_sales
-                    temp[item.commodity + ' 京东'] = item.jd_sales
+                    temp[item.commodity + ' 淘宝'] = item.taobao_total_sales
+                    temp[item.commodity + ' 京东'] = item.jd_total_sales
             elif source == 'taobao':
                 for item in res_temp:
-                    temp[item.commodity + ' 淘宝'] = item.taobao_sales
+                    temp[item.commodity + ' 淘宝'] = item.taobao_total_sales
             elif source == 'jd':
                 for item in res_temp:
-                    temp[item.commodity + ' 京东'] = item.jd_sales
+                    temp[item.commodity + ' 京东'] = item.jd_total_sales
             result[date.strftime('%m-%d')] = temp
         return JsonResponse(result,safe=False)
     else:
