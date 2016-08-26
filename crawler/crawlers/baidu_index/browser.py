@@ -4,6 +4,7 @@
 import time
 import urllib
 import json
+import sys
 from datetime import datetime, timedelta
 
 from selenium import webdriver
@@ -215,13 +216,19 @@ class BaiduBrowser(object):
         ps_obj = self.browser.find_element_by_id('TANGRAM__PSP_3__password')
         ps_obj.send_keys(password)
         sub_obj = self.browser.find_element_by_id('TANGRAM__PSP_3__submit')
+        # ver_obj = self.browser.find_element_by_id('TANGRAM__PSP_3__verifyCodeImgWrapper')
+        # print ver_obj
         try:
             sub_obj.click()
         except WebDriverException, e:
             print e
         # 如果页面的url没有改变，则继续等待
+        count = 0
         while self.browser.current_url == login_url:
             time.sleep(1)
+            count += 1
+            if count >=20:
+                sys.exit()
 
     def close(self):
         self.browser.quit()
