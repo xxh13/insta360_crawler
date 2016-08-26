@@ -16,7 +16,7 @@ from models import ErrorCondition
 from models import SearchIndex
 from models import CompetitorSales
 from models import Log
-# from task import get_taobao_sales as t
+# from task import get_jd_sales as t
 
 @csrf_exempt
 def sales_status(request):
