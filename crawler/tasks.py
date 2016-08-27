@@ -20,6 +20,7 @@ logger = get_task_logger(__name__)
 
 @shared_task
 def test(a, b):
+    print a + b
     return a+b
 
 
