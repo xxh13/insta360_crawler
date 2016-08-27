@@ -62,7 +62,7 @@ def sales_status(request):
         else:
             weeks = SalesStatus.objects.filter(is_native=is_native).order_by('-week')
             for item in weeks:
-                 week = item.week
+                 week = (item.week - datetime.timedelta(days=7)).strftime('%Y-%m-%d')
                  break
         data = []
         res = SalesStatus.objects.filter(week=week, is_native=is_native)
@@ -170,7 +170,7 @@ def electronic_sales(request):
         else:
             weeks = ElectronicSales.objects.dates('week', 'day', order='DESC')
             for item in weeks:
-                week = item
+                week = (item - datetime.timedelta(days=7)).strftime('%Y-%m-%d')
                 break
         data = []
         res = ElectronicSales.objects.filter(week=week)
