@@ -16,7 +16,7 @@ from models import ErrorCondition
 from models import SearchIndex
 from models import CompetitorSales
 from models import Log
-# from task import get_taobao_sales as t
+# from task import get_jd_sales as t
 
 @csrf_exempt
 def sales_status(request):
@@ -62,7 +62,7 @@ def sales_status(request):
         else:
             weeks = SalesStatus.objects.filter(is_native=is_native).order_by('-week')
             for item in weeks:
-                 week = item.week
+                 week = (item.week - datetime.timedelta(days=7)).strftime('%Y-%m-%d')
                  break
         data = []
         res = SalesStatus.objects.filter(week=week, is_native=is_native)
@@ -170,7 +170,7 @@ def electronic_sales(request):
         else:
             weeks = ElectronicSales.objects.dates('week', 'day', order='DESC')
             for item in weeks:
-                week = item
+                week = (item - datetime.timedelta(days=7)).strftime('%Y-%m-%d')
                 break
         data = []
         res = ElectronicSales.objects.filter(week=week)
@@ -430,14 +430,14 @@ def competitor_data(request):
             temp = collections.OrderedDict()
             if source == 'all':
                 for item in res_temp:
-                    temp[item.commodity + ' 淘宝'] = item.taobao_sales
-                    temp[item.commodity + ' 京东'] = item.jd_sales
+                    temp[item.commodity + ' 淘宝'] = item.taobao_total_sales
+                    temp[item.commodity + ' 京东'] = item.jd_total_sales
             elif source == 'taobao':
                 for item in res_temp:
-                    temp[item.commodity + ' 淘宝'] = item.taobao_sales
+                    temp[item.commodity + ' 淘宝'] = item.taobao_total_sales
             elif source == 'jd':
                 for item in res_temp:
-                    temp[item.commodity + ' 京东'] = item.jd_sales
+                    temp[item.commodity + ' 京东'] = item.jd_total_sales
             result[date.strftime('%m-%d')] = temp
         return JsonResponse(result,safe=False)
     else:

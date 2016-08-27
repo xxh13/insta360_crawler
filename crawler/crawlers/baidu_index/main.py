@@ -15,9 +15,9 @@ def baidu_index(start_date,end_date):
 
     s = BaiduBrowser()
 
-    fp = open(config.keywords_task_file_path, 'rb')
-    task_list = fp.readlines()
-    fp.close()
+    # fp = open(config.keywords_task_file_path, 'rb')
+    task_list = ['insta360','gear 360','theta s','okaa','eyesir','ZMER','VR相机','全景相机','全景摄像头']
+    # fp.close()
 
     root = os.path.dirname(os.path.realpath(__file__))
     result_folder = os.path.join(root, config.out_file_path)
@@ -42,6 +42,7 @@ def baidu_index(start_date,end_date):
                     value = baidu_index_dict[date]
                     temp = {'key': keyword_unicode, 'date': date, 'baidu_index': value}
                     data_list.append(temp)
+                    print temp
         except:
             print traceback.format_exc()
     jsonResult = json.dumps(data_list)

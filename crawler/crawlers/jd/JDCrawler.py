@@ -1,5 +1,8 @@
 #-*- coding: UTF-8 -*-
 import socket, sys
+import sys
+reload(sys)
+sys.setdefaultencoding("utf-8")
 timeout = 99999999
 socket.setdefaulttimeout(timeout)
 from selenium import webdriver
@@ -74,6 +77,7 @@ class JDCrawler:
                     temp = temp.replace('+','')
                     temp = temp.replace('万', '')
                     comment = int(temp)
+                    print comment
                     link = element.find_element_by_xpath("div/div[@class='p-img']/a").get_attribute("href")
                     id = element.get_attribute("data-sku")
                     commodity = Commodity(name, price, comment, link, id)

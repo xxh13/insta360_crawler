@@ -1,6 +1,8 @@
 #-*- coding: UTF-8 -*-
+import sys
+reload(sys)
+sys.setdefaultencoding("utf-8")
 import socket
-
 timeout = 9999
 socket.setdefaulttimeout(timeout)
 import datetime
@@ -28,12 +30,13 @@ class TaobaoCrawler:
             for product in products:
                 self.product = product
                 self.keyword = self.product.replace(' ', '+')
-                self.url = "https://s.taobao.com/search?q=" + self.keyword + "&imgfile=&js=1&stats_click=search_radio_all%3A1&initiative_id=staobaoz_" + self.date + "&ie=utf8" + "sort=sale-desc"
+                self.url = "https://s.taobao.com/search?q=" + self.keyword + "&imgfile=&js=1&stats_click=search_radio_all%3A1&initiative_id=staobaoz_" + self.date + "&ie=utf8" + "&sort=sale-desc"
                 self.commodityList = []
                 self.start()
                 sales = self.getTotalSales()
                 today = datetime.datetime.now().strftime('%Y-%m-%d')
                 temp = {'commodity': product, 'taobao_total_sales': sales, 'date':today}
+                print temp
                 result.append(temp)
             jsonResult = json.dumps(result)
             return jsonResult
@@ -222,7 +225,7 @@ class TaobaoCrawler:
                 except:
                     sales = 0
                     # print "Fail",commodity.id
-                # print sales
+                print sales
                 commodity.setSales(int(sales))
                 commodity.setShop(shop)
                 if count%40 == 0:

@@ -4,6 +4,7 @@
 import time
 import urllib
 import json
+import sys
 from datetime import datetime, timedelta
 
 from selenium import webdriver
@@ -15,7 +16,7 @@ from multi_thread import WorkManager
 
 
 class BaiduBrowser(object):
-    def __init__(self, cookie_json='', check_login=True):
+    def __init__(self, cookie_json='[{"domain": ".www.baidu.com", "name": "bdime", "expires": "\u5468\u4e00, 20 8\u6708 2046 02:19:54 GMT", "value": "0", "expiry": 2418344394, "path": "/", "httponly": false, "secure": false}, {"domain": ".www.baidu.com", "name": "ORIGIN", "expires": "\u5468\u4e00, 20 8\u6708 2046 02:19:54 GMT", "value": "0", "expiry": 2418344394, "path": "/", "httponly": false, "secure": false}, {"domain": ".www.baidu.com", "name": "sugstore", "expires": "\u5468\u4e00, 20 8\u6708 2046 02:19:54 GMT", "value": "0", "expiry": 2418344394, "path": "/", "httponly": false, "secure": false}, {"domain": ".www.baidu.com", "name": "sug", "expires": "\u5468\u4e00, 20 8\u6708 2046 02:19:54 GMT", "value": "3", "expiry": 2418344394, "path": "/", "httponly": false, "secure": false}, {"domain": "www.baidu.com", "name": "BD_UPN", "expires": "\u5468\u4e8c, 06 9\u6708 2016 02:19:54 GMT", "value": "14314454", "expiry": 1473128394, "path": "/", "httponly": false, "secure": false}, {"domain": ".baidu.com", "name": "BIDUPSID", "expires": "\u5468\u4e09, 19 8\u6708 2048 02:19:54 GMT", "value": "6E1180C96CF46D18311FCEEC15C24788", "expiry": 2481416394, "path": "/", "httponly": false, "secure": false}, {"domain": ".www.baidu.com", "name": "__bsi", "expires": "\u5468\u516d, 27 8\u6708 2016 02:20:00 GMT", "value": "14089856108596563531_00_14_N_N_82_0303_C02F_N_N_N_0", "expiry": 1472264400, "path": "/", "httponly": false, "secure": false}, {"domain": ".baidu.com", "name": "H_PS_PSSID", "value": "1442_18282_17001_11655_20856_20732_20837", "path": "/", "httponly": false, "secure": false}, {"domain": "www.baidu.com", "name": "BD_HOME", "value": "1", "path": "/", "httponly": false, "secure": false}, {"domain": "www.baidu.com", "name": "BD_LAST_QID", "expires": "\u5468\u516d, 27 8\u6708 2016 02:19:55 GMT", "value": "10205523215117148813", "expiry": 1472264395, "path": "/", "httponly": false, "secure": false}, {"domain": ".baidu.com", "name": "PSTM", "expires": "\u5468\u56db, 14 9\u6708 2084 05:34:01 GMT", "value": "1472264394", "expiry": 3619748041, "path": "/", "httponly": false, "secure": false}, {"domain": ".baidu.com", "name": "BDUSS", "expires": "\u5468\u4e09, 13 11\u6708 2024 02:19:52 GMT", "value": "xvLXdJYVQwU252NS03S3JNQXRDTVhXRC1LbmZKcmxtcHB-S1JDYzlFZkloZWhYQVFBQUFBJCQAAAAAAAAAAAEAAABoPjoFa2xxYnRuc25zMTIzAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMj4wFfI-MBXTm", "expiry": 1731464392, "path": "/", "httponly": true, "secure": false}, {"domain": ".baidu.com", "name": "BAIDUID", "expires": "\u5468\u65e5, 27 8\u6708 2017 02:19:48 GMT", "value": "1EAE4A5EF2FD224AAA0D6763DEA3E73B:FG=1", "expiry": 1503800388, "path": "/", "httponly": false, "secure": false}]', check_login=True):
         if not config.browser_driver:
             browser_driver_name = 'Firefox'
         else:
@@ -82,6 +83,7 @@ class BaiduBrowser(object):
     def get_one_day_index(self, date, url):
         try_num = 0
         try_max_num = 5
+        value = ''
         while try_num < try_max_num:
             try:
                 try_num += 1
@@ -119,7 +121,7 @@ class BaiduBrowser(object):
         )
         # 获取api的结果信息，这里面保存了后面日期节点的一些加密值
         all_index_info = self.api.get_all_index_html(url)
-        print all_index_info
+        # print all_index_info
         indexes_enc = all_index_info['data'][type_name][0]['userIndexes_enc']
         enc_list = indexes_enc.split(',')
 
@@ -215,18 +217,25 @@ class BaiduBrowser(object):
         ps_obj = self.browser.find_element_by_id('TANGRAM__PSP_3__password')
         ps_obj.send_keys(password)
         sub_obj = self.browser.find_element_by_id('TANGRAM__PSP_3__submit')
+        # ver_obj = self.browser.find_element_by_id('TANGRAM__PSP_3__verifyCodeImgWrapper')
+        # print ver_obj
         try:
             sub_obj.click()
         except WebDriverException, e:
             print e
         # 如果页面的url没有改变，则继续等待
+        count = 0
         while self.browser.current_url == login_url:
             time.sleep(1)
+            count += 1
+            if count >=20:
+                sys.exit()
 
     def close(self):
         self.browser.quit()
 
     def get_cookie_json(self):
+        print json.dumps(self.browser.get_cookies())
         return json.dumps(self.browser.get_cookies())
 
     def get_cookie_str(self, cookie_json=''):
