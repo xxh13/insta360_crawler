@@ -5,8 +5,8 @@ from django.shortcuts import render
 def index(request):
     return render(request, 'index/index.html', {
         'title': 'Index - Insta360 ',
-        'msg': 'Internal System For Insta360.',
-        'detail': 'HOOK / LOG / EMAIL.'
+        'msg': 'Crawler.Internal For Insta360.',
+        'detail': 'PYTHON / CRAWLER.'
     })
 
 

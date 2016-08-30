@@ -10,13 +10,13 @@ from utils.log import logger
 import config as config
 
 
-def baidu_index(start_date,end_date):
+def baidu_index(start_date, end_date):
     logger.info(u'请确保你填写的账号密码能够成功登陆百度')
 
     s = BaiduBrowser()
 
     # fp = open(config.keywords_task_file_path, 'rb')
-    task_list = ['insta360','gear 360','theta s','okaa','eyesir','ZMER','VR相机','全景相机','全景摄像头']
+    task_list = ['insta360', 'gear 360', 'theta s', 'okaa', 'eyesir', 'ZMER', 'VR相机', '全景相机', '全景摄像头']
     # fp.close()
 
     root = os.path.dirname(os.path.realpath(__file__))
@@ -48,5 +48,6 @@ def baidu_index(start_date,end_date):
     jsonResult = json.dumps(data_list)
     return jsonResult
 
-if __name__=="__main__":
+
+if __name__ == "__main__":
     baidu_index('2016-08-08', '2016-08-12')

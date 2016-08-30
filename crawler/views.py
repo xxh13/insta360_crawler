@@ -1,9 +1,5 @@
 # coding=utf-8
 
-import json, sys, datetime, time, collections
-
-reload(sys)
-sys.setdefaultencoding('utf-8')
 from django.contrib.auth import authenticate, login
 from django.http import HttpResponse, JsonResponse, QueryDict
 from django.views.decorators.csrf import csrf_exempt
@@ -16,7 +12,15 @@ from models import ErrorCondition
 from models import SearchIndex
 from models import CompetitorSales
 from models import Log
-# from tasks import get_jd_sales as t
+
+import json
+import sys
+import datetime
+import collections
+
+reload(sys)
+sys.setdefaultencoding('utf-8')
+
 
 @csrf_exempt
 def sales_status(request):
@@ -24,7 +28,7 @@ def sales_status(request):
         body = json.loads(request.body, encoding='utf-8')
         data = body['data']
         week = body['week']
-        username =body['username']
+        username = body['username']
         table = '国内销售'
         is_native = body['is_native']
         if is_native == 0:
@@ -41,13 +45,14 @@ def sales_status(request):
                 operator = 'add'
             else:
                 operator = 'update'
-            Log.objects.create(username=username,week=item['week'],table=table,location=item['location'],operator=operator)
+            Log.objects.create(username=username, week=item['week'], table=table, location=item['location'],
+                               operator=operator)
             SalesStatus.objects.update_or_create(week=next_week, location=item['location'], is_native=is_native)
             if item['location'] in s:
                 s.remove(item['location'])
         for i in s:
             SalesStatus.objects.filter(week=week, is_native=is_native, location=i).delete()
-            Log.objects.create(username=username,week=week,table=table,location=i,operator='delete')
+            Log.objects.create(username=username, week=week, table=table, location=i, operator='delete')
         return HttpResponse('Task submitted.')
     elif request.method == 'GET':
         para = request.GET
@@ -62,15 +67,18 @@ def sales_status(request):
         else:
             weeks = SalesStatus.objects.filter(is_native=is_native).order_by('-week')
             for item in weeks:
-                 week = (item.week - datetime.timedelta(days=7)).strftime('%Y-%m-%d')
-                 break
+                week = (item.week - datetime.timedelta(days=7)).strftime('%Y-%m-%d')
+                break
         data = []
         res = SalesStatus.objects.filter(week=week, is_native=is_native)
         for item in res:
-            temp = {'week': item.week,'location': item.location,'pick_up': item.pick_up,'sales_online': item.sales_online,'sales_offline': item.sales_offline,'inventory_first': item.inventory_first,'inventory_lower': item.inventory_lower,'reject':item.reject,'is_native':item.is_native}
+            temp = {'week': item.week, 'location': item.location, 'pick_up': item.pick_up,
+                    'sales_online': item.sales_online, 'sales_offline': item.sales_offline,
+                    'inventory_first': item.inventory_first, 'inventory_lower': item.inventory_lower,
+                    'reject': item.reject, 'is_native': item.is_native}
             data.append(temp)
-        result = {'week': week, 'data':data }
-        return JsonResponse(result,safe=False)
+        result = {'week': week, 'data': data}
+        return JsonResponse(result, safe=False)
     else:
         return HttpResponse('Error.')
 
@@ -99,17 +107,26 @@ def get_sales_status(request):
             location = para.__getitem__('location')
         result = collections.OrderedDict()
         if location == 'all':
-            res = SalesStatus.objects.filter(week__range=(start_time, end_time), is_native=is_native).values('week').annotate(pick_up_total=Sum('pick_up'), sales_online_total=Sum('sales_online'), sales_offline_total=Sum('sales_offline'), inventory_first_total=Sum('inventory_first'), inventory_lower_total=Sum('inventory_lower'), reject_total=Sum('reject')).order_by('week')
+            res = SalesStatus.objects.filter(week__range=(start_time, end_time), is_native=is_native).values(
+                'week').annotate(pick_up_total=Sum('pick_up'), sales_online_total=Sum('sales_online'),
+                                 sales_offline_total=Sum('sales_offline'), inventory_first_total=Sum('inventory_first'),
+                                 inventory_lower_total=Sum('inventory_lower'), reject_total=Sum('reject')).order_by(
+                'week')
             for item in res:
-                temp = {'pick_up': item['pick_up_total'],'sales_online': item['sales_online_total'],'sales_offline': item['sales_offline_total'],'inventory_first': item['inventory_first_total'],'inventory_lower': item['inventory_lower_total'],'reject':item['reject_total']}
+                temp = {'pick_up': item['pick_up_total'], 'sales_online': item['sales_online_total'],
+                        'sales_offline': item['sales_offline_total'], 'inventory_first': item['inventory_first_total'],
+                        'inventory_lower': item['inventory_lower_total'], 'reject': item['reject_total']}
                 end = (item['week'] + datetime.timedelta(days=6)).strftime('%m-%d')
-                result[item['week'].strftime('%m-%d')+'~'+end] = temp
+                result[item['week'].strftime('%m-%d') + '~' + end] = temp
         else:
-            res = SalesStatus.objects.filter(week__range=(start_time, end_time), is_native=is_native, location = location).order_by('week')
+            res = SalesStatus.objects.filter(week__range=(start_time, end_time), is_native=is_native,
+                                             location=location).order_by('week')
             for item in res:
-                temp = {'pick_up': item.pick_up,'sales_online': item.sales_online,'sales_offline': item.sales_offline,'inventory_first': item.inventory_first,'inventory_lower': item.inventory_lower,'reject':item.reject}
+                temp = {'pick_up': item.pick_up, 'sales_online': item.sales_online, 'sales_offline': item.sales_offline,
+                        'inventory_first': item.inventory_first, 'inventory_lower': item.inventory_lower,
+                        'reject': item.reject}
                 end = (item.week + datetime.timedelta(days=6)).strftime('%m-%d')
-                result[item.week.strftime('%m-%d')+'~'+end] = temp
+                result[item.week.strftime('%m-%d') + '~' + end] = temp
         locations = SalesStatus.objects.filter(is_native=is_native).values('location').distinct()
         last = SalesStatus.objects.filter(week__lt=start_time, is_native=is_native).order_by('-week').first()
         last_inventory_first = 0
@@ -126,7 +143,7 @@ def get_sales_status(request):
         temp = []
         for item in locations:
             temp.append(item['location'])
-        return JsonResponse({'locations':temp, 'data':result, 'last':res_last},safe=False)
+        return JsonResponse({'locations': temp, 'data': result, 'last': res_last}, safe=False)
     else:
         return HttpResponse('Error.')
 
@@ -137,7 +154,7 @@ def electronic_sales(request):
         body = json.loads(request.body, encoding='utf-8')
         data = body['data']
         week = body['week']
-        username =body['username']
+        username = body['username']
         table = '电商销售'
         week_date = datetime.datetime.strptime(week, '%Y-%m-%d').date()
         next_week = (week_date + datetime.timedelta(days=7)).strftime('%Y-%m-%d')
@@ -147,12 +164,14 @@ def electronic_sales(request):
             s.add(item['location'])
         # ElectronicSales.objects.filter(week=week).delete()
         for item in data:
-            result = ElectronicSales.objects.update_or_create(week=item['week'], location=item['location'], defaults=item)
+            result = ElectronicSales.objects.update_or_create(week=item['week'], location=item['location'],
+                                                              defaults=item)
             if result[1]:
                 operator = 'add'
             else:
                 operator = 'update'
-            Log.objects.create(username=username,week=item['week'],table=table,location=item['location'],operator=operator)
+            Log.objects.create(username=username, week=item['week'], table=table, location=item['location'],
+                               operator=operator)
             ElectronicSales.objects.update_or_create(week=next_week, location=item['location'])
             if item['location'] in s:
                 s.remove(item['location'])
@@ -175,12 +194,14 @@ def electronic_sales(request):
         data = []
         res = ElectronicSales.objects.filter(week=week)
         for item in res:
-            temp = {'week': item.week,'location': item.location,'view': item.view,'visitor': item.visitor,'payment': item.payment,'number': item.number,'buyer':item.buyer}
+            temp = {'week': item.week, 'location': item.location, 'view': item.view, 'visitor': item.visitor,
+                    'payment': item.payment, 'number': item.number, 'buyer': item.buyer}
             data.append(temp)
-        result = {'week': week, 'data':data }
-        return JsonResponse(result,safe=False)
+        result = {'week': week, 'data': data}
+        return JsonResponse(result, safe=False)
     else:
         return HttpResponse('Error.')
+
 
 @csrf_exempt
 def get_electronic_sales(request):
@@ -204,22 +225,26 @@ def get_electronic_sales(request):
 
         result = collections.OrderedDict()
         if location == 'all':
-            res = ElectronicSales.objects.filter(week__range=(start_time, end_time)).values('week').annotate(view_total=Sum('view'), visitor_total=Sum('visitor'), payment_total=Sum('payment'), number_total=Sum('number'), buyer_total=Sum('buyer')).order_by('week')
+            res = ElectronicSales.objects.filter(week__range=(start_time, end_time)).values('week').annotate(
+                view_total=Sum('view'), visitor_total=Sum('visitor'), payment_total=Sum('payment'),
+                number_total=Sum('number'), buyer_total=Sum('buyer')).order_by('week')
             for item in res:
-                temp = {'view': item['view_total'],'visitor': item['visitor_total'],'payment': item['payment_total'],'number': item['number_total'],'buyer': item['buyer_total']}
+                temp = {'view': item['view_total'], 'visitor': item['visitor_total'], 'payment': item['payment_total'],
+                        'number': item['number_total'], 'buyer': item['buyer_total']}
                 end = (item['week'] + datetime.timedelta(days=6)).strftime('%m-%d')
-                result[item['week'].strftime('%m-%d')+'~'+end] = temp
+                result[item['week'].strftime('%m-%d') + '~' + end] = temp
         else:
-            res = ElectronicSales.objects.filter(week__range=(start_time, end_time), location = location).order_by('week')
+            res = ElectronicSales.objects.filter(week__range=(start_time, end_time), location=location).order_by('week')
             for item in res:
-                temp = {'view': item.view,'visitor': item.visitor,'payment': item.payment,'number': item.number,'buyer': item.buyer}
+                temp = {'view': item.view, 'visitor': item.visitor, 'payment': item.payment, 'number': item.number,
+                        'buyer': item.buyer}
                 end = (item.week + datetime.timedelta(days=6)).strftime('%m-%d')
-                result[item.week.strftime('%m-%d')+'~'+end] = temp
+                result[item.week.strftime('%m-%d') + '~' + end] = temp
         locations = ElectronicSales.objects.values('location').distinct()
         temp = []
         for item in locations:
             temp.append(item['location'])
-        return JsonResponse({'locations':temp, 'data':result},safe=False)
+        return JsonResponse({'locations': temp, 'data': result}, safe=False)
     else:
         return HttpResponse('Error.')
 
@@ -241,10 +266,12 @@ def user_distribution(request):
             # end_time = (endTime + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
         res_native = []
         res_abroad = []
-        native = UserDistribution.objects.filter(date__range=(start_time, end_time), is_native=1).values('location').annotate(total=Sum('new_user')).order_by('-total')
-        abroad = UserDistribution.objects.filter(date__range=(start_time, end_time), is_native=0).values('location').annotate(total=Sum('new_user')).order_by('-total')
+        native = UserDistribution.objects.filter(date__range=(start_time, end_time), is_native=1).values(
+            'location').annotate(total=Sum('new_user')).order_by('-total')
+        abroad = UserDistribution.objects.filter(date__range=(start_time, end_time), is_native=0).values(
+            'location').annotate(total=Sum('new_user')).order_by('-total')
         fp = open('crawler/dict.json', 'r')
-        dict = json.loads(fp.read(),encoding='utf-8')
+        dict = json.loads(fp.read(), encoding='utf-8')
         fp.close()
         for item in native:
             # temp = {'location': item['location'],'total': item['total']}
@@ -258,8 +285,8 @@ def user_distribution(request):
             item['location'] = location
             # temp = {'location': location,'total': item['total']}
             res_abroad.append(item)
-        result={'abroad':res_abroad, 'native':res_native}
-        return JsonResponse(result,safe=False)
+        result = {'abroad': res_abroad, 'native': res_native}
+        return JsonResponse(result, safe=False)
     else:
         return HttpResponse('Error.')
 
@@ -296,9 +323,9 @@ def user_area(request):
                 except AttributeError:
                     temp[location] = 0
             result[date.strftime('%m-%d')] = temp
-        return JsonResponse(result,safe=False)
+        return JsonResponse(result, safe=False)
     else:
-         return HttpResponse('Error.')
+        return HttpResponse('Error.')
 
 
 @csrf_exempt
@@ -319,11 +346,13 @@ def use_condition(request):
         result = []
         res = UseCondition.objects.filter(date__range=(start_time, end_time)).order_by('date')
         for item in res:
-            temp = {'date': item.date.strftime('%m-%d'),'new_user': item.new_user,'active_user': item.active_user,'duration': item.duration}
+            temp = {'date': item.date.strftime('%m-%d'), 'new_user': item.new_user, 'active_user': item.active_user,
+                    'duration': item.duration}
             result.append(temp)
-        return JsonResponse(result,safe=False)
+        return JsonResponse(result, safe=False)
     else:
         return HttpResponse('Error.')
+
 
 @csrf_exempt
 def search_index(request):
@@ -343,9 +372,9 @@ def search_index(request):
         result = []
         res = SearchIndex.objects.filter(date__range=(start_time, end_time)).order_by('date')
         for item in res:
-            temp = {'date': item.date.strftime('%m-%d'),'key': item.key,'baidu_index': item.baidu_index}
+            temp = {'date': item.date.strftime('%m-%d'), 'key': item.key, 'baidu_index': item.baidu_index}
             result.append(temp)
-        return JsonResponse(result,safe=False)
+        return JsonResponse(result, safe=False)
     else:
         return HttpResponse('Error.')
 
@@ -399,7 +428,7 @@ def market_environment(request):
             for item in res_temp:
                 temp[item.key] = item.baidu_index
             result[date.strftime('%m-%d')] = temp
-        return JsonResponse(result,safe=False)
+        return JsonResponse(result, safe=False)
     else:
         return HttpResponse('Error.')
 
@@ -439,9 +468,10 @@ def competitor_data(request):
                 for item in res_temp:
                     temp[item.commodity + ' 京东'] = item.jd_total_sales
             result[date.strftime('%m-%d')] = temp
-        return JsonResponse(result,safe=False)
+        return JsonResponse(result, safe=False)
     else:
         return HttpResponse('Error.')
+
 
 @csrf_exempt
 def login(request):
@@ -463,12 +493,12 @@ def login(request):
                 groups = user.groups.all()
                 for group in groups:
                     res.append(group.name)
-                return JsonResponse({'result':True,'username':username, 'group':res},safe=False)
+                return JsonResponse({'result': True, 'username': username, 'group': res}, safe=False)
             else:
-                return JsonResponse({'result':False},safe=False)
+                return JsonResponse({'result': False}, safe=False)
 
         else:
-            return JsonResponse({'result':False},safe=False)
+            return JsonResponse({'result': False}, safe=False)
     else:
         return HttpResponse('Error.')
 

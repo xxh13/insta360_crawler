@@ -1,20 +1,20 @@
 from __future__ import absolute_import
-
+from celery import Celery
+from django.conf import settings
 import os
 
-from celery import Celery
 
 # set the default Django settings module for the 'celery' program.
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'internal_insta360.settings')
-
-from django.conf import settings  # noqa
-
-app = Celery('internal_insta360')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'internal.settings')
+app = Celery('crawler_internal')
 
 # Using a string here means the worker will not have to
 # pickle the object when using Windows.
 app.config_from_object('django.conf:settings')
 app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
+
+
+print settings.INSTALLED_APPS
 
 
 @app.task(bind=True)

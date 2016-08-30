@@ -1,9 +1,6 @@
-#-*- coding: UTF-8 -*-
+# -*- coding: UTF-8 -*-
 from __future__ import absolute_import
-import os, commands, urllib2, json, datetime, time
-from celery import task
 from celery import shared_task
-from celery.decorators import task
 from celery.utils.log import get_task_logger
 from .models import UseCondition
 from .models import SearchIndex
@@ -15,13 +12,17 @@ from .crawlers.taobao.TaobaoCrawler import TaobaoCrawler
 from .crawlers.jd.JDCrawler import JDCrawler
 from .crawlers.baidu_index.main import *
 
+import datetime
+import time
+
+
 logger = get_task_logger(__name__)
 
 
 @shared_task
 def test(a, b):
     print a + b
-    return a+b
+    return a + b
 
 
 @shared_task
@@ -44,7 +45,7 @@ def get_use_condition():
             time.sleep(5)
     data = json.loads(result)
     for item in data:
-        UseCondition.objects.update_or_create(date=item['date'], defaults = item)
+        UseCondition.objects.update_or_create(date=item['date'], defaults=item)
     return 'Finished.'
 
 
@@ -67,7 +68,7 @@ def get_baidu_index():
             time.sleep(5)
     data = json.loads(result)
     for item in data:
-        SearchIndex.objects.update_or_create(date=item['date'], key=item['key'], defaults = item)
+        SearchIndex.objects.update_or_create(date=item['date'], key=item['key'], defaults=item)
     return 'Finished.'
 
 
@@ -102,7 +103,7 @@ def get_taobao_sales():
                 item['taobao_sales'] = 0
         else:
             item['taobao_sales'] = item['taobao_total_sales']
-        CompetitorSales.objects.update_or_create(date=item['date'], commodity=item['commodity'], defaults = item)
+        CompetitorSales.objects.update_or_create(date=item['date'], commodity=item['commodity'], defaults=item)
     return 'Finished.'
 
 
@@ -137,7 +138,7 @@ def get_jd_sales():
                 item['jd_sales'] = 0
         else:
             item['jd_sales'] = item['jd_total_sales']
-        CompetitorSales.objects.update_or_create(date=item['date'], commodity=item['commodity'], defaults = item)
+        CompetitorSales.objects.update_or_create(date=item['date'], commodity=item['commodity'], defaults=item)
     return 'Finished.'
 
 
@@ -161,7 +162,7 @@ def get_error():
             time.sleep(5)
     data = json.loads(result)
     for item in data:
-        ErrorCondition.objects.update_or_create(date=item['date'], defaults = item)
+        ErrorCondition.objects.update_or_create(date=item['date'], defaults=item)
     return 'Finished.'
 
 
@@ -187,5 +188,5 @@ def get_user_distribution():
     for item in data:
         if (item['location'] == '内蒙'):
             item['location'] = '内蒙古'
-        UserDistribution.objects.update_or_create(date=item['date'], location=item['location'], defaults = item)
+        UserDistribution.objects.update_or_create(date=item['date'], location=item['location'], defaults=item)
     return 'Finished.'

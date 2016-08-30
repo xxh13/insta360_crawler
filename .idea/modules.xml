@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/python.docker.internal.insta360.iml" filepath="$PROJECT_DIR$/.idea/python.docker.internal.insta360.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/python.crawler.internal.iml" filepath="$PROJECT_DIR$/.idea/python.crawler.internal.iml" />
     </modules>
   </component>
 </project>
