@@ -38,6 +38,7 @@ class CompetitorSales(models.Model):
     def __unicode__(self):
         return str(self.id)
 
+
 class UserDistribution(models.Model):
     location = models.CharField(max_length=200)
     active_user = models.IntegerField(default=0)
@@ -62,16 +63,23 @@ class ErrorCondition(models.Model):
     def __unicode__(self):
         return str(self.id)
 
+
 class SalesStatus(models.Model):
-    week = models.DateField(auto_now=False, auto_now_add=False)
+
     location = models.CharField(max_length=200)
+    week = models.DateField(auto_now=False, auto_now_add=False)
+    agent_name = models.CharField(max_length=200, blank=True)
+    agent_type = models.CharField(max_length=200, blank=True)
+
     pick_up = models.IntegerField(default=0)
     sales_online = models.IntegerField(default=0)
     sales_offline = models.IntegerField(default=0)
+    sales_offline_count = models.IntegerField(default=0)
     inventory_first = models.IntegerField(default=0)
     inventory_lower = models.IntegerField(default=0)
     reject = models.IntegerField(default=0)
     is_native = models.IntegerField(default=0)
+
     date_created = models.DateTimeField(auto_now_add=True)
 
     def __unicode__(self):

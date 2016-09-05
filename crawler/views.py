@@ -33,35 +33,72 @@ def sales_status(request):
         is_native = body['is_native']
         if is_native == 0:
             table = '海外销售'
+
         week_date = datetime.datetime.strptime(week, '%Y-%m-%d').date()
         next_week = (week_date + datetime.timedelta(days=7)).strftime('%Y-%m-%d')
         old = SalesStatus.objects.filter(week=week, is_native=is_native).values('location')
         s = set()
         for item in old:
             s.add(item['location'])
+
         for item in data:
-            result = SalesStatus.objects.update_or_create(week=item['week'], location=item['location'], defaults=item)
+
+            result = SalesStatus.objects.update_or_create(
+                week=item['week'],
+                location=item['location'],
+                defaults=item
+            )
+
             if result[1]:
                 operator = 'add'
             else:
                 operator = 'update'
-            Log.objects.create(username=username, week=item['week'], table=table, location=item['location'],
-                               operator=operator)
-            SalesStatus.objects.update_or_create(week=next_week, location=item['location'], is_native=is_native)
+
+            Log.objects.create(
+                username=username,
+                week=item['week'],
+                table=table,
+                location=item['location'],
+                operator=operator
+            )
+
+            SalesStatus.objects.update_or_create(
+                week=next_week,
+                location=item['location'],
+                is_native=is_native
+            )
+
             if item['location'] in s:
                 s.remove(item['location'])
+
         for i in s:
-            SalesStatus.objects.filter(week=week, is_native=is_native, location=i).delete()
-            Log.objects.create(username=username, week=week, table=table, location=i, operator='delete')
+            SalesStatus.objects.filter(
+                week=week,
+                is_native=is_native,
+                location=i
+            ).delete()
+
+            Log.objects.create(
+                username=username,
+                week=week,
+                table=table,
+                location=i,
+                operator='delete'
+            )
+
         return HttpResponse('Task submitted.')
+
     elif request.method == 'GET':
+
         para = request.GET
         today = datetime.datetime.today()
         delta = today.weekday()
         is_native = 1
+
         if para.__contains__('is_native'):
             is_native = para.__getitem__('is_native')
         week = (today - datetime.timedelta(days=delta)).strftime('%Y-%m-%d')
+
         if para.__contains__('week'):
             week = para.__getitem__('week')
         else:
@@ -69,15 +106,33 @@ def sales_status(request):
             for item in weeks:
                 week = (item.week - datetime.timedelta(days=7)).strftime('%Y-%m-%d')
                 break
+
         data = []
         res = SalesStatus.objects.filter(week=week, is_native=is_native)
+
         for item in res:
-            temp = {'week': item.week, 'location': item.location, 'pick_up': item.pick_up,
-                    'sales_online': item.sales_online, 'sales_offline': item.sales_offline,
-                    'inventory_first': item.inventory_first, 'inventory_lower': item.inventory_lower,
-                    'reject': item.reject, 'is_native': item.is_native}
+            temp = {
+                'week': item.week,
+                'pick_up': item.pick_up,
+                'location': item.location,
+
+                'agent_name': item.agent_name,
+                'agent_type': item.agent_type,
+
+                'sales_online': item.sales_online,
+                'sales_offline': item.sales_offline,
+                'sales_offline_count': item.sales_offline_count,
+                'inventory_first': item.inventory_first,
+                'inventory_lower': item.inventory_lower,
+                'reject': item.reject,
+                'is_native': item.is_native
+            }
+
             data.append(temp)
-        result = {'week': week, 'data': data}
+        result = {
+            'week': week,
+            'data': data
+        }
         return JsonResponse(result, safe=False)
     else:
         return HttpResponse('Error.')
@@ -88,50 +143,80 @@ def get_sales_status(request):
     if request.method == 'POST':
         return HttpResponse('Do Nothing.')
     elif request.method == 'GET':
+
         para = request.GET
         today = datetime.datetime.today()
         start_time = (today - datetime.timedelta(days=29)).strftime('%Y-%m-%d')
         end_time = (today + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
         is_native = 1
         location = "all"
+
         if para.__contains__('is_native'):
             is_native = para.__getitem__('is_native')
+
         if para.__contains__('start_time'):
             startTime = datetime.datetime.strptime(para.__getitem__('start_time'), '%Y-%m-%d').date()
             start_time = (startTime - datetime.timedelta(days=6)).strftime('%Y-%m-%d')
+
         if para.__contains__('end_time'):
             end_time = para.__getitem__('end_time')
             # endTime = datetime.datetime.strptime(para.__getitem__('end_time'), '%Y-%m-%d').date()
             # end_time = (endTime + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
         if para.__contains__('location'):
             location = para.__getitem__('location')
+
         result = collections.OrderedDict()
+
         if location == 'all':
-            res = SalesStatus.objects.filter(week__range=(start_time, end_time), is_native=is_native).values(
-                'week').annotate(pick_up_total=Sum('pick_up'), sales_online_total=Sum('sales_online'),
-                                 sales_offline_total=Sum('sales_offline'), inventory_first_total=Sum('inventory_first'),
-                                 inventory_lower_total=Sum('inventory_lower'), reject_total=Sum('reject')).order_by(
-                'week')
+            res = SalesStatus.objects.filter(
+                week__range=(start_time, end_time),
+                is_native=is_native
+            ).values(
+                'week'
+            ).annotate(
+                pick_up_total=Sum('pick_up'),
+                sales_online_total=Sum('sales_online'),
+                sales_offline_total=Sum('sales_offline'),
+                inventory_first_total=Sum('inventory_first'),
+                inventory_lower_total=Sum('inventory_lower'),
+                reject_total=Sum('reject')
+            ).order_by('week')
+
             for item in res:
-                temp = {'pick_up': item['pick_up_total'], 'sales_online': item['sales_online_total'],
-                        'sales_offline': item['sales_offline_total'], 'inventory_first': item['inventory_first_total'],
-                        'inventory_lower': item['inventory_lower_total'], 'reject': item['reject_total']}
+                temp = {
+                    'pick_up': item['pick_up_total'],
+                    'sales_online': item['sales_online_total'],
+                    'sales_offline': item['sales_offline_total'],
+                    'inventory_first': item['inventory_first_total'],
+                    'inventory_lower': item['inventory_lower_total'],
+                    'reject': item['reject_total']
+                }
                 end = (item['week'] + datetime.timedelta(days=6)).strftime('%m-%d')
                 result[item['week'].strftime('%m-%d') + '~' + end] = temp
         else:
-            res = SalesStatus.objects.filter(week__range=(start_time, end_time), is_native=is_native,
-                                             location=location).order_by('week')
+            res = SalesStatus.objects.filter(
+                week__range=(start_time, end_time),
+                is_native=is_native,
+                location=location).order_by('week')
             for item in res:
-                temp = {'pick_up': item.pick_up, 'sales_online': item.sales_online, 'sales_offline': item.sales_offline,
-                        'inventory_first': item.inventory_first, 'inventory_lower': item.inventory_lower,
-                        'reject': item.reject}
+                temp = {
+                    'pick_up': item.pick_up,
+                    'sales_online': item.sales_online,
+                    'sales_offline': item.sales_offline,
+                    'inventory_first': item.inventory_first,
+                    'inventory_lower': item.inventory_lower,
+                    'reject': item.reject
+                }
+
                 end = (item.week + datetime.timedelta(days=6)).strftime('%m-%d')
                 result[item.week.strftime('%m-%d') + '~' + end] = temp
+
         locations = SalesStatus.objects.filter(is_native=is_native).values('location').distinct()
         last = SalesStatus.objects.filter(week__lt=start_time, is_native=is_native).order_by('-week').first()
         last_inventory_first = 0
         last_inventory_lower = 0
         last_reject = 0
+
         if (last != None):
             last_inventory_first = last.inventory_first
             last_inventory_lower = last.inventory_lower
