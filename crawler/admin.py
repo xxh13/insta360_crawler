@@ -35,7 +35,8 @@ class ErrorConditionAdmin(admin.ModelAdmin):
 
 class SalesStatusAdmin(admin.ModelAdmin):
     list_display = ('id', 'week', 'location', 'pick_up',
-                    'sales_online', 'sales_offline', 'inventory_first', 'inventory_lower',
+                    'agent_name', 'agent_type', 'agent_price',
+                    'sales_online', 'sales_offline', 'sales_offline_count', 'inventory_first', 'inventory_lower',
                     'reject', 'is_native', 'date_created')
 
 

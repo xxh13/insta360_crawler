@@ -71,6 +71,7 @@ class SalesStatus(models.Model):
     agent_name = models.CharField(max_length=200, blank=True)
     agent_type = models.CharField(max_length=200, blank=True)
 
+    agent_price = models.IntegerField(default=0)
     pick_up = models.IntegerField(default=0)
     sales_online = models.IntegerField(default=0)
     sales_offline = models.IntegerField(default=0)

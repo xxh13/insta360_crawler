@@ -118,6 +118,7 @@ def sales_status(request):
 
                 'agent_name': item.agent_name,
                 'agent_type': item.agent_type,
+                'agent_price': item.agent_price,
 
                 'sales_online': item.sales_online,
                 'sales_offline': item.sales_offline,
@@ -177,6 +178,7 @@ def get_sales_status(request):
                 pick_up_total=Sum('pick_up'),
                 sales_online_total=Sum('sales_online'),
                 sales_offline_total=Sum('sales_offline'),
+                sales_offline_count_total=Sum('sales_offline_count'),
                 inventory_first_total=Sum('inventory_first'),
                 inventory_lower_total=Sum('inventory_lower'),
                 reject_total=Sum('reject')
@@ -187,6 +189,7 @@ def get_sales_status(request):
                     'pick_up': item['pick_up_total'],
                     'sales_online': item['sales_online_total'],
                     'sales_offline': item['sales_offline_total'],
+                    'sales_offline_count': item['sales_offline_count_total'],
                     'inventory_first': item['inventory_first_total'],
                     'inventory_lower': item['inventory_lower_total'],
                     'reject': item['reject_total']
@@ -203,6 +206,7 @@ def get_sales_status(request):
                     'pick_up': item.pick_up,
                     'sales_online': item.sales_online,
                     'sales_offline': item.sales_offline,
+                    'sales_offline_count': item.sales_offline_count,
                     'inventory_first': item.inventory_first,
                     'inventory_lower': item.inventory_lower,
                     'reject': item.reject
