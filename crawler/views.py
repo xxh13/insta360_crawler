@@ -64,6 +64,9 @@ def sales_status(request):
 
             SalesStatus.objects.update_or_create(
                 week=next_week,
+                agent_name=item['agent_name'],
+                agent_type=item['agent_type'],
+                agent_price=item['agent_price'],
                 location=item['location'],
                 is_native=is_native
             )
