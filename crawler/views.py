@@ -64,6 +64,9 @@ def sales_status(request):
 
             SalesStatus.objects.update_or_create(
                 week=next_week,
+                agent_name=item['agent_name'],
+                agent_type=item['agent_type'],
+                agent_price=item['agent_price'],
                 location=item['location'],
                 is_native=is_native
             )
@@ -231,7 +234,14 @@ def get_sales_status(request):
         res_last['reject'] = last_reject
         temp = []
         for item in locations:
-            temp.append(item['location'])
+            res_temp = SalesStatus.objects.filter(is_native=is_native, location=item['location']).order_by('-agent_name').first()
+            location_agent = {
+                'location': item['location'],
+                'agent_name': res_temp.agent_name,
+                'agent_type': res_temp.agent_type,
+                'agent_price': res_temp.agent_price
+            }
+            temp.append(location_agent)
         return JsonResponse({'locations': temp, 'data': result, 'last': res_last}, safe=False)
     else:
         return HttpResponse('Error.')
