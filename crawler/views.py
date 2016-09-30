@@ -11,7 +11,11 @@ from models import UseCondition
 from models import ErrorCondition
 from models import SearchIndex
 from models import CompetitorSales
+from models import MediaFan
 from models import Log
+from models import TaobaoDetail
+
+from tasks import get_fans as t
 
 import json
 import sys
@@ -61,14 +65,19 @@ def sales_status(request):
                 location=item['location'],
                 operator=operator
             )
-
+            temp = {
+                'week': next_week,
+                'location': item['location'],
+                'is_native': is_native,
+                'agent_name': item['agent_name'],
+                'agent_type': item['agent_type'],
+                'agent_price': item['agent_price']
+            }
             SalesStatus.objects.update_or_create(
                 week=next_week,
-                agent_name=item['agent_name'],
-                agent_type=item['agent_type'],
-                agent_price=item['agent_price'],
                 location=item['location'],
-                is_native=is_native
+                is_native=is_native,
+                defaults = temp
             )
 
             if item['location'] in s:
@@ -603,11 +612,81 @@ def login(request):
 
 
 @csrf_exempt
+def media_fans(request):
+    if request.method == 'POST':
+        return HttpResponse('Task submitted.')
+    elif request.method == 'GET':
+        para = request.GET
+        today = datetime.datetime.today()
+        start_time = (today - datetime.timedelta(days=6)).strftime('%Y-%m-%d')
+        end_time = (today + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
+        if para.__contains__('start_time'):
+            start_time = para.__getitem__('start_time')
+        if para.__contains__('end_time'):
+            end_time = para.__getitem__('end_time')
+            # endTime = datetime.datetime.strptime(para.__getitem__('end_time'), '%Y-%m-%d').date()
+            # end_time = (endTime + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
+        result = collections.OrderedDict()
+        res = MediaFan.objects.filter(date__range=(start_time, end_time)).order_by('date')
+        dates = res.dates('date', 'day')
+        for date in dates:
+            res_temp = res.filter(date=date)
+            temp = {}
+            for item in res_temp:
+                temp[item.platform] = item.fans
+            result[date.strftime('%m-%d')] = temp
+        return JsonResponse(result, safe=False)
+    else:
+        return HttpResponse('Error.')
+
+
+@csrf_exempt
+def taobao_detail(request):
+    if request.method == 'POST':
+        return HttpResponse('Task submitted.')
+    elif request.method == 'GET':
+        para = request.GET
+        today = datetime.datetime.today()
+        date = (today - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
+        commodity = 'insta360 Nano'
+        if para.__contains__('date'):
+            date = para.__getitem__('date')
+        if para.__contains__('commodity'):
+            commodity = para.__getitem__('commodity')
+        res = TaobaoDetail.objects.filter(
+            date=date,
+            commodity=commodity
+        ).order_by('-sales')
+        stores = []
+        for item in res:
+            temp = {
+                'shop': item.shop,
+                'name': item.name,
+                'price': item.price,
+                'sales': item.sales,
+                'link': item.link,
+                'location': item.location,
+                'is_tmall': item.is_tmall,
+            }
+            stores.append(temp)
+        commodities_res = TaobaoDetail.objects.filter().values('commodity').distinct()
+        commodities = []
+        for c in commodities_res:
+            commodities.append(c['commodity'])
+        result = {'data': stores, 'commodities': commodities}
+        return JsonResponse(result, safe=False)
+    else:
+        return HttpResponse('Error.')
+
+
+
+
+@csrf_exempt
 def test(request):
     if request.method == 'POST':
         return HttpResponse('Task submitted.')
     elif request.method == 'GET':
-        # t()
+        t()
         return HttpResponse('Task submitted.')
     else:
         return HttpResponse('Error.')

@@ -38,10 +38,28 @@ class TaobaoCrawler:
             self.start()
             sales = self.getTotalSales()
             today = datetime.datetime.now().strftime('%Y-%m-%d')
-            temp = {'commodity': product, 'taobao_total_sales': sales, 'date': today}
-            print temp
+            stores = []
+            for commodity in self.commodityList:
+                store = {
+                    'name': commodity.name,
+                    'price': commodity.price,
+                    'pay': commodity.pay,
+                    'shop_keeper': commodity.shopKeeper,
+                    'shop': commodity.shop,
+                    'location': commodity.location,
+                    'link': commodity.link,
+                    'store_id': commodity.id,
+                    'sales': commodity.sales,
+                    'is_tmall': commodity.isTmall,
+                    'date': today,
+                    'commodity': product
+                }
+                stores.append(store)
+            temp = {'commodity': product, 'taobao_total_sales': sales, 'date': today, 'stores': stores}
+            # print temp
             result.append(temp)
         jsonResult = json.dumps(result)
+        # print jsonResult
         return jsonResult
 
     def start(self):
@@ -111,7 +129,7 @@ class TaobaoCrawler:
             self.filterLG()
         self.distinct()
         self.getSalesByRequest()
-        # self.sort()
+        self.sort()
         # self.showList()
         # self.save()
 
@@ -235,7 +253,7 @@ class TaobaoCrawler:
             except:
                 sales = 0
                 # print "Fail",commodity.id
-            print sales
+            # print sales
             commodity.setSales(int(sales))
             commodity.setShop(shop)
             if count % 40 == 0:
@@ -248,4 +266,4 @@ class TaobaoCrawler:
 
 if __name__ == "__main__":
     crawler = TaobaoCrawler()
-    print crawler.main()
+    crawler.main()
