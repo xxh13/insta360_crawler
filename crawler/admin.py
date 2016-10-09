@@ -7,6 +7,8 @@ from .models import SalesStatus
 from .models import ElectronicSales
 from .models import ErrorCondition
 from .models import Log
+from .models import MediaFan
+from .models import TaobaoDetail
 
 
 # Register your models here.
@@ -47,6 +49,12 @@ class ElectronicSalesAdmin(admin.ModelAdmin):
 class LogAdmin(admin.ModelAdmin):
     list_display = ('id', 'week', 'username', 'table', 'operator', 'location', 'date_created')
 
+class MediaFanAdmin(admin.ModelAdmin):
+    list_display = ('id', 'platform', 'fans_increment', 'fans', 'date', 'date_created')
+
+class TaobaoDetailAdmin(admin.ModelAdmin):
+    list_display = ('id', 'shop', 'shop_keeper', 'name', 'commodity', 'price', 'pay', 'sales', 'store_id', 'link', 'location', 'is_tmall', 'date', 'date_created')
+
 
 admin.site.register(UseCondition, UseConditionAdmin)
 admin.site.register(SearchIndex, SearchIndexAdmin)
@@ -56,3 +64,5 @@ admin.site.register(ErrorCondition, ErrorConditionAdmin)
 admin.site.register(SalesStatus, SalesStatusAdmin)
 admin.site.register(ElectronicSales, ElectronicSalesAdmin)
 admin.site.register(Log, LogAdmin)
+admin.site.register(MediaFan, MediaFanAdmin)
+admin.site.register(TaobaoDetail, TaobaoDetailAdmin)
