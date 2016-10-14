@@ -630,8 +630,8 @@ def media_fans(request):
         res = MediaFan.objects.filter(date__range=(start_time, end_time)).order_by('date')
         dates = res.dates('date', 'day')
         for date in dates:
-            res_temp = res.filter(date=date)
-            temp = {}
+            res_temp = res.filter(date=date).order_by('fans')
+            temp = collections.OrderedDict()
             for item in res_temp:
                 temp[item.platform] = item.fans
             result[date.strftime('%m-%d')] = temp
