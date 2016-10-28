@@ -10,12 +10,15 @@ from models import UserDistribution
 from models import UseCondition
 from models import ErrorCondition
 from models import SearchIndex
+from models import GoogleIndex
 from models import CompetitorSales
 from models import MediaFan
 from models import Log
 from models import TaobaoDetail
 
 from tasks import get_fans as t
+from tasks import get_google_index as g
+
 
 import json
 import sys
@@ -208,6 +211,36 @@ def get_sales_status(request):
                 }
                 end = (item['week'] + datetime.timedelta(days=6)).strftime('%m-%d')
                 result[item['week'].strftime('%m-%d') + '~' + end] = temp
+
+
+            last_res = SalesStatus.objects.filter(
+                week__lt=start_time,
+                is_native=is_native
+            ).values(
+                'week'
+            ).annotate(
+                last_inventory_first=Sum('inventory_first'),
+                last_inventory_lower=Sum('inventory_lower'),
+                last_reject=Sum('reject'),
+            ).order_by('-week')
+
+
+            last_inventory_first = 0
+            last_inventory_lower = 0
+            last_reject = 0
+
+            for item in last_res:
+                last_inventory_first = item['last_inventory_first']
+                last_inventory_lower = item['last_inventory_lower']
+                last_reject = item['last_reject']
+                break
+
+            res_last = {}
+            res_last['inventory_first'] = last_inventory_first
+            res_last['inventory_lower'] = last_inventory_lower
+            res_last['reject'] = last_reject
+
+
         else:
             res = SalesStatus.objects.filter(
                 week__range=(start_time, end_time),
@@ -227,20 +260,21 @@ def get_sales_status(request):
                 end = (item.week + datetime.timedelta(days=6)).strftime('%m-%d')
                 result[item.week.strftime('%m-%d') + '~' + end] = temp
 
-        locations = SalesStatus.objects.filter(is_native=is_native).values('location').distinct()
-        last = SalesStatus.objects.filter(week__lt=start_time, is_native=is_native).order_by('-week').first()
-        last_inventory_first = 0
-        last_inventory_lower = 0
-        last_reject = 0
+            last = SalesStatus.objects.filter(week__lt=start_time, is_native=is_native, location=location).order_by('-week').first()
+            last_inventory_first = 0
+            last_inventory_lower = 0
+            last_reject = 0
 
-        if (last != None):
-            last_inventory_first = last.inventory_first
-            last_inventory_lower = last.inventory_lower
-            last_reject = last.reject
-        res_last = {}
-        res_last['inventory_first'] = last_inventory_first
-        res_last['inventory_lower'] = last_inventory_lower
-        res_last['reject'] = last_reject
+            if (last != None):
+                last_inventory_first = last.inventory_first
+                last_inventory_lower = last.inventory_lower
+                last_reject = last.reject
+            res_last = {}
+            res_last['inventory_first'] = last_inventory_first
+            res_last['inventory_lower'] = last_inventory_lower
+            res_last['reject'] = last_reject
+
+        locations = SalesStatus.objects.filter(is_native=is_native).values('location').distinct()
         temp = []
         for item in locations:
             res_temp = SalesStatus.objects.filter(is_native=is_native, location=item['location']).order_by('-week').first()
@@ -471,17 +505,59 @@ def search_index(request):
         today = datetime.datetime.today()
         start_time = (today - datetime.timedelta(days=6)).strftime('%Y-%m-%d')
         end_time = (today + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
+        site = 'baidu'
         if para.__contains__('start_time'):
             start_time = para.__getitem__('start_time')
         if para.__contains__('end_time'):
             end_time = para.__getitem__('end_time')
             # endTime = datetime.datetime.strptime(para.__getitem__('end_time'), '%Y-%m-%d').date()
             # end_time = (endTime + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
+        if para.__contains__('site'):
+                site = para.__getitem__('site')
+
         result = []
-        res = SearchIndex.objects.filter(date__range=(start_time, end_time)).order_by('date')
-        for item in res:
-            temp = {'date': item.date.strftime('%m-%d'), 'key': item.key, 'baidu_index': item.baidu_index}
-            result.append(temp)
+
+        if site == 'baidu':
+            res = SearchIndex.objects.filter(date__range=(start_time, end_time)).order_by('date')
+            for item in res:
+                temp = {'date': item.date.strftime('%m-%d'), 'key': item.key, 'baidu_index': item.baidu_index}
+                result.append(temp)
+
+        elif site == 'google':
+            res = GoogleIndex.objects.filter(date__range=(start_time, end_time)).order_by('date')
+            for item in res:
+                temp = {'date': item.date.strftime('%m-%d'), 'key': item.key, 'google_index': item.google_index}
+                result.append(temp)
+
+        return JsonResponse(result, safe=False)
+    else:
+        return HttpResponse('Error.')
+
+
+@csrf_exempt
+def google_index(request):
+    if request.method == 'POST':
+        return HttpResponse('Task submitted.')
+    elif request.method == 'GET':
+        para = request.GET
+        today = datetime.datetime.today()
+        start_time = (today - datetime.timedelta(days=6)).strftime('%Y-%m-%d')
+        end_time = (today + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
+        if para.__contains__('start_time'):
+            start_time = para.__getitem__('start_time')
+        if para.__contains__('end_time'):
+            end_time = para.__getitem__('end_time')
+            # endTime = datetime.datetime.strptime(para.__getitem__('end_time'), '%Y-%m-%d').date()
+            # end_time = (endTime + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
+        result = collections.OrderedDict()
+        res = GoogleIndex.objects.filter(date__range=(start_time, end_time)).order_by('date')
+        dates = res.dates('date', 'day')
+        for date in dates:
+            res_temp = res.filter(date=date)
+            temp = {}
+            for item in res_temp:
+                temp[item.key] = item.google_index
+            result[date.strftime('%m-%d')] = temp
         return JsonResponse(result, safe=False)
     else:
         return HttpResponse('Error.')
@@ -521,21 +597,34 @@ def market_environment(request):
         today = datetime.datetime.today()
         start_time = (today - datetime.timedelta(days=6)).strftime('%Y-%m-%d')
         end_time = (today + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
+        site = 'baidu'
         if para.__contains__('start_time'):
             start_time = para.__getitem__('start_time')
         if para.__contains__('end_time'):
             end_time = para.__getitem__('end_time')
             # endTime = datetime.datetime.strptime(para.__getitem__('end_time'), '%Y-%m-%d').date()
             # end_time = (endTime + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
+        if para.__contains__('site'):
+                site = para.__getitem__('site')
         result = collections.OrderedDict()
-        res = SearchIndex.objects.filter(date__range=(start_time, end_time)).order_by('date')
-        dates = res.dates('date', 'day')
-        for date in dates:
-            res_temp = res.filter(date=date)
-            temp = {}
-            for item in res_temp:
-                temp[item.key] = item.baidu_index
-            result[date.strftime('%m-%d')] = temp
+        if site == 'baidu':
+            res = SearchIndex.objects.filter(date__range=(start_time, end_time)).order_by('date')
+            dates = res.dates('date', 'day')
+            for date in dates:
+                res_temp = res.filter(date=date)
+                temp = {}
+                for item in res_temp:
+                    temp[item.key] = item.baidu_index
+                result[date.strftime('%m-%d')] = temp
+        elif site == 'google':
+            res = GoogleIndex.objects.filter(date__range=(start_time, end_time)).order_by('date')
+            dates = res.dates('date', 'day')
+            for date in dates:
+                res_temp = res.filter(date=date)
+                temp = {}
+                for item in res_temp:
+                    temp[item.key] = item.google_index
+                result[date.strftime('%m-%d')] = temp
         return JsonResponse(result, safe=False)
     else:
         return HttpResponse('Error.')
@@ -686,6 +775,7 @@ def test(request):
     if request.method == 'POST':
         return HttpResponse('Task submitted.')
     elif request.method == 'GET':
+        # g()
         t()
         return HttpResponse('Task submitted.')
     else:
