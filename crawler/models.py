@@ -25,6 +25,15 @@ class SearchIndex(models.Model):
     def __unicode__(self):
         return str(self.id)
 
+class GoogleIndex(models.Model):
+    key = models.CharField(max_length=200)
+    google_index = models.IntegerField(default=0)
+    date = models.DateField(auto_now=False, auto_now_add=False)
+    date_created = models.DateTimeField(auto_now_add=True)
+
+    def __unicode__(self):
+        return str(self.id)
+
 
 class CompetitorSales(models.Model):
     commodity = models.CharField(max_length=200)
