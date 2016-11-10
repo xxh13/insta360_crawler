@@ -25,6 +25,15 @@ class SearchIndex(models.Model):
     def __unicode__(self):
         return str(self.id)
 
+class GoogleIndex(models.Model):
+    key = models.CharField(max_length=200)
+    google_index = models.IntegerField(default=0)
+    date = models.DateField(auto_now=False, auto_now_add=False)
+    date_created = models.DateTimeField(auto_now_add=True)
+
+    def __unicode__(self):
+        return str(self.id)
+
 
 class CompetitorSales(models.Model):
     commodity = models.CharField(max_length=200)
@@ -107,6 +116,36 @@ class Log(models.Model):
     table = models.CharField(max_length=200)
     operator = models.CharField(max_length=200)
     location = models.CharField(max_length=200)
+    date_created = models.DateTimeField(auto_now_add=True)
+
+    def __unicode__(self):
+        return str(self.id)
+
+
+class MediaFan(models.Model):
+    platform = models.CharField(max_length=200)
+    fans_increment = models.IntegerField(default=0)
+    fans = models.IntegerField(default=0)
+    date = models.DateField(auto_now=False, auto_now_add=False)
+    date_created = models.DateTimeField(auto_now_add=True)
+
+    def __unicode__(self):
+        return str(self.id)
+
+
+class TaobaoDetail(models.Model):
+    shop = models.CharField(max_length=200)
+    shop_keeper = models.CharField(max_length=200)
+    name = models.CharField(max_length=200)
+    commodity = models.CharField(max_length=200)
+    price = models.FloatField(default=0.0)
+    pay = models.IntegerField(default=0)
+    sales = models.IntegerField(default=0)
+    store_id = models.CharField(max_length=200)
+    link = models.CharField(max_length=200)
+    location = models.CharField(max_length=200)
+    is_tmall = models.IntegerField(default=0)
+    date = models.DateField(auto_now=False, auto_now_add=False)
     date_created = models.DateTimeField(auto_now_add=True)
 
     def __unicode__(self):
