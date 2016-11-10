@@ -1,6 +1,7 @@
 from django.contrib import admin
 from .models import UseCondition
 from .models import SearchIndex
+from .models import GoogleIndex
 from .models import CompetitorSales
 from .models import UserDistribution
 from .models import SalesStatus
@@ -18,6 +19,10 @@ class UseConditionAdmin(admin.ModelAdmin):
 
 class SearchIndexAdmin(admin.ModelAdmin):
     list_display = ('id', 'date', 'key', 'baidu_index', 'date_created')
+
+
+class GoogleIndexAdmin(admin.ModelAdmin):
+    list_display = ('id', 'date', 'key', 'google_index', 'date_created')
 
 
 class CompetitorSalesAdmin(admin.ModelAdmin):
@@ -58,6 +63,7 @@ class TaobaoDetailAdmin(admin.ModelAdmin):
 
 admin.site.register(UseCondition, UseConditionAdmin)
 admin.site.register(SearchIndex, SearchIndexAdmin)
+admin.site.register(GoogleIndex, GoogleIndexAdmin)
 admin.site.register(CompetitorSales, CompetitorSalesAdmin)
 admin.site.register(UserDistribution, UserDistributionAdmin)
 admin.site.register(ErrorCondition, ErrorConditionAdmin)

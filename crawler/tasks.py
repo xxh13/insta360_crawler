@@ -4,6 +4,7 @@ from celery import shared_task
 from celery.utils.log import get_task_logger
 from .models import UseCondition
 from .models import SearchIndex
+from .models import GoogleIndex
 from .models import CompetitorSales
 from .models import UserDistribution
 from .models import ErrorCondition
@@ -13,6 +14,7 @@ from .crawlers.umeng.UmengCrawler import UmengCrawler
 from .crawlers.taobao.TaobaoCrawler import TaobaoCrawler
 from .crawlers.jd.JDCrawler import JDCrawler
 from .crawlers.baidu_index.main import *
+from .crawlers.google_index.google_trends import google_index
 from .crawlers.fans_crawler.main import main as fans_crawler
 
 import datetime
@@ -72,6 +74,26 @@ def get_baidu_index():
     data = json.loads(result)
     for item in data:
         SearchIndex.objects.update_or_create(date=item['date'], key=item['key'], defaults=item)
+    return 'Finished.'
+
+
+@shared_task
+def get_google_index():
+    result = '[]'
+    count = 0
+    while True:
+        try:
+            count += 1
+            result = google_index()
+            break
+        except:
+            print 'error'
+            if count >= 3:
+                break
+            time.sleep(5)
+    data = json.loads(result)
+    for item in data:
+        GoogleIndex.objects.update_or_create(date=item['date'], key=item['key'], defaults=item)
     return 'Finished.'
 
 

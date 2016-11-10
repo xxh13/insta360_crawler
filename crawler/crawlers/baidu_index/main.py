@@ -42,7 +42,7 @@ def baidu_index(start_date, end_date):
                     value = baidu_index_dict[date]
                     temp = {'key': keyword_unicode, 'date': date, 'baidu_index': value}
                     data_list.append(temp)
-                    print temp
+                    # print temp
         except:
             print traceback.format_exc()
     jsonResult = json.dumps(data_list)

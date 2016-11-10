@@ -11,6 +11,7 @@ urlpatterns = [
     url(r'^user_area/$', views.user_area, name='user_area'),
     url(r'^use_condition/$', views.use_condition, name='use_condition'),
     url(r'^search_index/$', views.search_index, name='search_index'),
+    url(r'^google_index/$', views.google_index, name='google_index'),
     url(r'^error_condition/$', views.error_condition, name='error_condition'),
     url(r'^market_environment/$', views.market_environment, name='market_environment'),
     url(r'^competitor_data/$', views.competitor_data, name='competitor_data'),
