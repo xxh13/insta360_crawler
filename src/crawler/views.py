@@ -749,6 +749,7 @@ def taobao_detail(request):
         stores = []
         for item in res:
             temp = {
+                'store_id': item.store_id,
                 'shop': item.shop,
                 'name': item.name,
                 'price': item.price,
@@ -768,6 +769,34 @@ def taobao_detail(request):
         return HttpResponse('Error.')
 
 
+@csrf_exempt
+def store_detail(request):
+    if request.method == 'POST':
+        return HttpResponse('Task submitted.')
+    elif request.method == 'GET':
+        para = request.GET
+        if not para.__contains__('store_id'):
+            return HttpResponse('Missing parameter store_id')
+        store_id = para.__getitem__('store_id')
+        today = datetime.datetime.today()
+        start_time = (today - datetime.timedelta(days=29)).strftime('%Y-%m-%d')
+        end_time = (today + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
+        if para.__contains__('start_time'):
+            start_time = para.__getitem__('start_time')
+        if para.__contains__('end_time'):
+            end_time = para.__getitem__('end_time')
+        res = TaobaoDetail.objects.filter(store_id=store_id, date__range=(start_time, end_time)).order_by('date')
+        result = {}
+        shop = ''
+        data = collections.OrderedDict()
+        for item in res:
+            date = item.date
+            sales = item.sales
+            shop = item.shop
+            data[date.strftime('%m-%d')] = sales
+        result['data'] = data
+        result['store'] = shop
+        return JsonResponse(result, safe=False)
 
 
 @csrf_exempt
