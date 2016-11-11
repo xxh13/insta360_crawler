@@ -1,0 +1,3 @@
+#!/usr/bin/with-contenv sh
+
+cd /app && /usr/local/bin/celery -A internal worker -Q celery -B -l info --hostname=docker_internal
