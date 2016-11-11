@@ -37,7 +37,7 @@ VOLUME /app
 ADD root /
 
 # run server
-COPY . /app
+COPY src/ /app
 
 WORKDIR /app/
 
