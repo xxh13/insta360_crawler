@@ -4,3 +4,4 @@ Django==1.9
 django-celery==3.1.17
 django-cors-headers==1.1.0
 requests==2.2.1
+phantomJS==2.2.1
