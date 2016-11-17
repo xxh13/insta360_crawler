@@ -87,8 +87,9 @@ class JDCrawler:
                 comment = int(temp)
                 print comment
                 link = element.find_element_by_xpath("div/div[@class='p-img']/a").get_attribute("href")
+                title = element.find_element_by_xpath("div/div[@class='p-img']/a").get_attribute("title")
                 id = element.get_attribute("data-sku")
-                commodity = Commodity(name, price, comment, link, id)
+                commodity = Commodity(name, price, comment, link, id, title)
                 self.commodityList.append(commodity)
                 # print count
                 # commodity.show()
@@ -122,9 +123,9 @@ class JDCrawler:
         i = 0
         s = set()
         while i < len(self.commodityList):
-            id = self.commodityList[i].id
-            if not id in s:
-                s.add(id)
+            title = self.commodityList[i].title
+            if not title in s:
+                s.add(title)
             else:
                 del self.commodityList[i]
                 i -= 1

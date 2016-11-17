@@ -6,13 +6,15 @@ class Commodity:
     link = ""
     id = ""
     sales = 0
+    title = ''
 
-    def __init__(self, name, price, comment, link, id):
+    def __init__(self, name, price, comment, link, id, title):
         self.name = name
         self.price = price
         self.comment = comment
         self.link = link
         self.id = id
+        self.title = title
 
     def setPrice(self, price):
         self.price = price
@@ -25,6 +27,9 @@ class Commodity:
 
     def setLink(self, link):
         self.link = link
+
+    def setTitle(self, title):
+        self.title = title
 
     def setId(self,id):
         self.id = id
@@ -39,4 +44,5 @@ class Commodity:
         print "comment: ",self.comment
         print "link: ",self.link
         print "id: ", self.id
+        print "title: ", self.title
         print
