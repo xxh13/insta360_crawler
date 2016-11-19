@@ -15,9 +15,11 @@ from models import CompetitorSales
 from models import MediaFan
 from models import Log
 from models import TaobaoDetail
-
-from tasks import get_fans as t
+from tasks import get_fans as f
+from tasks import get_taobao_sales as t
+from tasks import get_baidu_index as b
 from tasks import get_google_index as g
+from tasks import get_jd_sales as j
 
 
 import json
@@ -804,8 +806,11 @@ def test(request):
     if request.method == 'POST':
         return HttpResponse('Task submitted.')
     elif request.method == 'GET':
-        # g()
-        t()
+        # b()
+        # j()
+        # t()
+        f()
+        g()
         return HttpResponse('Task submitted.')
     else:
         return HttpResponse('Error.')
