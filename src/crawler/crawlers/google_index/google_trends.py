@@ -3,6 +3,7 @@ import sys
 import json
 import time
 import urllib
+import urllib2
 import requests
 import ssl
 import datetime
@@ -22,7 +23,6 @@ before = now.replace(year=year, month=month, day=day)
 start_date = before.strftime('%Y-%m-%d')
 end_date = now.strftime('%Y-%m-%d')
 def google_index():
-    ssl.wrap_socket = sslwrap(ssl.wrap_socket)
     tasks = ['insta360', 'gear 360', 'theta s', 'okaa', 'eyesir', 'ZMER', '全景相机']
     result = []
     for task in tasks:
@@ -108,10 +108,12 @@ def get_token(key):
 def sslwrap(func):
     @wraps(func)
     def bar(*args, **kw):
-        kw['ssl_version'] = ssl._PROTOCOL_NAMES
+        kw['ssl_version'] = ssl.PROTOCOL_TLSv1
+        # kw['ssl_version'] = ssl._PROTOCOL_NAMES
         return func(*args, **kw)
     return bar
 
 
 if __name__ == '__main__':
+    ssl.wrap_socket = sslwrap(ssl.wrap_socket)
     google_index()
