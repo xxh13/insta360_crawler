@@ -250,3 +250,11 @@ def get_fans():
             item['fans_increment'] = 0
         MediaFan.objects.update_or_create(date=item['date'], platform=item['platform'], defaults=item)
     return 'Finished.'
+
+
+@shared_task
+def refresh_active():
+    request = urllib2.Request(url='http://sales.internal.insta360.com/sales/util/refresh_active')
+    response = urllib2.urlopen(request)
+    result = response.read()
+    return result
