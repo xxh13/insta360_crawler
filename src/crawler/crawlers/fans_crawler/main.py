@@ -7,11 +7,12 @@ from twitter_crawler import get_by_request as get_twitter_fans
 from youtube_crawler import get_by_api as get_youtube_fans
 from youku_crawler import get_by_api as get_youku_fans
 from weixin_crawler import get_by_api as get_weixin_fans
+from instagram_crawler import get_by_request as get_instagram_fans
 
 
 
 def main():
-    platform = ['facebook', 'weibo', 'twitter', 'youtube', 'youku', 'weixin']
+    platform = ['facebook', 'weibo', 'twitter', 'youtube', 'youku', 'weixin', 'instagram']
     result = []
     today = datetime.datetime.now().strftime('%Y-%m-%d')
     for i in platform:
@@ -28,6 +29,8 @@ def main():
             fans = get_youku_fans()
         elif i == 'weixin':
             fans = get_weixin_fans()
+        elif i == 'instagram':
+            fans = get_instagram_fans()
         temp = {'platform': i, 'fans': fans, 'date': today}
         result.append(temp)
     jsonResult = json.dumps(result)

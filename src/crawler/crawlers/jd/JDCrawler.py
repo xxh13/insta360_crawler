@@ -45,13 +45,18 @@ class JDCrawler:
         result = []
         for product in products:
             self.product = product
+            if self.product == 'theta':
+                self.product = 'Ricoh theta'
             self.keyword = self.product.replace(' ', '+')
             self.url = "http://search.jd.com/Search?keyword=" + self.keyword + "&enc=utf-8&psort=4"
+            print self.url
             self.commodityList = []
+            print product
             self.start()
             sales = self.getTotalComments()
             today = datetime.datetime.now().strftime('%Y-%m-%d')
             temp = {'commodity': product, 'jd_total_sales': sales, 'date': today}
+            print temp
             result.append(temp)
         self.driver.quit()
         jsonResult = json.dumps(result)
@@ -98,7 +103,7 @@ class JDCrawler:
             self.filterNano()
         elif self.product == 'Gear 360':
             self.filterGear()
-        elif self.product == 'theta':
+        elif self.product == 'Ricoh theta':
             self.filterTheta()
         elif self.product == 'LG 360 CAM':
             self.filterLG()
@@ -113,7 +118,7 @@ class JDCrawler:
         while i < len(self.commodityList):
             name = self.commodityList[i].name.lower()
             price = self.commodityList[i].price
-            if ((not ('insta' in name)) or (not ('nano' in name)) or ('gear' in name) or (price < 100) or (
+            if ((not ('insta' in name)) or (not ('nano' in name)) or (price < 500) or (
                 price > 2317)):
                 del self.commodityList[i]
                 i -= 1
