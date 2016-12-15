@@ -15,6 +15,7 @@ from models import CompetitorSales
 from models import MediaFan
 from models import Log
 from models import TaobaoDetail
+from tasks import *
 from tasks import get_fans as f
 from tasks import get_taobao_sales as t
 from tasks import get_baidu_index as b
@@ -806,11 +807,14 @@ def test(request):
     if request.method == 'POST':
         return HttpResponse('Task submitted.')
     elif request.method == 'GET':
-        # b()
-        # j()
+        b()
+        j()
         # t()
         f()
         g()
+        # get_user_distribution()
+        # get_use_condition()
+        # get_error()
         return HttpResponse('Task submitted.')
     else:
         return HttpResponse('Error.')
