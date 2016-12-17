@@ -2,6 +2,7 @@
 from __future__ import absolute_import
 from celery import shared_task
 from celery.utils.log import get_task_logger
+from django.contrib.auth.models import User
 from .models import UseCondition
 from .models import SearchIndex
 from .models import GoogleIndex
@@ -16,6 +17,7 @@ from .crawlers.jd.JDCrawler import JDCrawler
 from .crawlers.baidu_index.main import *
 from .crawlers.google_index.google_trends import google_index
 from .crawlers.fans_crawler.main import main as fans_crawler
+from .util.admin import password_updater
 
 import datetime
 import time
@@ -258,3 +260,9 @@ def refresh_active():
     response = urllib2.urlopen(request)
     result = response.read()
     return result
+
+
+@shared_task
+def update_password():
+    password = password_updater()
+    return password
