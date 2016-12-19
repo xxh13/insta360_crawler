@@ -11,8 +11,8 @@ RUN apt-get update \
 
 RUN mkdir -p /app \
 	&& mkdir -p /var/log/supervisor/ \
-    ln -sf /dev/stdout /var/log/nginx/access.log && \
-    ln -sf /dev/stderr /var/log/nginx/error.log
+    && ln -sf /dev/stdout /var/log/nginx/access.log \
+    && ln -sf /dev/stderr /var/log/nginx/error.log
 
 ADD root /
 
