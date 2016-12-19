@@ -1,38 +1,18 @@
-FROM python:2.7.12-alpine
+FROM thonatos/ubuntu-python-phantomjs:2.7-2.1.1
 
 MAINTAINER Thonatos.Yang <thonatos.yang@gmail.com>
 LABEL vendor=implements.io
 LABEL io.implements.version=0.1.0
 
-ENV S6_OVERLAY_VERSION=v1.17.2.0 \
-    HOME=/root
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends supervisor nginx \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-# update repositories
-RUN sed -i "s/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g" /etc/apk/repositories
-
-# use aliyun mirrors
-COPY root/root/.pip/ /root/.pip/
-
-# install package
-RUN apk add --update curl gcc g++ libgcc make \
-    zlib-dev libjpeg-turbo-dev tiff-dev \
-    mariadb-dev \
-    nginx \
-    && curl -sSL https://github.com/just-containers/s6-overlay/releases/download/${S6_OVERLAY_VERSION}/s6-overlay-amd64.tar.gz | tar xfz - -C /
-
-# install pillow & mysqlclient
-RUN pip install pillow mysqlclient
-
-# clean cache & package
-RUN apk del gcc g++ make \
-    && rm -rf /usr/include /usr/share/man /tmp/* /var/cache/apk/*     
-
-# nginx
-RUN mkdir -p /app && \
+RUN mkdir -p /app \
+	&& mkdir -p /var/log/supervisor/ \
     ln -sf /dev/stdout /var/log/nginx/access.log && \
     ln -sf /dev/stderr /var/log/nginx/error.log
-
-VOLUME /app
 
 ADD root /
 
@@ -45,4 +25,4 @@ RUN pip install -r requirements.txt
 
 EXPOSE 80 443 8000
 
-ENTRYPOINT ["/init"]
+CMD ["/usr/bin/supervisord","-n"]

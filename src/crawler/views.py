@@ -807,14 +807,14 @@ def test(request):
     if request.method == 'POST':
         return HttpResponse('Task submitted.')
     elif request.method == 'GET':
-        b()
-        j()
-        # t()
-        f()
-        g()
+        # b()
+        # j()
+        t()
+        # f()
+        # g()
         # get_user_distribution()
         # get_use_condition()
         # get_error()
-        return HttpResponse('Task submitted.')
+        return HttpResponse('succeed')
     else:
         return HttpResponse('Error.')

@@ -138,7 +138,7 @@ class TaobaoCrawler:
         while i < len(self.commodityList):
             name = self.commodityList[i].name.lower()
             price = self.commodityList[i].price
-            if ((not ('insta' in name)) or (not ('nano' in name)) or ('gear' in name) or (price < 1000) or (
+            if ((not ('insta' in name)) or (not ('nano' in name)) or ('gear' in name) or (price < 500) or (
                         price > 1500)):
                 del self.commodityList[i]
                 i -= 1
