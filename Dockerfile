@@ -5,7 +5,7 @@ LABEL vendor=implements.io
 LABEL io.implements.version=0.1.0
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends supervisor nginx \
+    && apt-get install -y --no-install-recommends supervisor nginx vi \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
