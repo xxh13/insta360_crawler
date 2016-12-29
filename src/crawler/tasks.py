@@ -9,6 +9,7 @@ from .models import GoogleIndex
 from .models import CompetitorSales
 from .models import UserDistribution
 from .models import ErrorCondition
+from .models import ShareChannel
 from .models import MediaFan
 from .models import TaobaoDetail
 from .crawlers.umeng.UmengCrawler import UmengCrawler
@@ -202,10 +203,55 @@ def get_error():
 
 
 @shared_task
+def get_share_channel():
+    today = datetime.datetime.today()
+    end_date = today.strftime('%Y-%m-%d')
+    start_date = (today - datetime.timedelta(days=2)).strftime('%Y-%m-%d')
+    result = '[]'
+    count = 0
+    while True:
+        try:
+            count += 1
+            crawler = UmengCrawler()
+            result = crawler.getShareChannel(start_date, end_date)
+            break
+        except:
+            print 'error'
+            if count >= 3:
+                break
+            time.sleep(5)
+    data = json.loads(result)
+    for item in data:
+        event_group_id = item['event_group_id']
+        type = item['type']
+        version = item['version']
+        channel = item['channel']
+        detail = item['data']
+
+        for i in detail:
+            try:
+                device = int(i['device'])
+            except:
+                device = 0
+            temp = {
+                'channel': channel,
+                'type': type,
+                'count': i['count'],
+                'device': device,
+                'count_per_launch': i['count_per_launch']
+            }
+            ShareChannel.objects.update_or_create(date=i['date'],
+                                                  event_group_id=event_group_id,
+                                                  version=version,
+                                                  defaults=temp)
+    return 'Finished.'
+
+
+@shared_task
 def get_user_distribution():
     today = datetime.datetime.today()
     end_date = today.strftime('%Y-%m-%d')
-    start_date = (today - datetime.timedelta(days=6)).strftime('%Y-%m-%d')
+    start_date = (today - datetime.timedelta(days=2)).strftime('%Y-%m-%d')
     result = '[]'
     count = 0
     while True:

@@ -48,6 +48,19 @@ class CompetitorSales(models.Model):
         return str(self.id)
 
 
+class AbroadSales(models.Model):
+    commodity = models.CharField(max_length=200)
+    country = models.CharField(max_length=200)
+    comment = models.IntegerField(default=0)
+    total_comment = models.IntegerField(default=0)
+    site = models.CharField(max_length=200)
+    date = models.DateField(auto_now=False, auto_now_add=False)
+    date_created = models.DateTimeField(auto_now_add=True)
+
+    def __unicode__(self):
+        return str(self.id)
+
+
 class UserDistribution(models.Model):
     location = models.CharField(max_length=200)
     active_user = models.IntegerField(default=0)
@@ -67,6 +80,21 @@ class UserDistribution(models.Model):
 class ErrorCondition(models.Model):
     total_error = models.IntegerField(default=0)
     date = models.DateField(auto_now=False, auto_now_add=False)
+    date_created = models.DateTimeField(auto_now_add=True)
+
+    def __unicode__(self):
+        return str(self.id)
+
+
+class ShareChannel(models.Model):
+    event_group_id = models.CharField(max_length=200, blank=True)
+    channel = models.CharField(max_length=200, blank=True)
+    type = models.CharField(max_length=200, blank=True)
+    date = models.DateField(auto_now=False, auto_now_add=False)
+    version = models.CharField(max_length=200, blank=True)
+    count = models.IntegerField(default=0)
+    device = models.IntegerField(default=0)
+    count_per_launch = models.FloatField(default=0.0)
     date_created = models.DateTimeField(auto_now_add=True)
 
     def __unicode__(self):

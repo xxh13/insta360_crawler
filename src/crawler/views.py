@@ -12,6 +12,7 @@ from models import ErrorCondition
 from models import SearchIndex
 from models import GoogleIndex
 from models import CompetitorSales
+from models import ShareChannel
 from models import MediaFan
 from models import Log
 from models import TaobaoDetail
@@ -500,6 +501,43 @@ def use_condition(request):
 
 
 @csrf_exempt
+def share_channel(request):
+    if request.method == 'POST':
+        return HttpResponse('Task submitted.')
+    elif request.method == 'GET':
+        para = request.GET
+        today = datetime.datetime.today()
+        start_time = (today - datetime.timedelta(days=6)).strftime('%Y-%m-%d')
+        end_time = (today + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
+        if para.__contains__('start_time'):
+            start_time = para.__getitem__('start_time')
+        if para.__contains__('end_time'):
+            end_time = para.__getitem__('end_time')
+        type = 'img'
+        if para.__contains__('type'):
+            type = para.__getitem__('type')
+        version = '1.6.3'
+        if para.__contains__('version'):
+            version = para.__getitem__('version')
+        result = collections.OrderedDict()
+        res = ShareChannel.objects.filter(date__range=(start_time, end_time), version=version,type=type).order_by('date')
+        dates = res.dates('date', 'day')
+        for date in dates:
+            res_temp = res.filter(date=date).order_by('count')
+            temp = collections.OrderedDict()
+            for item in res_temp:
+                temp[item.channel] = item.count
+            result[date.strftime('%m-%d')] = temp
+        versions = ShareChannel.objects.values('version').distinct()
+        temp1 = []
+        for item in versions:
+            temp1.append(item['version'])
+        return JsonResponse({'versions': temp1, 'data': result}, safe=False)
+    else:
+        return HttpResponse('Error.')
+
+
+@csrf_exempt
 def search_index(request):
     if request.method == 'POST':
         return HttpResponse('Task submitted.')
@@ -809,12 +847,13 @@ def test(request):
     elif request.method == 'GET':
         # b()
         # j()
-        t()
+        # t()
         # f()
         # g()
         # get_user_distribution()
         # get_use_condition()
         # get_error()
+        # get_share_channel()
         return HttpResponse('succeed')
     else:
         return HttpResponse('Error.')

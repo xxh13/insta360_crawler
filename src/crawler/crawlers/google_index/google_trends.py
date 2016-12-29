@@ -61,7 +61,6 @@ def get_google_trend(key):
         url = url + index + '=' + value[index] + '&'
     results = requests.get(url, headers=headers)
     page = results.content
-    print page
     jsonData = page[5:]
     data = json.loads(jsonData, encoding="utf-8")
     items = data['default']['timelineData']
@@ -99,7 +98,6 @@ def get_token(key):
         url = url + index + '=' + value[index] + '&'
     results = requests.get(url, headers=headers)
     page = results.content
-    print page
     jsonData = page[5:]
     data = json.loads(jsonData, encoding="utf-8")
     the_token = data['widgets'][0]['token']
