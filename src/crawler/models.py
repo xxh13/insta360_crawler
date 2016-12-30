@@ -101,6 +101,22 @@ class ShareChannel(models.Model):
         return str(self.id)
 
 
+class ShareCount(models.Model):
+    type = models.CharField(max_length=200, blank=True)
+    date = models.DateField(auto_now=False, auto_now_add=False)
+    version = models.CharField(max_length=200, blank=True)
+    success_count = models.IntegerField(default=0)
+    success_device = models.IntegerField(default=0)
+    success_count_per_launch = models.FloatField(default=0.0)
+    try_count = models.IntegerField(default=0)
+    try_device = models.IntegerField(default=0)
+    try_count_per_launch = models.FloatField(default=0.0)
+    date_created = models.DateTimeField(auto_now_add=True)
+
+    def __unicode__(self):
+        return str(self.id)
+
+
 class SalesStatus(models.Model):
 
     location = models.CharField(max_length=200)

@@ -275,6 +275,7 @@ class UmengCrawler:
             if hasattr(e, "reason"):
                 print e.reason
 
+
     def getShareChannel(self, start_date, end_date):
         event_group_ids = {
             '微信_img': '57afe74767e58ea4ca000428',
@@ -319,6 +320,34 @@ class UmengCrawler:
                     'channel': temps[0],
                     'type': temps[1],
                     'data': data
+                }
+                result.append(temp)
+        jsonResult = json.dumps(result)
+        return jsonResult
+
+
+    def getShareCount(self, start_date, end_date):
+        event_group_ids = {
+            'video_success': '576ba13767e58eb24f001ee5',
+            'video_try': '576ca33267e58e9c380026a4',
+            'img_try': '576ca36067e58ed3450030a8',
+            'img_success': '576ba15a67e58e15b2001435'
+        }
+        versions = self.getVersions()
+        result = []
+        for version in versions:
+            if version < '1.6.0':
+                continue
+            for index in event_group_ids:
+                event_group_id = event_group_ids[index]
+                data = self.getEvent(start_date, end_date, event_group_id, version)
+                temps = index.split('_')
+                temp = {
+                    'version': version,
+                    'event_group_id': event_group_id,
+                    'data': data,
+                    'type': temps[0],
+                    'flag': temps[1]
                 }
                 result.append(temp)
         jsonResult = json.dumps(result)

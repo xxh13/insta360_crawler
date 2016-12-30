@@ -9,6 +9,7 @@ from .models import SalesStatus
 from .models import ElectronicSales
 from .models import ErrorCondition
 from .models import ShareChannel
+from .models import ShareCount
 from .models import Log
 from .models import MediaFan
 from .models import TaobaoDetail
@@ -53,6 +54,13 @@ class ShareChannelAdmin(admin.ModelAdmin):
                     'version', 'count', 'device', 'count_per_launch', 'date_created')
 
 
+class ShareCountAdmin(admin.ModelAdmin):
+    list_display = ('id', 'type', 'date',
+                    'version', 'success_count', 'success_device',
+                    'success_count_per_launch', 'try_count', 'try_device',
+                    'try_count_per_launch', 'date_created')
+
+
 class SalesStatusAdmin(admin.ModelAdmin):
     list_display = ('id', 'week', 'location', 'pick_up',
                     'agent_name', 'agent_type', 'agent_price',
@@ -87,6 +95,7 @@ admin.site.register(AbroadSales, AbroadSalesAdmin)
 admin.site.register(UserDistribution, UserDistributionAdmin)
 admin.site.register(ErrorCondition, ErrorConditionAdmin)
 admin.site.register(ShareChannel, ShareChannelAdmin)
+admin.site.register(ShareCount, ShareCountAdmin)
 admin.site.register(SalesStatus, SalesStatusAdmin)
 admin.site.register(ElectronicSales, ElectronicSalesAdmin)
 admin.site.register(Log, LogAdmin)

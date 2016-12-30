@@ -10,6 +10,7 @@ from .models import CompetitorSales
 from .models import UserDistribution
 from .models import ErrorCondition
 from .models import ShareChannel
+from .models import ShareCount
 from .models import MediaFan
 from .models import TaobaoDetail
 from .crawlers.umeng.UmengCrawler import UmengCrawler
@@ -244,6 +245,63 @@ def get_share_channel():
                                                   event_group_id=event_group_id,
                                                   version=version,
                                                   defaults=temp)
+    return 'Finished.'
+
+
+@shared_task
+def get_share_count():
+    today = datetime.datetime.today()
+    end_date = today.strftime('%Y-%m-%d')
+    start_date = (today - datetime.timedelta(days=2)).strftime('%Y-%m-%d')
+    result = '[]'
+    count = 0
+    while True:
+        try:
+            count += 1
+            crawler = UmengCrawler()
+            result = crawler.getShareCount(start_date, end_date)
+            break
+        except:
+            print 'error'
+            if count >= 3:
+                break
+            time.sleep(5)
+    data = json.loads(result)
+    for item in data:
+        type = item['type']
+        version = item['version']
+        flag = item['flag']
+        detail = item['data']
+        if flag == 'success':
+            for i in detail:
+                try:
+                    device = int(i['device'])
+                except:
+                    device = 0
+                temp = {
+                    'success_count': i['count'],
+                    'success_device': device,
+                    'success_count_per_launch': i['count_per_launch']
+                }
+                ShareCount.objects.update_or_create(date=i['date'],
+                                                      version=version,
+                                                      type=type,
+                                                      defaults=temp)
+        else:
+            for i in detail:
+                try:
+                    device = int(i['device'])
+                except:
+                    device = 0
+                temp = {
+                    'try_count': i['count'],
+                    'try_device': device,
+                    'try_count_per_launch': i['count_per_launch']
+                }
+                ShareCount.objects.update_or_create(date=i['date'],
+                                                      version=version,
+                                                      type=type,
+                                                      defaults=temp)
     return 'Finished.'
 
 

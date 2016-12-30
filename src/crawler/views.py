@@ -538,6 +538,52 @@ def share_channel(request):
 
 
 @csrf_exempt
+def share_count(request):
+    if request.method == 'POST':
+        return HttpResponse('Task submitted.')
+    elif request.method == 'GET':
+        para = request.GET
+        today = datetime.datetime.today()
+        start_time = (today - datetime.timedelta(days=6)).strftime('%Y-%m-%d')
+        end_time = (today + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
+        if para.__contains__('start_time'):
+            start_time = para.__getitem__('start_time')
+        if para.__contains__('end_time'):
+            end_time = para.__getitem__('end_time')
+        type = 'img'
+        if para.__contains__('type'):
+            type = para.__getitem__('type')
+        version = '1.6.3'
+        if para.__contains__('version'):
+            version = para.__getitem__('version')
+        result = collections.OrderedDict()
+
+        res = ShareCount.objects.filter(date__range=(start_time, end_time), version=version,type=type).order_by('date')
+        dates = res.dates('date', 'day')
+        for date in dates:
+            res_temp = res.filter(date=date).order_by('success_count')
+            temp = collections.OrderedDict()
+            for item in res_temp:
+                try_count = item.try_count
+                success_count = item.success_count
+                if try_count == 0:
+                    percent = 0
+                else:
+                    percent = round(success_count * 100.0 / try_count, 1)
+                temp['share_count'] = try_count
+                temp['success_count'] = success_count
+                temp['percent'] = percent
+            result[date.strftime('%m-%d')] = temp
+        versions = ShareCount.objects.values('version').distinct()
+        temp1 = []
+        for item in versions:
+            temp1.append(item['version'])
+        return JsonResponse({'versions': temp1, 'data': result}, safe=False)
+    else:
+        return HttpResponse('Error.')
+
+
+@csrf_exempt
 def search_index(request):
     if request.method == 'POST':
         return HttpResponse('Task submitted.')
@@ -853,7 +899,7 @@ def test(request):
         # get_user_distribution()
         # get_use_condition()
         # get_error()
-        # get_share_channel()
+        # get_share_count()
         return HttpResponse('succeed')
     else:
         return HttpResponse('Error.')
