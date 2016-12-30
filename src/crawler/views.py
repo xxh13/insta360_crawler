@@ -13,6 +13,7 @@ from models import SearchIndex
 from models import GoogleIndex
 from models import CompetitorSales
 from models import ShareChannel
+from models import ShareCount
 from models import MediaFan
 from models import Log
 from models import TaobaoDetail
