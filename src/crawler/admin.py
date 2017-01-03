@@ -46,7 +46,7 @@ class UserDistributionAdmin(admin.ModelAdmin):
 
 
 class ErrorConditionAdmin(admin.ModelAdmin):
-    list_display = ('id', 'date', 'total_error', 'date_created')
+    list_display = ('id', 'date', 'total_error', 'error_rate', 'date_created')
 
 
 class ShareChannelAdmin(admin.ModelAdmin):

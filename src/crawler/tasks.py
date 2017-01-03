@@ -200,6 +200,23 @@ def get_error():
     data = json.loads(result)
     for item in data:
         ErrorCondition.objects.update_or_create(date=item['date'], defaults=item)
+
+    result = '[]'
+    count = 0
+    while True:
+        try:
+            count += 1
+            crawler = UmengCrawler()
+            result = crawler.getErrorRate(start_date, end_date)
+            break
+        except:
+            print 'error'
+            if count >= 3:
+                break
+            time.sleep(5)
+    data = json.loads(result)
+    for item in data:
+        ErrorCondition.objects.update_or_create(date=item['date'], defaults=item)
     return 'Finished.'
 
 

@@ -79,6 +79,7 @@ class UserDistribution(models.Model):
 
 class ErrorCondition(models.Model):
     total_error = models.IntegerField(default=0)
+    error_rate = models.FloatField(default=0.0)
     date = models.DateField(auto_now=False, auto_now_add=False)
     date_created = models.DateTimeField(auto_now_add=True)
 

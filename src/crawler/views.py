@@ -669,7 +669,7 @@ def error_condition(request):
         result = []
         res = ErrorCondition.objects.filter(date__range=(start_time, end_time)).order_by('date')
         for item in res:
-            temp = {'date': item.date.strftime('%m-%d'), 'total_error': item.total_error}
+            temp = {'date': item.date.strftime('%m-%d'), 'total_error': item.total_error, 'error_rate': item.error_rate}
             result.append(temp)
         return JsonResponse(result, safe=False)
     else:
@@ -895,12 +895,8 @@ def test(request):
         # b()
         # j()
         # t()
-        # f()
-        # g()
-        # get_user_distribution()
-        # get_use_condition()
-        # get_error()
-        # get_share_count()
+        f()
+        g()
         return HttpResponse('succeed')
     else:
         return HttpResponse('Error.')

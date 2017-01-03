@@ -139,6 +139,31 @@ class UmengCrawler:
         jsonResult = json.dumps(result)
         return jsonResult
 
+
+    def getErrorRate(self, start_date, end_date):
+        self.headers['Referer'] = 'http://mobile.umeng.com/apps/cf41008f4de85e761c647675/reports/trend_summary'
+        request = urllib2.Request(
+            'http://mobile.umeng.com/apps/cf41008f4de85e761c647675/reports/load_chart_data?start_date=' + start_date + '&end_date=' + end_date + '&stats=trend_error_rate',
+            headers=self.headers)
+        result = []
+        try:
+            response = urllib2.urlopen(request)
+            jsonData = response.read()
+            res = json.loads(jsonData, encoding="utf-8")
+            data = res['stats'][0]['data']
+            dates = res['dates']
+            for index in range(len(dates)):
+                temp = {'date': dates[index], 'error_rate': data[index]}
+                result.append(temp)
+        except urllib2.URLError, e:
+            if hasattr(e, "code"):
+                print e.code
+            if hasattr(e, "reason"):
+                print e.reason
+        jsonResult = json.dumps(result)
+        return jsonResult
+
+
     def getErrorDetail(self, start_date, end_date):
         # start_date 必须在今天的前15天之后
         self.headers['Referer'] = 'http://mobile.umeng.com/apps/cf41008f4de85e761c647675/error_types'
