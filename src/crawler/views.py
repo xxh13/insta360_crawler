@@ -904,8 +904,8 @@ def test(request):
         # b()
         # j()
         # t()
-        f()
-        g()
-        return HttpResponse('succeed')
+        # f()
+        # g()
+        return HttpResponse('Success')
     else:
         return HttpResponse('Error.')

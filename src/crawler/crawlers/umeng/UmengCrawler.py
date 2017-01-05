@@ -227,10 +227,13 @@ class UmengCrawler:
             date = (end - datetime.timedelta(days=i)).strftime('%Y-%m-%d')
             city = self.getUserCityDistribution(date, date)
             for item in city:
+                is_native = 1
+                if item['date'] == '香港' or item['date'] == '台湾' or item['date'] == '澳门':
+                    is_native = 0
                 temp = {'date': date, 'location': item['date'], 'active_user': item['active_data'],
                         'active_rate': item['active_rate'], 'new_user': item['install_data'],
                         'new_rate': item['install_rate'], 'launch_data': item['launch_data'],
-                        'launch_rate': item['launch_rate'], 'is_native': 1}
+                        'launch_rate': item['launch_rate'], 'is_native': is_native}
                 result.append(temp)
             country = self.getUserCountryDistribution(date, date)
             for item in country:
