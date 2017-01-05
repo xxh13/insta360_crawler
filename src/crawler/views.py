@@ -459,17 +459,26 @@ def user_area(request):
         result = collections.OrderedDict()
         res = UserDistribution.objects.filter(date__range=(start_time, end_time), is_native=is_native)
         locations = res.values('location').annotate(total=Sum('new_user')).order_by('-total')[:10]
+        location_list = []
+        for location in locations:
+            location_list.append(location['location'])
         dates = res.dates('date', 'day')
+        data = collections.OrderedDict()
         for date in dates:
             temp = collections.OrderedDict()
-            for item in locations:
-                location = item['location']
-                try:
-                    query = res.filter(date=date, location=location).first()
-                    temp[location] = query.new_user
-                except AttributeError:
-                    temp[location] = 0
-            result[date.strftime('%m-%d')] = temp
+            # for item in locations:
+            #     location = item['location']
+            #     try:
+            #         query = res.get(date=date, location=location)
+            #         temp[location] = query.new_user
+            #     except:
+            #         temp[location] = 0
+            query = res.filter(date=date, location__in=location_list)
+            for item in query:
+                temp[item.location] = item.new_user
+            data[date.strftime('%m-%d')] = temp
+        result['data'] = data
+        result['locations'] = location_list
         return JsonResponse(result, safe=False)
     else:
         return HttpResponse('Error.')
