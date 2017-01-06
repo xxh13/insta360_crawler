@@ -2,6 +2,7 @@
 from __future__ import absolute_import
 from celery import shared_task
 from celery.utils.log import get_task_logger
+from django.db.models import Sum
 from django.contrib.auth.models import User
 from .models import UseCondition
 from .models import SearchIndex
@@ -324,9 +325,10 @@ def get_share_count():
 
 @shared_task
 def get_user_distribution():
+    delta = 2
     today = datetime.datetime.today()
     end_date = today.strftime('%Y-%m-%d')
-    start_date = (today - datetime.timedelta(days=2)).strftime('%Y-%m-%d')
+    start_date = (today - datetime.timedelta(days=delta)).strftime('%Y-%m-%d')
     result = '[]'
     count = 0
     while True:
@@ -344,7 +346,39 @@ def get_user_distribution():
     for item in data:
         if (item['location'] == '内蒙'):
             item['location'] = '内蒙古'
-        UserDistribution.objects.update_or_create(date=item['date'], location=item['location'], defaults=item)
+        UserDistribution.objects.update_or_create(date=item['date'], location=item['location'], is_native=item['is_native'], defaults=item)
+
+    locations = [
+            '香港',
+            '澳门',
+            '台湾'
+        ]
+    start = (today - datetime.timedelta(days=delta))
+    end = (today + datetime.timedelta(days=1))
+    result = UserDistribution.objects.filter(
+        location__in=locations,
+        date__range=(start, end)
+    ).values(
+            'date'
+        ).annotate(
+        launch_data_total=Sum('launch_data'),
+        active_user_total=Sum('active_user'),
+        new_user_total=Sum('new_user'),
+    )
+    for i in result:
+        date = i['date']
+        new_user_total = i['new_user_total']
+        launch_data_total = i['launch_data_total']
+        active_user_total = i['active_user_total']
+        try:
+            china = UserDistribution.objects.get(date=date, location='中国')
+            china.new_user = china.new_user - new_user_total
+            china.launch_data = china.launch_data - launch_data_total
+            china.active_user = china.active_user - active_user_total
+            china.save()
+        except:
+            pass
+
     return 'Finished.'
 
 
