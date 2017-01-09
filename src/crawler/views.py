@@ -526,10 +526,33 @@ def share_channel(request):
         type = 'img'
         if para.__contains__('type'):
             type = para.__getitem__('type')
-        version = '1.6.3'
+        version = 'all'
         if para.__contains__('version'):
             version = para.__getitem__('version')
         result = collections.OrderedDict()
+
+        if version == 'all':
+            res = ShareChannel.objects.filter(
+                date__range=(start_time, end_time),
+                type=type
+            ).values(
+                'date', 'channel'
+            ).annotate(
+                count_total=Sum('count')
+            ).order_by('date')
+            dates = res.dates('date', 'day')
+            for date in dates:
+                res_temp = res.filter(date=date).order_by('count_total')
+                temp = collections.OrderedDict()
+                for item in res_temp:
+                    temp[item['channel']] = item['count_total']
+                result[date.strftime('%m-%d')] = temp
+            versions = ShareChannel.objects.values('version').distinct()
+            temp1 = []
+            for item in versions:
+                temp1.append(item['version'])
+            return JsonResponse({'versions': temp1, 'data': result}, safe=False)
+
         res = ShareChannel.objects.filter(date__range=(start_time, end_time), version=version,type=type).order_by('date')
         dates = res.dates('date', 'day')
         for date in dates:
@@ -563,12 +586,43 @@ def share_count(request):
         type = 'img'
         if para.__contains__('type'):
             type = para.__getitem__('type')
-        version = '1.6.3'
+        version = 'all'
         if para.__contains__('version'):
             version = para.__getitem__('version')
         result = collections.OrderedDict()
 
-        res = ShareCount.objects.filter(date__range=(start_time, end_time), version=version,type=type).order_by('date')
+        if version == 'all':
+            res = ShareCount.objects.filter(
+                date__range=(start_time, end_time),
+                type=type
+            ).values(
+                'date'
+            ).annotate(
+                try_total=Sum('try_count'),
+                success_total = Sum('success_count')
+            ).order_by('date')
+            dates = res.dates('date', 'day')
+            for date in dates:
+                res_temp = res.filter(date=date).order_by('success_total')
+                temp = collections.OrderedDict()
+                for item in res_temp:
+                    try_count = item['try_total']
+                    success_count = item['success_total']
+                    if try_count == 0:
+                        percent = 0
+                    else:
+                        percent = round(success_count * 100.0 / try_count, 1)
+                    temp['share_count'] = try_count
+                    temp['success_count'] = success_count
+                    temp['percent'] = percent
+                result[date.strftime('%m-%d')] = temp
+            versions = ShareCount.objects.values('version').distinct()
+            temp1 = []
+            for item in versions:
+                temp1.append(item['version'])
+            return JsonResponse({'versions': temp1, 'data': result}, safe=False)
+
+        res = ShareCount.objects.filter(date__range=(start_time, end_time), version=version, type=type).order_by('date')
         dates = res.dates('date', 'day')
         for date in dates:
             res_temp = res.filter(date=date).order_by('success_count')
@@ -904,8 +958,8 @@ def test(request):
         # b()
         # j()
         # t()
-        # f()
-        # g()
+        f()
+        g()
         # test1()
         # get_share_count()
         return HttpResponse('Success')
