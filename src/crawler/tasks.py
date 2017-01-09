@@ -421,3 +421,8 @@ def refresh_active():
 def update_password():
     password = password_updater()
     return password
+
+
+@shared_task
+def test1():
+    return 1

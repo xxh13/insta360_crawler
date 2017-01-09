@@ -906,6 +906,8 @@ def test(request):
         # t()
         # f()
         # g()
+        # test1()
+        # get_share_count()
         return HttpResponse('Success')
     else:
         return HttpResponse('Error.')

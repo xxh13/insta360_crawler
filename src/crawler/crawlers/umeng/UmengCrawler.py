@@ -310,13 +310,13 @@ class UmengCrawler:
             'Facebook_img': '57afe75ce0f55a34db00349c',
             'Whatsapp_img': '57afe7a267e58edf73002e91',
             'Facebook_video': '57afe6ce67e58eb85a0046e5',
-            'Pasteboard_video': '5858e1fdf5ade402780010ac',
+            '链接_video': '5858e1fdf5ade402780010ac',
             '微信_video': '57afe6bee0f55a480400445a',
             'Line_img': '57afe7bce0f55ac27900447b',
             'Whatsapp_video': '57afe71b67e58e317b003814',
             'Moment_img': '57afe78567e58e3c1f001b74',
             'Instagram_video': '5858e1f17666135f19000550',
-            'Pasteboard_img': '5858e214f5ade44ac9000fce',
+            '链接_img': '5858e214f5ade44ac9000fce',
             'Youtube_video': '57afe6ed67e58e84230001c1',
             'Messenger_img': '57afe7af67e58e7837001ac7',
             'Line_video': '57afe73767e58e6bc80006b2',
@@ -380,6 +380,7 @@ class UmengCrawler:
                 result.append(temp)
         jsonResult = json.dumps(result)
         return jsonResult
+
 
 
 if __name__ == "__main__":
