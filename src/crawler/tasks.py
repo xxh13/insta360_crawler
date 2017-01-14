@@ -13,6 +13,7 @@ from .models import ErrorCondition
 from .models import ShareChannel
 from .models import ShareCount
 from .models import MediaFan
+from .models import MediaData
 from .models import TaobaoDetail
 from .crawlers.umeng.UmengCrawler import UmengCrawler
 from .crawlers.taobao.TaobaoCrawler import TaobaoCrawler
@@ -20,6 +21,7 @@ from .crawlers.jd.JDCrawler import JDCrawler
 from .crawlers.baidu_index.main import *
 from .crawlers.google_index.google_trends import google_index
 from .crawlers.fans_crawler.main import main as fans_crawler
+from .crawlers.media_crawler.main import main as media_crawler
 from .util.admin import password_updater
 
 import datetime
@@ -406,6 +408,28 @@ def get_fans():
         else:
             item['fans_increment'] = 0
         MediaFan.objects.update_or_create(date=item['date'], platform=item['platform'], defaults=item)
+    return 'Finished.'
+
+
+@shared_task
+def get_media_data():
+    result = '[]'
+    count = 0
+    while True:
+        try:
+            count += 1
+            result = media_crawler()
+            break
+        except:
+            print 'error'
+            if count >= 3:
+                break
+            time.sleep(5)
+    items = json.loads(result)
+    for item in items:
+        date = item['date']
+        platform = item['platform']
+        MediaData.objects.update_or_create(date=date, platform=platform, defaults=item)
     return 'Finished.'
 
 

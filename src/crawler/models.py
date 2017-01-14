@@ -178,6 +178,21 @@ class MediaFan(models.Model):
         return str(self.id)
 
 
+class MediaData(models.Model):
+    platform = models.CharField(max_length=200)
+    date = models.DateField(auto_now=False, auto_now_add=False)
+    comment = models.IntegerField(default=0)
+    like = models.IntegerField(default=0)
+    share = models.IntegerField(default=0)
+    dislike = models.IntegerField(default=0)
+    view = models.IntegerField(default=0)
+    created_time = models.DateTimeField(auto_now_add=True)
+    update_time = models.DateField(auto_now=True)
+
+    def __unicode__(self):
+        return str(self.id)
+
+
 class TaobaoDetail(models.Model):
     shop = models.CharField(max_length=200)
     shop_keeper = models.CharField(max_length=200)

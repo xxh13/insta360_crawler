@@ -23,6 +23,7 @@ before = now.replace(year=year, month=month, day=day)
 start_date = before.strftime('%Y-%m-%d')
 end_date = now.strftime('%Y-%m-%d')
 def google_index():
+    ssl.wrap_socket = sslwrap(ssl.wrap_socket)
     tasks = ['insta360', 'gear 360', 'theta s', 'okaa', 'eyesir', 'ZMER', '全景相机']
     result = []
     for task in tasks:
@@ -113,5 +114,4 @@ def sslwrap(func):
 
 
 if __name__ == '__main__':
-    ssl.wrap_socket = sslwrap(ssl.wrap_socket)
     google_index()

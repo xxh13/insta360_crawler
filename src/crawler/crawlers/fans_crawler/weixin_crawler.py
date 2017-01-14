@@ -14,7 +14,6 @@ def get_by_api():
     request = urllib2.Request(url = url, data = data)
     response = urllib2.urlopen(request)
     page = response.read()
-    # print page
     data = json.loads(page, encoding="utf-8")
     fans = 0
     try:

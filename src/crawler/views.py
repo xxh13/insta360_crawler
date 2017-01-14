@@ -4,6 +4,7 @@ from django.contrib.auth import authenticate, login
 from django.http import HttpResponse, JsonResponse, QueryDict
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Sum
+from django.forms.models import model_to_dict
 from models import SalesStatus
 from models import ElectronicSales
 from models import UserDistribution
@@ -23,6 +24,7 @@ from tasks import get_taobao_sales as t
 from tasks import get_baidu_index as b
 from tasks import get_google_index as g
 from tasks import get_jd_sales as j
+from util.dict import media_dict
 
 
 import json
@@ -727,8 +729,6 @@ def error_condition(request):
             start_time = para.__getitem__('start_time')
         if para.__contains__('end_time'):
             end_time = para.__getitem__('end_time')
-            # endTime = datetime.datetime.strptime(para.__getitem__('end_time'), '%Y-%m-%d').date()
-            # end_time = (endTime + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
         result = []
         res = ErrorCondition.objects.filter(date__range=(start_time, end_time)).order_by('date')
         for item in res:
@@ -753,8 +753,6 @@ def market_environment(request):
             start_time = para.__getitem__('start_time')
         if para.__contains__('end_time'):
             end_time = para.__getitem__('end_time')
-            # endTime = datetime.datetime.strptime(para.__getitem__('end_time'), '%Y-%m-%d').date()
-            # end_time = (endTime + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
         if para.__contains__('site'):
                 site = para.__getitem__('site')
         result = collections.OrderedDict()
@@ -782,6 +780,55 @@ def market_environment(request):
 
 
 @csrf_exempt
+def media_data(request):
+    if request.method == 'POST':
+        return HttpResponse('Task submitted.')
+    elif request.method == 'GET':
+        para = request.GET
+        today = datetime.datetime.today()
+        start_time = (today - datetime.timedelta(days=6)).strftime('%Y-%m-%d')
+        end_time = (today + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
+        platform = 'facebook'
+        if para.__contains__('start_time'):
+            start_time = para.__getitem__('start_time')
+        if para.__contains__('end_time'):
+            end_time = para.__getitem__('end_time')
+        if para.__contains__('platform'):
+            platform = para.__getitem__('platform')
+        items = {}
+        items['instagram'] = ['comment', 'like']
+        items['weixin'] = ['view', 'like']
+        items['youku'] = ['comment', 'like', 'dislike', 'view']
+        items['youtube'] = ['comment', 'like', 'dislike', 'view']
+        items['twitter'] = ['like', 'share']
+        items['weibo'] = ['comment', 'like', 'share']
+        items['facebook'] = ['comment', 'like', 'share']
+        result = collections.OrderedDict()
+        res = MediaData.objects.filter(date__range=(start_time, end_time), platform=platform).order_by('date')
+        dates = res.dates('date', 'day')
+        for date in dates:
+            try:
+                res_temp = res.get(date=date)
+            except:
+                continue
+            res_temp = model_to_dict(res_temp)
+            temp = {}
+            for item in items[platform]:
+                temp[media_dict[item]] = res_temp[item]
+            result[date.strftime('%m-%d')] = temp
+        platforms = MediaData.objects.values('platform').distinct()
+        temp1 = []
+        for item in platforms:
+            temp1.append(item['platform'])
+        indexes = []
+        for item in items[platform]:
+            indexes.append(media_dict[item])
+        return JsonResponse({'platform': platform,'platforms': temp1, 'data': result, 'indexes': indexes}, safe=False)
+    else:
+        return HttpResponse('Error.')
+
+
+@csrf_exempt
 def competitor_data(request):
     if request.method == 'POST':
         return HttpResponse('Task submitted.')
@@ -795,8 +842,6 @@ def competitor_data(request):
             start_time = para.__getitem__('start_time')
         if para.__contains__('end_time'):
             end_time = para.__getitem__('end_time')
-            # endTime = datetime.datetime.strptime(para.__getitem__('end_time'), '%Y-%m-%d').date()
-            # end_time = (endTime + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
         if para.__contains__('source'):
             source = para.__getitem__('source')
         result = collections.OrderedDict()
@@ -961,7 +1006,7 @@ def test(request):
         f()
         g()
         # test1()
-        # get_share_count()
+        get_media_data()
         return HttpResponse('Success')
     else:
         return HttpResponse('Error.')

@@ -12,6 +12,7 @@ from .models import ShareChannel
 from .models import ShareCount
 from .models import Log
 from .models import MediaFan
+from .models import MediaData
 from .models import TaobaoDetail
 
 
@@ -80,6 +81,10 @@ class LogAdmin(admin.ModelAdmin):
 class MediaFanAdmin(admin.ModelAdmin):
     list_display = ('id', 'platform', 'fans_increment', 'fans', 'date', 'date_created')
 
+class MediaDataAdmin(admin.ModelAdmin):
+    list_display = ('id', 'platform', 'date', 'comment', 'like', 'dislike', 'share', 'view', 'created_time', 'update_time')
+
+
 class TaobaoDetailAdmin(admin.ModelAdmin):
     list_display = ('id', 'shop', 'shop_keeper',
                     'name', 'commodity', 'price',
@@ -100,4 +105,5 @@ admin.site.register(SalesStatus, SalesStatusAdmin)
 admin.site.register(ElectronicSales, ElectronicSalesAdmin)
 admin.site.register(Log, LogAdmin)
 admin.site.register(MediaFan, MediaFanAdmin)
+admin.site.register(MediaData, MediaDataAdmin)
 admin.site.register(TaobaoDetail, TaobaoDetailAdmin)
