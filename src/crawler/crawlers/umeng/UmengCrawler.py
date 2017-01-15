@@ -273,6 +273,7 @@ class UmengCrawler:
         try:
             response = urllib2.urlopen(request)
             jsonData = response.read()
+            print jsonData
             result = json.loads(jsonData, encoding="utf-8")
             return result['stats']
         except urllib2.URLError, e:
@@ -382,7 +383,36 @@ class UmengCrawler:
         return jsonResult
 
 
+    def getTakeCount(self, start_date, end_date):
+        event_group_ids = {
+            'video': '5767490667e58e557e002902',
+            'img': '5767490667e58e557e00290a'
+        }
+        versions = self.getVersions()
+        versions.append('')
+        result = []
+        for version in versions:
+            if version < '1.0.1' and version != '':
+                continue
+            for index in event_group_ids:
+                event_group_id = event_group_ids[index]
+                data = self.getEvent(start_date, end_date, event_group_id, version)
+                v = version
+                if v == '':
+                    v = 'all'
+                temp = {
+                    'version': v,
+                    'event_group_id': event_group_id,
+                    'data': data,
+                    'type': index
+                }
+                result.append(temp)
+        jsonResult = json.dumps(result)
+        return jsonResult
+
+
+
 
 if __name__ == "__main__":
     crawler = UmengCrawler()
-    print crawler.getUseCondition('2016-08-08', '2016-08-12')
+    print crawler.getTakeCount('2016-12-08', '2016-12-14')

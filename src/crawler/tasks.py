@@ -12,13 +12,16 @@ from .models import UserDistribution
 from .models import ErrorCondition
 from .models import ShareChannel
 from .models import ShareCount
+from .models import TakeCount
 from .models import MediaFan
 from .models import MediaData
 from .models import TaobaoDetail
+from .models import GlobalElectronicSales
 from .crawlers.umeng.UmengCrawler import UmengCrawler
 from .crawlers.taobao.TaobaoCrawler import TaobaoCrawler
 from .crawlers.jd.JDCrawler import JDCrawler
 from .crawlers.baidu_index.main import *
+from .crawlers.amazon.amazon_crawler import main as amanzon_crawler
 from .crawlers.google_index.google_trends import google_index
 from .crawlers.fans_crawler.main import main as fans_crawler
 from .crawlers.media_crawler.main import main as media_crawler
@@ -183,6 +186,26 @@ def get_jd_sales():
 
 
 @shared_task
+def get_amazon_sales():
+    result = '[]'
+    count = 0
+    while True:
+        try:
+            count += 1
+            result = amanzon_crawler()
+            break
+        except:
+            print 'error'
+            if count >= 3:
+                break
+            time.sleep(5)
+    data = json.loads(result, encoding="utf-8")
+    for item in data:
+        GlobalElectronicSales.objects.update_or_create(date=item['date'],country=item['country'], commodity=item['commodity'], site=item['site'], defaults=item)
+    return 'Finished.'
+
+
+@shared_task
 def get_error():
     today = datetime.datetime.today()
     end_date = today.strftime('%Y-%m-%d')
@@ -321,6 +344,60 @@ def get_share_count():
                 ShareCount.objects.update_or_create(date=i['date'],
                                                       version=version,
                                                       type=type,
+                                                      defaults=temp)
+    return 'Finished.'
+
+
+@shared_task
+def get_take_count():
+    today = datetime.datetime.today()
+    end_date = today.strftime('%Y-%m-%d')
+    start_date = (today - datetime.timedelta(days=2)).strftime('%Y-%m-%d')
+    result = '[]'
+    count = 0
+    while True:
+        try:
+            count += 1
+            crawler = UmengCrawler()
+            result = crawler.getTakeCount(start_date, end_date)
+            break
+        except:
+            print 'error'
+            if count >= 3:
+                break
+            time.sleep(5)
+    data = json.loads(result)
+    for item in data:
+        type = item['type']
+        version = item['version']
+        detail = item['data']
+        if type == 'img':
+            for i in detail:
+                try:
+                    device = int(i['device'])
+                except:
+                    device = 0
+                temp = {
+                    'img_count': i['count'],
+                    'img_device': device,
+                    'img_count_per_launch': i['count_per_launch']
+                }
+                TakeCount.objects.update_or_create(date=i['date'],
+                                                      version=version,
+                                                      defaults=temp)
+        else:
+            for i in detail:
+                try:
+                    device = int(i['device'])
+                except:
+                    device = 0
+                temp = {
+                    'video_count': i['count'],
+                    'video_device': device,
+                    'video_count_per_launch': i['count_per_launch']
+                }
+                TakeCount.objects.update_or_create(date=i['date'],
+                                                      version=version,
                                                       defaults=temp)
     return 'Finished.'
 

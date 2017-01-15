@@ -48,6 +48,20 @@ class CompetitorSales(models.Model):
         return str(self.id)
 
 
+class GlobalElectronicSales(models.Model):
+    commodity = models.CharField(max_length=200, default='insta360 Nano')
+    country = models.CharField(max_length=200, default='中国')
+    site = models.CharField(max_length=200)
+    comment = models.IntegerField(default=0)
+    sale = models.IntegerField(default=0)
+    date = models.DateField(auto_now=False, auto_now_add=False)
+    created_time = models.DateTimeField(auto_now_add=True)
+    update_time = models.DateTimeField(auto_now=True)
+
+    def __unicode__(self):
+        return str(self.id)
+
+
 class AbroadSales(models.Model):
     commodity = models.CharField(max_length=200)
     country = models.CharField(max_length=200)
@@ -113,6 +127,22 @@ class ShareCount(models.Model):
     try_device = models.IntegerField(default=0)
     try_count_per_launch = models.FloatField(default=0.0)
     date_created = models.DateTimeField(auto_now_add=True)
+
+    def __unicode__(self):
+        return str(self.id)
+
+
+class TakeCount(models.Model):
+    date = models.DateField(auto_now=False, auto_now_add=False)
+    version = models.CharField(max_length=200, blank=True)
+    img_count = models.IntegerField(default=0)
+    img_device = models.IntegerField(default=0)
+    img_count_per_launch = models.FloatField(default=0.0)
+    video_count = models.IntegerField(default=0)
+    video_device = models.IntegerField(default=0)
+    video_count_per_launch = models.FloatField(default=0.0)
+    created_time = models.DateTimeField(auto_now_add=True)
+    update_time = models.DateField(auto_now=True)
 
     def __unicode__(self):
         return str(self.id)

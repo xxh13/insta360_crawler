@@ -15,6 +15,7 @@ from models import GoogleIndex
 from models import CompetitorSales
 from models import ShareChannel
 from models import ShareCount
+from models import TakeCount
 from models import MediaFan
 from models import Log
 from models import TaobaoDetail
@@ -650,6 +651,39 @@ def share_count(request):
 
 
 @csrf_exempt
+def take_count(request):
+    if request.method == 'POST':
+        return HttpResponse('Task submitted.')
+    elif request.method == 'GET':
+        para = request.GET
+        today = datetime.datetime.today()
+        start_time = (today - datetime.timedelta(days=6)).strftime('%Y-%m-%d')
+        end_time = (today + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
+        if para.__contains__('start_time'):
+            start_time = para.__getitem__('start_time')
+        if para.__contains__('end_time'):
+            end_time = para.__getitem__('end_time')
+        version = 'all'
+        if para.__contains__('version'):
+            version = para.__getitem__('version')
+        result = collections.OrderedDict()
+
+        res = TakeCount.objects.filter(date__range=(start_time, end_time), version=version).order_by('date')
+        for item in res:
+            temp =  collections.OrderedDict()
+            temp['img'] = item.img_count
+            temp['video'] = item.video_count
+            result[item.date.strftime('%m-%d')] = temp
+        versions = ShareCount.objects.values('version').distinct()
+        temp1 = []
+        for item in versions:
+            temp1.append(item['version'])
+        return JsonResponse({'versions': temp1, 'data': result}, safe=False)
+    else:
+        return HttpResponse('Error.')
+
+
+@csrf_exempt
 def search_index(request):
     if request.method == 'POST':
         return HttpResponse('Task submitted.')
@@ -1003,10 +1037,10 @@ def test(request):
         # b()
         # j()
         # t()
-        f()
-        g()
-        # test1()
-        get_media_data()
+        # f()
+        # g()
+        # get_media_data()
+        # get_amazon_sales()
         return HttpResponse('Success')
     else:
         return HttpResponse('Error.')

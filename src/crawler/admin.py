@@ -10,10 +10,12 @@ from .models import ElectronicSales
 from .models import ErrorCondition
 from .models import ShareChannel
 from .models import ShareCount
+from .models import TakeCount
 from .models import Log
 from .models import MediaFan
 from .models import MediaData
 from .models import TaobaoDetail
+from .models import GlobalElectronicSales
 
 
 # Register your models here.
@@ -61,6 +63,8 @@ class ShareCountAdmin(admin.ModelAdmin):
                     'success_count_per_launch', 'try_count', 'try_device',
                     'try_count_per_launch', 'date_created')
 
+class TakeCountAdmin(admin.ModelAdmin):
+    list_display = ('id', 'date', 'version', 'img_count', 'img_device','img_count_per_launch', 'video_count', 'video_device','video_count_per_launch', 'created_time', 'update_time')
 
 class SalesStatusAdmin(admin.ModelAdmin):
     list_display = ('id', 'week', 'location', 'pick_up',
@@ -84,13 +88,14 @@ class MediaFanAdmin(admin.ModelAdmin):
 class MediaDataAdmin(admin.ModelAdmin):
     list_display = ('id', 'platform', 'date', 'comment', 'like', 'dislike', 'share', 'view', 'created_time', 'update_time')
 
-
 class TaobaoDetailAdmin(admin.ModelAdmin):
     list_display = ('id', 'shop', 'shop_keeper',
                     'name', 'commodity', 'price',
                     'pay', 'sales', 'store_id', 'link',
                     'location', 'is_tmall', 'date', 'date_created')
 
+class GlobalElectronicSalesAdmin(admin.ModelAdmin):
+    list_display = ('id', 'commodity', 'site', 'country', 'comment', 'sale', 'date', 'created_time', 'update_time')
 
 admin.site.register(UseCondition, UseConditionAdmin)
 admin.site.register(SearchIndex, SearchIndexAdmin)
@@ -101,9 +106,11 @@ admin.site.register(UserDistribution, UserDistributionAdmin)
 admin.site.register(ErrorCondition, ErrorConditionAdmin)
 admin.site.register(ShareChannel, ShareChannelAdmin)
 admin.site.register(ShareCount, ShareCountAdmin)
+admin.site.register(TakeCount, TakeCountAdmin)
 admin.site.register(SalesStatus, SalesStatusAdmin)
 admin.site.register(ElectronicSales, ElectronicSalesAdmin)
 admin.site.register(Log, LogAdmin)
 admin.site.register(MediaFan, MediaFanAdmin)
 admin.site.register(MediaData, MediaDataAdmin)
 admin.site.register(TaobaoDetail, TaobaoDetailAdmin)
+admin.site.register(GlobalElectronicSales, GlobalElectronicSalesAdmin)

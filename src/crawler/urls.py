@@ -15,6 +15,7 @@ urlpatterns = [
     url(r'^error_condition/$', views.error_condition, name='error_condition'),
     url(r'^share_channel/$', views.share_channel, name='share_channel'),
     url(r'^share_count/$', views.share_count, name='share_count'),
+    url(r'^take_count/$', views.take_count, name='take_count'),
     url(r'^market_environment/$', views.market_environment, name='market_environment'),
     url(r'^competitor_data/$', views.competitor_data, name='competitor_data'),
     url(r'^media_fans/$', views.media_fans, name='media_fans'),
