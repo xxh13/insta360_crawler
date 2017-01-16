@@ -44,14 +44,18 @@ def get_comment(url, country):
     if first[country] in content:
         print 0
         return 0
-    pattern = re.compile('\d+' + review[country], re.S)
-    items = re.findall(pattern, content)
-    temp = items[0]
-    pattern = re.compile('\d+', re.S)
-    items = re.findall(pattern, temp)
-    sales = (int)(items[0])
-    print sales
-    return sales
+    try:
+        pattern = re.compile('\d+' + review[country], re.S)
+        items = re.findall(pattern, content)
+        temp = items[0]
+        pattern = re.compile('\d+', re.S)
+        items = re.findall(pattern, temp)
+        sales = (int)(items[0])
+        print sales
+        return sales
+    except:
+        print 'error'
+        return 0
 
 
 def sslwrap(func):

@@ -18,6 +18,7 @@ urlpatterns = [
     url(r'^take_count/$', views.take_count, name='take_count'),
     url(r'^market_environment/$', views.market_environment, name='market_environment'),
     url(r'^competitor_data/$', views.competitor_data, name='competitor_data'),
+    url(r'^global_sales/$', views.global_sales, name='global_sales'),
     url(r'^media_fans/$', views.media_fans, name='media_fans'),
     url(r'^media_data/$', views.media_data, name='media_data'),
     url(r'^taobao_detail/$', views.taobao_detail, name='taobao_detail'),

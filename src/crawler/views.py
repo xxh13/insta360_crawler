@@ -13,6 +13,7 @@ from models import ErrorCondition
 from models import SearchIndex
 from models import GoogleIndex
 from models import CompetitorSales
+from models import GlobalElectronicSales
 from models import ShareChannel
 from models import ShareCount
 from models import TakeCount
@@ -894,6 +895,36 @@ def competitor_data(request):
             elif source == 'jd':
                 for item in res_temp:
                     temp[item.commodity + ' 京东'] = item.jd_total_sales
+            result[date.strftime('%m-%d')] = temp
+        return JsonResponse(result, safe=False)
+    else:
+        return HttpResponse('Error.')
+
+
+@csrf_exempt
+def global_sales(request):
+    if request.method == 'POST':
+        return HttpResponse('Task submitted.')
+    elif request.method == 'GET':
+        para = request.GET
+        today = datetime.datetime.today()
+        start_time = (today - datetime.timedelta(days=6)).strftime('%Y-%m-%d')
+        end_time = (today + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
+        site = 'amazon'
+        if para.__contains__('start_time'):
+            start_time = para.__getitem__('start_time')
+        if para.__contains__('end_time'):
+            end_time = para.__getitem__('end_time')
+        if para.__contains__('site'):
+            site = para.__getitem__('site')
+        result = collections.OrderedDict()
+        res = GlobalElectronicSales.objects.filter(date__range=(start_time, end_time), site=site).order_by('date')
+        dates = res.dates('date', 'day')
+        for date in dates:
+            res_temp = res.filter(date=date).order_by('-comment')
+            temp = collections.OrderedDict()
+            for item in res_temp:
+                temp[item.country] = item.comment
             result[date.strftime('%m-%d')] = temp
         return JsonResponse(result, safe=False)
     else:
