@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
-
-# from selenium.common.exceptions import NoSuchElementException
+'''
+使用phantomjs
+'''
 from selenium import webdriver
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support.ui import WebDriverWait
@@ -38,7 +39,6 @@ class JDCrawler:
         self.driver = webdriver.PhantomJS(desired_capabilities=self.cap,
                                           service_args=['--ignore-ssl-errors=true', '--ssl-protocol=any',
                                                         '--web-security=true'])
-        # self.driver = webdriver.Chrome()
 
     def main(self):
         products = ['insta360 Nano', 'Gear 360', 'theta', 'LG 360 CAM']
@@ -97,7 +97,6 @@ class JDCrawler:
                 commodity = Commodity(name, price, comment, link, id, title)
                 self.commodityList.append(commodity)
                 # print count
-                # commodity.show()
                 count += 1
         if self.product == 'insta360 Nano':
             self.filterNano()
@@ -108,10 +107,6 @@ class JDCrawler:
         elif self.product == 'LG 360 CAM':
             self.filterLG()
         self.distinct()
-
-        # self.sort()
-        # self.showList()
-        # self.save()
 
     def filterNano(self):
         i = 0
@@ -124,17 +119,6 @@ class JDCrawler:
                 i -= 1
             i += 1
 
-    def distinct(self):
-        i = 0
-        s = set()
-        while i < len(self.commodityList):
-            title = self.commodityList[i].title
-            if not title in s:
-                s.add(title)
-            else:
-                del self.commodityList[i]
-                i -= 1
-            i += 1
 
     def filterGear(self):
         i = 0
@@ -166,12 +150,6 @@ class JDCrawler:
                 i -= 1
             i += 1
 
-    def showList(self):
-        count = 1
-        for commodity in self.commodityList:
-            # print count
-            commodity.show()
-            count += 1
 
     def getTotalComments(self):
         totalComments = 0
@@ -182,6 +160,18 @@ class JDCrawler:
     def sort(self):
         self.commodityList.sort(key=lambda commodity: commodity.sales, reverse=True)
 
+
+    def distinct(self):
+        i = 0
+        s = set()
+        while i < len(self.commodityList):
+            title = self.commodityList[i].title
+            if not title in s:
+                s.add(title)
+            else:
+                del self.commodityList[i]
+                i -= 1
+            i += 1
 
 if __name__ == "__main__":
     reload(sys)

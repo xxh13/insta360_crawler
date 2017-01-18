@@ -9,7 +9,6 @@ from youku_crawler import get_by_api as get_youku_fans
 from weixin_crawler import get_by_api as get_weixin_fans
 from instagram_crawler import get_by_request as get_instagram_fans
 
-
 def main():
     platform = ['facebook', 'weibo', 'twitter', 'youtube', 'youku', 'weixin', 'instagram']
     result = []

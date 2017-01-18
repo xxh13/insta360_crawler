@@ -32,8 +32,6 @@ def main():
             data = get_instagram()
 
         data = json.loads(data)
-        # today = datetime.datetime.now().strftime('%Y-%m-%d')
-        # temp = {'platform': i, 'data': data, 'date': today}
         result.append(data)
     jsonResult = json.dumps(result)
     print  jsonResult

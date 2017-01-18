@@ -3,6 +3,7 @@ import sys
 reload(sys)
 sys.setdefaultencoding("utf-8")
 
+#各国的亚马逊网店地址
 urls = {}
 urls['美国'] = [
     'https://www.amazon.com/Insta360-Nano-degree-Camera-iPhone/dp/B01FY8CHIA/ref=sr_1_1?ie=UTF8&qid=1482248463&sr=8-1&keywords=insta360',
@@ -78,6 +79,7 @@ urls['印度'] = [
     'http://www.amazon.in/dp/B01N7DXQ34/ref=sr_1_5?ie=UTF8&qid=1482249856&sr=8-5&keywords=insta360'
 ]
 
+#第一个评论该商品
 first = {}
 first['美国'] = 'the first to review this item'
 first['加拿大'] = 'the first to review this item'
@@ -90,6 +92,7 @@ first['意大利'] = 'per primo questo articolo'
 first['日本'] = 'カスタマーレビューを書きませんか'
 first['印度'] = 'the first to review this item'
 
+#XXX条评论
 review = {}
 review['美国'] = ' customer reviews</span>'
 review['加拿大'] = ' customer reviews</span>'

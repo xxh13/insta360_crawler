@@ -1,4 +1,7 @@
 # -*- coding: UTF-8 -*-
+'''
+官方接口
+'''
 import urllib2
 import json
 import urllib

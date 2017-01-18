@@ -1,5 +1,8 @@
 # -*- coding: UTF-8 -*-
-from urls import *
+'''
+使用requests获取网页源文件，通过正则匹配获取评论数
+'''
+from urls import *   #各国亚马逊网址列表
 import requests
 import datetime
 import json
@@ -12,7 +15,7 @@ sys.setdefaultencoding("utf-8")
 
 
 def main():
-    ssl.wrap_socket = sslwrap(ssl.wrap_socket)
+    ssl.wrap_socket = sslwrap(ssl.wrap_socket)  #预防网络请求错误
     today = datetime.datetime.now().strftime('%Y-%m-%d')
     result = []
     for i in urls:
@@ -30,6 +33,7 @@ def main():
     return jsonResult
 
 
+# 获取评论数的思路： 如果页面中出现类似“成为第一个评论该商品的人”的内容，则判断评论数为0， 否则通过正则匹配获取类似“已有n条评论”的内容，拿到评论数。 不同国家,引号中的内容是不一样的，详情见urls.py
 def get_comment(url, country):
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:50.0) Gecko/20100101 Firefox/50.0',
@@ -41,9 +45,11 @@ def get_comment(url, country):
         print 'error'
         return 0
     content = page.text.encode('utf-8')
+    # 如果页面中出现类似“成为第一个评论该商品的人”的内容，则判断评论数为0
     if first[country] in content:
         print 0
         return 0
+    # 否则通过正则匹配获取类似“已有n条评论”的内容，拿到评论数
     try:
         pattern = re.compile('\d+' + review[country], re.S)
         items = re.findall(pattern, content)
@@ -57,7 +63,7 @@ def get_comment(url, country):
         print 'error'
         return 0
 
-
+# stack overflow上抄的
 def sslwrap(func):
     @wraps(func)
     def bar(*args, **kw):

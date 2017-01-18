@@ -1,4 +1,8 @@
 # -*- coding: UTF-8 -*-
+'''
+stack overflow里找到的官方接口，官方文档中没有
+最近一周动态的评论、点赞总和
+'''
 import urllib2
 import json
 import datetime

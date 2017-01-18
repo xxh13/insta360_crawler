@@ -3,7 +3,6 @@ from .models import UseCondition
 from .models import SearchIndex
 from .models import GoogleIndex
 from .models import CompetitorSales
-from .models import AbroadSales
 from .models import UserDistribution
 from .models import SalesStatus
 from .models import ElectronicSales
@@ -34,11 +33,6 @@ class GoogleIndexAdmin(admin.ModelAdmin):
 class CompetitorSalesAdmin(admin.ModelAdmin):
     list_display = ('id', 'date', 'commodity', 'taobao_sales',
                     'taobao_total_sales', 'jd_sales', 'jd_total_sales', 'date_created')
-
-
-class AbroadSalesAdmin(admin.ModelAdmin):
-    list_display = ('id', 'date', 'commodity', 'country', 'comment',
-                    'total_comment', 'site', 'date_created')
 
 
 class UserDistributionAdmin(admin.ModelAdmin):
@@ -101,7 +95,6 @@ admin.site.register(UseCondition, UseConditionAdmin)
 admin.site.register(SearchIndex, SearchIndexAdmin)
 admin.site.register(GoogleIndex, GoogleIndexAdmin)
 admin.site.register(CompetitorSales, CompetitorSalesAdmin)
-admin.site.register(AbroadSales, AbroadSalesAdmin)
 admin.site.register(UserDistribution, UserDistributionAdmin)
 admin.site.register(ErrorCondition, ErrorConditionAdmin)
 admin.site.register(ShareChannel, ShareChannelAdmin)

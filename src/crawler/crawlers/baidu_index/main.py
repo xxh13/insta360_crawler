@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
-import os
+'''
+使用phantomjs模拟浏览器访问
+https://github.com/longzhiwen888/fetch_baidu_index
+'''
 import traceback
 import json
 
@@ -15,14 +17,7 @@ def baidu_index(start_date, end_date):
 
     s = BaiduBrowser()
 
-    # fp = open(config.keywords_task_file_path, 'rb')
-    task_list = ['insta360', 'gear 360', 'theta s', 'okaa', 'eyesir', 'ZMER', 'VR相机', '全景相机', '全景摄像头']
-    # fp.close()
-
-    root = os.path.dirname(os.path.realpath(__file__))
-    result_folder = os.path.join(root, config.out_file_path)
-    if not os.path.exists(result_folder):
-        os.makedirs(result_folder)
+    task_list = config.key_list
 
     type_list = config.index_type_list
     data_list = []
@@ -42,7 +37,6 @@ def baidu_index(start_date, end_date):
                     value = baidu_index_dict[date]
                     temp = {'key': keyword_unicode, 'date': date, 'baidu_index': value}
                     data_list.append(temp)
-                    # print temp
         except:
             print traceback.format_exc()
     jsonResult = json.dumps(data_list)
@@ -50,4 +44,4 @@ def baidu_index(start_date, end_date):
 
 
 if __name__ == "__main__":
-    baidu_index('2016-08-08', '2016-08-12')
+    baidu_index('2016-12-12', '2016-12-20')

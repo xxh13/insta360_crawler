@@ -1,5 +1,8 @@
 # -*- coding: UTF-8 -*-
-
+'''
+用于更新bi系统中insta_admin账号的密码，并发送邮件给指定的人
+配置见config.py（对应tasks.py中的update_password）
+'''
 from django.contrib.auth.models import User
 from .config import config
 
@@ -11,6 +14,8 @@ import time
 
 reload(sys)
 sys.setdefaultencoding("utf-8")
+
+#定时任务，用于更新bi系统中insta_admin账号的密码，并发送邮件给指定的人，配置见config.py
 
 def password_updater ():
     username = config['username']

@@ -22,10 +22,7 @@ from models import Log
 from models import TaobaoDetail
 from tasks import *
 from tasks import get_fans as f
-from tasks import get_taobao_sales as t
-from tasks import get_baidu_index as b
 from tasks import get_google_index as g
-from tasks import get_jd_sales as j
 from util.dict import media_dict
 
 
@@ -37,7 +34,7 @@ import collections
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
-
+#销售录入系统的增删该查接口
 @csrf_exempt
 def sales_status(request):
     if request.method == 'POST':
@@ -162,7 +159,7 @@ def sales_status(request):
     else:
         return HttpResponse('Error.')
 
-
+#bi系统->Nano 零售渠道->国内、海外销售情况
 @csrf_exempt
 def get_sales_status(request):
     if request.method == 'POST':
@@ -185,8 +182,6 @@ def get_sales_status(request):
 
         if para.__contains__('end_time'):
             end_time = para.__getitem__('end_time')
-            # endTime = datetime.datetime.strptime(para.__getitem__('end_time'), '%Y-%m-%d').date()
-            # end_time = (endTime + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
         if para.__contains__('location'):
             location = para.__getitem__('location')
 
@@ -298,7 +293,7 @@ def get_sales_status(request):
     else:
         return HttpResponse('Error.')
 
-
+# 销售录入系统电商销售的增删该查接口
 @csrf_exempt
 def electronic_sales(request):
     if request.method == 'POST':
@@ -313,7 +308,6 @@ def electronic_sales(request):
         s = set()
         for item in old:
             s.add(item['location'])
-        # ElectronicSales.objects.filter(week=week).delete()
         for item in data:
             result = ElectronicSales.objects.update_or_create(week=item['week'], location=item['location'],
                                                               defaults=item)
@@ -354,6 +348,7 @@ def electronic_sales(request):
         return HttpResponse('Error.')
 
 
+#bi系统->Nano 零售渠道->自有电商渠道
 @csrf_exempt
 def get_electronic_sales(request):
     if request.method == 'POST':
@@ -399,7 +394,7 @@ def get_electronic_sales(request):
     else:
         return HttpResponse('Error.')
 
-
+#bi系统->Nano App使用情况->APP用户区域分布
 @csrf_exempt
 def user_distribution(request):
     if request.method == 'POST':
@@ -413,20 +408,16 @@ def user_distribution(request):
             start_time = para.__getitem__('start_time')
         if para.__contains__('end_time'):
             end_time = para.__getitem__('end_time')
-            # endTime = datetime.datetime.strptime(para.__getitem__('end_time'), '%Y-%m-%d').date()
-            # end_time = (endTime + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
         res_native = []
         res_abroad = []
         native = UserDistribution.objects.filter(date__range=(start_time, end_time), is_native=1).values(
             'location').annotate(total=Sum('new_user')).order_by('-total')
         abroad = UserDistribution.objects.filter(date__range=(start_time, end_time), is_native=0).values(
             'location').annotate(total=Sum('new_user')).order_by('-total')
-        fp = open('crawler/dict.json', 'r')
+        fp = open('crawler/util/dict.json', 'r')
         dict = json.loads(fp.read(), encoding='utf-8')
         fp.close()
         for item in native:
-            # temp = {'location': item['location'],'total': item['total']}
-            # res_native.append({item['location']: temp})
             res_native.append(item)
         for item in abroad:
             try:
@@ -434,14 +425,13 @@ def user_distribution(request):
             except KeyError:
                 location = item['location']
             item['location'] = location
-            # temp = {'location': location,'total': item['total']}
             res_abroad.append(item)
         result = {'abroad': res_abroad, 'native': res_native}
         return JsonResponse(result, safe=False)
     else:
         return HttpResponse('Error.')
 
-
+#bi系统->Nano App使用情况->APP用户区域分布->区域对比
 @csrf_exempt
 def user_area(request):
     if request.method == 'POST':
@@ -456,8 +446,6 @@ def user_area(request):
             start_time = para.__getitem__('start_time')
         if para.__contains__('end_time'):
             end_time = para.__getitem__('end_time')
-            # endTime = datetime.datetime.strptime(para.__getitem__('end_time'), '%Y-%m-%d').date()
-            # end_time = (endTime + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
         if para.__contains__('is_native'):
             is_native = para.__getitem__('is_native')
         result = collections.OrderedDict()
@@ -470,13 +458,6 @@ def user_area(request):
         data = collections.OrderedDict()
         for date in dates:
             temp = collections.OrderedDict()
-            # for item in locations:
-            #     location = item['location']
-            #     try:
-            #         query = res.get(date=date, location=location)
-            #         temp[location] = query.new_user
-            #     except:
-            #         temp[location] = 0
             query = res.filter(date=date, location__in=location_list)
             for item in query:
                 temp[item.location] = item.new_user
@@ -487,7 +468,7 @@ def user_area(request):
     else:
         return HttpResponse('Error.')
 
-
+#bi系统->Nano App使用情况->用户概况
 @csrf_exempt
 def use_condition(request):
     if request.method == 'POST':
@@ -501,8 +482,6 @@ def use_condition(request):
             start_time = para.__getitem__('start_time')
         if para.__contains__('end_time'):
             end_time = para.__getitem__('end_time')
-            # endTime = datetime.datetime.strptime(para.__getitem__('end_time'), '%Y-%m-%d').date()
-            # end_time = (endTime + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
         result = []
         res = UseCondition.objects.filter(date__range=(start_time, end_time)).order_by('date')
         for item in res:
@@ -513,7 +492,7 @@ def use_condition(request):
     else:
         return HttpResponse('Error.')
 
-
+#bi系统->Nano内容分享->分享渠道占比
 @csrf_exempt
 def share_channel(request):
     if request.method == 'POST':
@@ -573,7 +552,7 @@ def share_channel(request):
     else:
         return HttpResponse('Error.')
 
-
+#bi系统->Nano App使用情况->分享转化率
 @csrf_exempt
 def share_count(request):
     if request.method == 'POST':
@@ -650,7 +629,7 @@ def share_count(request):
     else:
         return HttpResponse('Error.')
 
-
+#bi系统->Nano App使用情况->图片视频生产数
 @csrf_exempt
 def take_count(request):
     if request.method == 'POST':
@@ -684,73 +663,7 @@ def take_count(request):
         return HttpResponse('Error.')
 
 
-@csrf_exempt
-def search_index(request):
-    if request.method == 'POST':
-        return HttpResponse('Task submitted.')
-    elif request.method == 'GET':
-        para = request.GET
-        today = datetime.datetime.today()
-        start_time = (today - datetime.timedelta(days=6)).strftime('%Y-%m-%d')
-        end_time = (today + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
-        site = 'baidu'
-        if para.__contains__('start_time'):
-            start_time = para.__getitem__('start_time')
-        if para.__contains__('end_time'):
-            end_time = para.__getitem__('end_time')
-            # endTime = datetime.datetime.strptime(para.__getitem__('end_time'), '%Y-%m-%d').date()
-            # end_time = (endTime + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
-        if para.__contains__('site'):
-                site = para.__getitem__('site')
-
-        result = []
-
-        if site == 'baidu':
-            res = SearchIndex.objects.filter(date__range=(start_time, end_time)).order_by('date')
-            for item in res:
-                temp = {'date': item.date.strftime('%m-%d'), 'key': item.key, 'baidu_index': item.baidu_index}
-                result.append(temp)
-
-        elif site == 'google':
-            res = GoogleIndex.objects.filter(date__range=(start_time, end_time)).order_by('date')
-            for item in res:
-                temp = {'date': item.date.strftime('%m-%d'), 'key': item.key, 'google_index': item.google_index}
-                result.append(temp)
-
-        return JsonResponse(result, safe=False)
-    else:
-        return HttpResponse('Error.')
-
-
-@csrf_exempt
-def google_index(request):
-    if request.method == 'POST':
-        return HttpResponse('Task submitted.')
-    elif request.method == 'GET':
-        para = request.GET
-        today = datetime.datetime.today()
-        start_time = (today - datetime.timedelta(days=6)).strftime('%Y-%m-%d')
-        end_time = (today + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
-        if para.__contains__('start_time'):
-            start_time = para.__getitem__('start_time')
-        if para.__contains__('end_time'):
-            end_time = para.__getitem__('end_time')
-            # endTime = datetime.datetime.strptime(para.__getitem__('end_time'), '%Y-%m-%d').date()
-            # end_time = (endTime + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
-        result = collections.OrderedDict()
-        res = GoogleIndex.objects.filter(date__range=(start_time, end_time)).order_by('date')
-        dates = res.dates('date', 'day')
-        for date in dates:
-            res_temp = res.filter(date=date)
-            temp = {}
-            for item in res_temp:
-                temp[item.key] = item.google_index
-            result[date.strftime('%m-%d')] = temp
-        return JsonResponse(result, safe=False)
-    else:
-        return HttpResponse('Error.')
-
-
+#bi系统->Nano App使用情况->错误异常
 @csrf_exempt
 def error_condition(request):
     if request.method == 'POST':
@@ -773,7 +686,7 @@ def error_condition(request):
     else:
         return HttpResponse('Error.')
 
-
+#bi系统->Nano市场环境->搜索指数
 @csrf_exempt
 def market_environment(request):
     if request.method == 'POST':
@@ -813,7 +726,7 @@ def market_environment(request):
     else:
         return HttpResponse('Error.')
 
-
+#bi系统->新媒体监控->热度走势
 @csrf_exempt
 def media_data(request):
     if request.method == 'POST':
@@ -862,7 +775,7 @@ def media_data(request):
     else:
         return HttpResponse('Error.')
 
-
+#bi系统->Nano市场环境->30天销量/评论
 @csrf_exempt
 def competitor_data(request):
     if request.method == 'POST':
@@ -900,7 +813,7 @@ def competitor_data(request):
     else:
         return HttpResponse('Error.')
 
-
+#bi系统->Nano市场环境->亚马逊评论
 @csrf_exempt
 def global_sales(request):
     if request.method == 'POST':
@@ -930,7 +843,7 @@ def global_sales(request):
     else:
         return HttpResponse('Error.')
 
-
+#bi系统->登录
 @csrf_exempt
 def login(request):
     if request.method == 'POST':
@@ -960,7 +873,7 @@ def login(request):
     else:
         return HttpResponse('Error.')
 
-
+#bi系统->新媒体监控->粉丝走势
 @csrf_exempt
 def media_fans(request):
     if request.method == 'POST':
@@ -974,8 +887,6 @@ def media_fans(request):
             start_time = para.__getitem__('start_time')
         if para.__contains__('end_time'):
             end_time = para.__getitem__('end_time')
-            # endTime = datetime.datetime.strptime(para.__getitem__('end_time'), '%Y-%m-%d').date()
-            # end_time = (endTime + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
         result = collections.OrderedDict()
         res = MediaFan.objects.filter(date__range=(start_time, end_time)).order_by('date')
         dates = res.dates('date', 'day')
@@ -989,7 +900,7 @@ def media_fans(request):
     else:
         return HttpResponse('Error.')
 
-
+#bi系统->Nano市场环境->30天评论/销量->淘宝店铺详情
 @csrf_exempt
 def taobao_detail(request):
     if request.method == 'POST':
@@ -1029,7 +940,7 @@ def taobao_detail(request):
     else:
         return HttpResponse('Error.')
 
-
+#bi系统->Nano市场环境->30天评论/销量->淘宝店铺详情->单个店铺的销量走势
 @csrf_exempt
 def store_detail(request):
     if request.method == 'POST':
@@ -1059,19 +970,15 @@ def store_detail(request):
         result['store'] = shop
         return JsonResponse(result, safe=False)
 
-
+#用于本地调用测试
 @csrf_exempt
 def test(request):
     if request.method == 'POST':
         return HttpResponse('Task submitted.')
     elif request.method == 'GET':
-        # b()
-        # j()
-        # t()
         # f()
         # g()
         # get_media_data()
-        # get_amazon_sales()
         return HttpResponse('Success')
     else:
         return HttpResponse('Error.')

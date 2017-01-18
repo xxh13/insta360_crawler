@@ -1,4 +1,8 @@
 # -*- coding: UTF-8 -*-
+'''
+第三方接口 http://www.newrank.cn/public/info/detail.html?account=Insta360_official
+最近一周动态的浏览、点赞总和
+'''
 import urllib2
 import urllib
 import json

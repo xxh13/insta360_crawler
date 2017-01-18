@@ -3,7 +3,6 @@ from __future__ import absolute_import
 from celery import shared_task
 from celery.utils.log import get_task_logger
 from django.db.models import Sum
-from django.contrib.auth.models import User
 from .models import UseCondition
 from .models import SearchIndex
 from .models import GoogleIndex
@@ -31,16 +30,10 @@ import datetime
 import time
 import urllib2
 
-
 logger = get_task_logger(__name__)
 
 
-@shared_task
-def test(a, b):
-    print a + b
-    return a + b
-
-
+#用户概况 对应model： UseCondition
 @shared_task
 def get_use_condition():
     today = datetime.datetime.today()
@@ -64,7 +57,7 @@ def get_use_condition():
         UseCondition.objects.update_or_create(date=item['date'], defaults=item)
     return 'Finished.'
 
-
+#百度指数 对应model： SearchIndex
 @shared_task
 def get_baidu_index():
     today = datetime.datetime.today()
@@ -87,7 +80,7 @@ def get_baidu_index():
         SearchIndex.objects.update_or_create(date=item['date'], key=item['key'], defaults=item)
     return 'Finished.'
 
-
+#谷歌指数 对应model： GoogleIndex
 @shared_task
 def get_google_index():
     result = '[]'
@@ -107,7 +100,7 @@ def get_google_index():
         GoogleIndex.objects.update_or_create(date=item['date'], key=item['key'], defaults=item)
     return 'Finished.'
 
-
+#淘宝销量 对应model： CompetitorSales, TaobaoDetail
 @shared_task
 def get_taobao_sales():
     result = '[]'
@@ -131,7 +124,6 @@ def get_taobao_sales():
         commodity = item['commodity']
         taobao_total_sales = item['taobao_total_sales']
         stores = item['stores']
-        # print stores
         old = CompetitorSales.objects.filter(date__lt=date, commodity=commodity).order_by('-date').first()
         if (old != None):
             if taobao_total_sales < old.taobao_total_sales * 0.7:
@@ -149,7 +141,7 @@ def get_taobao_sales():
             TaobaoDetail.objects.update_or_create(date=store['date'], store_id=store['store_id'], defaults=store)
     return 'Finished.'
 
-
+#京东评论数 对应model： CompetitorSales
 @shared_task
 def get_jd_sales():
     result = '[]'
@@ -184,7 +176,7 @@ def get_jd_sales():
         CompetitorSales.objects.update_or_create(date=item['date'], commodity=item['commodity'], defaults=item)
     return 'Finished.'
 
-
+#亚马逊评论数 对应model： GlobalElectronicSales
 @shared_task
 def get_amazon_sales():
     result = '[]'
@@ -204,7 +196,7 @@ def get_amazon_sales():
         GlobalElectronicSales.objects.update_or_create(date=item['date'],country=item['country'], commodity=item['commodity'], site=item['site'], defaults=item)
     return 'Finished.'
 
-
+#app错误情况 对应model： ErrorCondition
 @shared_task
 def get_error():
     today = datetime.datetime.today()
@@ -245,7 +237,7 @@ def get_error():
         ErrorCondition.objects.update_or_create(date=item['date'], defaults=item)
     return 'Finished.'
 
-
+#app分享渠道 对应model： ShareChannel
 @shared_task
 def get_share_channel():
     today = datetime.datetime.today()
@@ -290,7 +282,7 @@ def get_share_channel():
                                                   defaults=temp)
     return 'Finished.'
 
-
+#app分享数量和转化率 对应model： ShareCount
 @shared_task
 def get_share_count():
     today = datetime.datetime.today()
@@ -347,7 +339,7 @@ def get_share_count():
                                                       defaults=temp)
     return 'Finished.'
 
-
+#app视频图片拍摄数量 对应model： TakeCount
 @shared_task
 def get_take_count():
     today = datetime.datetime.today()
@@ -401,7 +393,7 @@ def get_take_count():
                                                       defaults=temp)
     return 'Finished.'
 
-
+#app用户分布 对应model： UserDistribution ， 其中港澳台算国外，中国减掉港澳台的数据
 @shared_task
 def get_user_distribution():
     delta = 2
@@ -460,7 +452,7 @@ def get_user_distribution():
 
     return 'Finished.'
 
-
+#新媒体粉丝数 对应model： MediaFan
 @shared_task
 def get_fans():
     result = '[]'
@@ -487,7 +479,7 @@ def get_fans():
         MediaFan.objects.update_or_create(date=item['date'], platform=item['platform'], defaults=item)
     return 'Finished.'
 
-
+#新媒体互动数（热度） 对应model： MediaData
 @shared_task
 def get_media_data():
     result = '[]'
@@ -509,7 +501,7 @@ def get_media_data():
         MediaData.objects.update_or_create(date=date, platform=platform, defaults=item)
     return 'Finished.'
 
-
+#调用销售支持系统的一个接口，用于每天刷新数据库中卖出去的nano的激活状态
 @shared_task
 def refresh_active():
     request = urllib2.Request(url='http://sales.internal.insta360.com/sales/util/refresh_active')
@@ -517,13 +509,8 @@ def refresh_active():
     result = response.read()
     return result
 
-
+#更新bi系统中insta_admin账号的密码，并发送邮件给指定的人
 @shared_task
 def update_password():
     password = password_updater()
     return password
-
-
-@shared_task
-def test1():
-    return 1

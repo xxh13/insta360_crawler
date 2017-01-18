@@ -3,7 +3,7 @@
 
 # 要启用的浏览器driver, 因为有些人PhantomJS配置可能有问题，默认使用Firefox(容易配置).
 # 具体参考selenium的浏览器环境配置
-browser_driver = 'PhantomJS'  # 可以替换为PhantomJS
+browser_driver = 'PhantomJS'  # 可以替换为Chrome
 # 百度用户名
 user_name = 'klqbtnsns123'
 # 百度密码
@@ -32,17 +32,7 @@ user_center_url = 'http://i.baidu.com/'
 login_sign = 'http://passport.baidu.com/?logout'
 # 线程数
 num_of_threads = 40
-# 关键词index的区间开始
-start_date = '2016-07-01'
-# 关键词index的区间结束
-end_date = '2016-07-05'
-
-# 输出的格式，暂时只支持excel
-# extension = 'excel'
-# 输出的文件夹路径，可以自定义
-out_file_path = './data/out'
-# 关键词任务的文件路径，可以自定义
-keywords_task_file_path = 'task.txt'
-
 # 要获取趋势的类别，默认是三种趋势都获取。all代表整体趋势，pc代表PC趋势, wise代表移动趋势
 index_type_list = ['all']  #, 'pc', 'wise'
+#关键字列表
+key_list = ['insta360', 'gear 360', 'theta s', 'okaa', 'eyesir', 'ZMER', 'VR相机', '全景相机', '全景摄像头']

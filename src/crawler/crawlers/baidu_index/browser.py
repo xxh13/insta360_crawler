@@ -22,7 +22,7 @@ class BaiduBrowser(object):
                  check_login=True
                  ):
         if not config.browser_driver:
-            browser_driver_name = 'Firefox'
+            browser_driver_name = 'PhantomJS'
         else:
             browser_driver_name = config.browser_driver
         browser_driver_class = getattr(webdriver, browser_driver_name)
@@ -152,64 +152,6 @@ class BaiduBrowser(object):
 
         return baidu_index_dict
 
-    def _get_index_period(self, keyword):
-        # 拼接一周趋势的url
-        url = config.one_week_trend_url.format(
-            word=urllib.quote(keyword.encode('gbk'))
-        )
-        self.browser.get(url)
-        # 获取下方api要用到的res和res2的值
-        res = self.browser.execute_script('return PPval.ppt;')
-        res2 = self.browser.execute_script('return PPval.res2;')
-        start_date, end_date = self.browser.execute_script(
-            'return BID.getParams.time()[0];'
-        ).split('|')
-        start_date, end_date, date_list = self.get_date_info(
-            start_date, end_date
-        )
-        url = config.all_index_url.format(
-            res=res, res2=res2, start_date=start_date, end_date=end_date
-        )
-        all_index_info = self.api.get_all_index_html(url)
-        start_date, end_date = all_index_info['data']['all'][0][
-            'period'].split('|')
-        # 重置start_date, end_date，以api返回的为准
-        start_date, end_date, date_list = self.get_date_info(
-            start_date, end_date
-        )
-        logger.info('all_start_date:%s, all_end_date:%s' % (start_date, end_date))
-        return date_list
-
-    def get_baidu_index(self, keyword, type_name):
-        if config.start_date and config.end_date:
-            _, _, date_list = self.get_date_info(
-                start_date=config.start_date, end_date=config.end_date
-            )
-        else:
-            # 配置文件不配置start_date和end_date，可以查询到这个关键词数据的最大区间
-            date_list = self._get_index_period(keyword)
-
-        baidu_index_dict = dict()
-        start = 0
-        skip = 180
-        end = len(date_list)
-        while start < end:
-            try:
-                start_date = date_list[start]
-                if start + skip >= end - 1:
-                    end_date = date_list[-1]
-                else:
-                    end_date = date_list[start + skip]
-                result = self.get_baidu_index_by_date_range(
-                    keyword, start_date, end_date, type_name
-                )
-                baidu_index_dict.update(result)
-                start += skip + 1
-            except:
-                import traceback
-
-                print traceback.format_exc()
-        return baidu_index_dict
 
     def login(self, user_name, password):
         login_url = config.login_url

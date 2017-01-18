@@ -1,4 +1,8 @@
 # -*- coding: UTF-8 -*-
+'''
+官方接口
+最近一个月动态的评论、点赞、踩、浏览总和
+'''
 import urllib2
 import time
 import json

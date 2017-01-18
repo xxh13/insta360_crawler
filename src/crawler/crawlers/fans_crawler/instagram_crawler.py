@@ -1,7 +1,9 @@
 # -*- coding: UTF-8 -*-
+'''
+第三方接口
+'''
 import urllib2
 import json
-import urllib
 
 def get_by_request():
     username = 'insta360official'

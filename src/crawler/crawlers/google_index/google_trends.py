@@ -1,9 +1,12 @@
 # -*- coding: UTF-8 -*-
+'''
+使用requests，先获取每个词的token，再获取数据。
+日期参数（start_date，end_date）必须是最近三十天，所以在爬虫的方法里写死了。
+'''
 import sys
 import json
 import time
 import urllib
-import urllib2
 import requests
 import ssl
 import datetime
@@ -22,6 +25,7 @@ day = min(now.day, calendar.monthrange(year, month)[1])
 before = now.replace(year=year, month=month, day=day)
 start_date = before.strftime('%Y-%m-%d')
 end_date = now.strftime('%Y-%m-%d')
+#查询日期必须是最近三十天
 def google_index():
     ssl.wrap_socket = sslwrap(ssl.wrap_socket)
     tasks = ['insta360', 'gear 360', 'theta s', 'okaa', 'eyesir', 'ZMER', '全景相机']
@@ -33,7 +37,36 @@ def google_index():
     print jsonResult
     return jsonResult
 
+#得到没个词的token
+def get_token(key):
+    headers = {}
+    headers['Host'] = 'www.google.com'
+    headers['User-Agent'] = 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:49.0) Gecko/20100101 Firefox/49.0'
+    headers['Referfer'] = 'https://www.google.com/trends/explore?date=today%201-m&q=' + urllib.quote(key)
+    headers['Cookie'] = '__utma=173272373.1277331075.1476358092.1476358092.1476415913.2; __utmz=173272373.1476358092.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); __utmb=173272373.2.10.1476415913; __utmc=173272373; __utmt=1; NID=84=lT0Y5iF9rOA6QJn8KF04H5f1N7J7bMkQbUSiA9eJnY3-mBpf6OOz1dBQWJBi9BHnXzb3OmQW0d2DslexTFNU5Mr1dTjfEM2CD22BB5yAM44IL_vi9-BWG1C6QjL6XRFk'
+    headers['Connection'] = 'keep-alive'
+    headers['Accept'] = 'application/json, text/plain, */*'
+    headers['Accept-Language'] = 'zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3'
+    headers['Accept-Encoding'] = 'gzip, deflate, br'
+    req = {}
+    req['category'] = 0
+    req['property'] = ''
+    req['comparisonItem'] = [{"geo": "","keyword":  urllib.quote(key).replace(' ', '+'),"time":"today+1-m"}]
+    value = {}
+    value['hl'] = 'zh-CN'
+    value['tz'] = '-480'
+    value['req'] = str(req).replace(' ','')
+    url = 'https://www.google.com/trends/api/explore?'
+    for index in value:
+        url = url + index + '=' + value[index] + '&'
+    results = requests.get(url, headers=headers)
+    page = results.content
+    jsonData = page[5:]
+    data = json.loads(jsonData, encoding="utf-8")
+    the_token = data['widgets'][0]['token']
+    token[key] = the_token
 
+#获取数据
 def get_google_trend(key):
     headers = {}
     headers['Host'] = 'www.google.com'
@@ -76,39 +109,10 @@ def get_google_trend(key):
     return result
 
 
-def get_token(key):
-    headers = {}
-    headers['Host'] = 'www.google.com'
-    headers['User-Agent'] = 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:49.0) Gecko/20100101 Firefox/49.0'
-    headers['Referfer'] = 'https://www.google.com/trends/explore?date=today%201-m&q=' + urllib.quote(key)
-    headers['Cookie'] = '__utma=173272373.1277331075.1476358092.1476358092.1476415913.2; __utmz=173272373.1476358092.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); __utmb=173272373.2.10.1476415913; __utmc=173272373; __utmt=1; NID=84=lT0Y5iF9rOA6QJn8KF04H5f1N7J7bMkQbUSiA9eJnY3-mBpf6OOz1dBQWJBi9BHnXzb3OmQW0d2DslexTFNU5Mr1dTjfEM2CD22BB5yAM44IL_vi9-BWG1C6QjL6XRFk'
-    headers['Connection'] = 'keep-alive'
-    headers['Accept'] = 'application/json, text/plain, */*'
-    headers['Accept-Language'] = 'zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3'
-    headers['Accept-Encoding'] = 'gzip, deflate, br'
-    req = {}
-    req['category'] = 0
-    req['property'] = ''
-    req['comparisonItem'] = [{"geo": "","keyword":  urllib.quote(key).replace(' ', '+'),"time":"today+1-m"}]
-    value = {}
-    value['hl'] = 'zh-CN'
-    value['tz'] = '-480'
-    value['req'] = str(req).replace(' ','')
-    url = 'https://www.google.com/trends/api/explore?'
-    for index in value:
-        url = url + index + '=' + value[index] + '&'
-    results = requests.get(url, headers=headers)
-    page = results.content
-    jsonData = page[5:]
-    data = json.loads(jsonData, encoding="utf-8")
-    the_token = data['widgets'][0]['token']
-    token[key] = the_token
-
 def sslwrap(func):
     @wraps(func)
     def bar(*args, **kw):
         kw['ssl_version'] = ssl.PROTOCOL_TLSv1
-        # kw['ssl_version'] = ssl._PROTOCOL_NAMES
         return func(*args, **kw)
     return bar
 

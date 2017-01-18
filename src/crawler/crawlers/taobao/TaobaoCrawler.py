@@ -1,5 +1,8 @@
 # -*- coding: UTF-8 -*-
-
+'''
+淘宝销量	使用urllib2，用正则匹配获取网页源文件中的json数据。
+其中除了获取每个产品的当天总销量外，还要获取各个店铺的当天销量
+'''
 from Commodity import Commodity
 
 import datetime
@@ -21,11 +24,16 @@ class TaobaoCrawler:
         self.product = 'insta360 Nano'
         self.keyword = self.product.replace(' ', '+')
         self.date = time.strftime('%Y%m%d', time.localtime(time.time()))
-        self.url = "https://s.taobao.com/search?q=" + self.keyword + "&imgfile=&js=1&stats_click=search_radio_all%3A1&initiative_id=staobaoz_" + self.date + "&ie=utf8" + "&sort=sale-desc"
+        self.url = "https://s.taobao.com/search?q=" + self.keyword + "&imgfile=&js=1&stats_click=search_radio_all%3A1&initiative_id=staobaoz_" + self.date + "&ie=utf8&sort=sale-desc"
         self.commodityList = []
         self.totalPage = 0
-        user_agent = 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:47.0) Gecko/20100101 Firefox/47.0'
-        self.headers = {'User-Agent': user_agent}
+        # user_agent = 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:47.0) Gecko/20100101 Firefox/47.0'
+        user_agent = 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36'
+        cookie = 'miid=8929995663388453206; hng=CN%7Czh-cn%7CCNY; uc3=sg2=VFQmloNtynToEuMeFQKLTZ21PXTH85EtuHZVkHtdn%2FQ%3D&nk2=CNu7fvUK%2FEvBzGe9&id2=UonciUs0wvLz%2Bg%3D%3D&vt3=F8dARHfB55D4ceKVxQg%3D&lg2=UIHiLt3xD8xYTw%3D%3D; uss=W8hhc%2FiL5F3QQxDnorK5%2Bpxtk6UVQTxdX39qSJdTeNa%2FgPPtvy2njhEaqqM%3D; lgc=klqbtnsns123; tracknick=klqbtnsns123; _cc_=VT5L2FSpdA%3D%3D; tg=0; t=df50d2b4a1821ccecb466ada4db35fc8; mt=ci=-1_0; cookie2=31f737050ec6130e8a50270a329f6824; v=0; thw=cn; swfstore=151527; alitrackid=www.taobao.com; lastalitrackid=www.taobao.com; _m_h5_tk=a83b5b9c622408ab9af96c4a8f8ecf3f_1484714010722; _m_h5_tk_enc=77fdcaea2035bb430ad63b125727deed; _tb_token_=7e735e888a7e7; linezing_session=gsi35HL97qLeTfNpudWTOzFV_1484711392594XGpm_1; JSESSIONID=39D91055DEA807D78FB0FA80DE0A63AF; cna=JZgYEL1ENwACAXeJbdPXPixk; uc1=cookie14=UoW%2FWXYeb%2BAHbQ%3D%3D; x=e%3D1%26p%3D*%26s%3D0%26c%3D0%26f%3D0%26g%3D0%26t%3D0%26__ll%3D-1%26_ato%3D0; l=AvX1oXyLVgE50p9P9DX54yLahXuvcqmE; isg=AtLSiT6D3hIxcyKNso1DDjwRI5jex9Z96qDZXpwr_gVwr3KphHMmjdjNabxp'
+        pragma = 'no-cache'
+        cache_control = 'no-cache'
+        upgrade_insecure_requests = 1
+        self.headers = {'User-Agent': user_agent, 'pragma': pragma, 'cache-control': cache_control, 'upgrade-insecure-requests':upgrade_insecure_requests, 'cookie':cookie}
 
     def main(self):
         products = ['insta360 Nano', 'Gear 360', 'theta', 'LG 360 CAM']
@@ -33,7 +41,7 @@ class TaobaoCrawler:
         for product in products:
             self.product = product
             self.keyword = self.product.replace(' ', '+')
-            self.url = "https://s.taobao.com/search?q=" + self.keyword + "&imgfile=&js=1&stats_click=search_radio_all%3A1&initiative_id=staobaoz_" + self.date + "&ie=utf8" + "&sort=sale-desc"
+            self.url = "https://s.taobao.com/search?q=" + self.keyword + "&imgfile=&js=1&stats_click=search_radio_all%3A1&initiative_id=staobaoz_" + self.date + "&ie=utf8&sort=sale-desc"
             self.commodityList = []
             self.start()
             sales = self.getTotalSales()
@@ -56,7 +64,7 @@ class TaobaoCrawler:
                 }
                 stores.append(store)
             temp = {'commodity': product, 'taobao_total_sales': sales, 'date': today, 'stores': stores}
-            # print temp
+            print temp
             result.append(temp)
         jsonResult = json.dumps(result)
         # print jsonResult
@@ -82,11 +90,10 @@ class TaobaoCrawler:
             if hasattr(e, "reason"):
                 print e.reason
 
-        if self.totalPage > 3:
-            self.totalPage = 3
+        if self.totalPage > 5:  #因为基本上第5页以后，销量都为0了
+            self.totalPage = 5
         count = 1
         for i in range(1, self.totalPage + 1):
-            # print "page ",i ,":"
             if i != 1:
                 try:
                     request = urllib2.Request(self.url + "&s=" + str((i - 1) * 44), headers=self.headers)
@@ -130,8 +137,6 @@ class TaobaoCrawler:
         self.distinct()
         self.getSalesByRequest()
         self.sort()
-        # self.showList()
-        # self.save()
 
     def filterNano(self):
         i = 0
@@ -140,18 +145,6 @@ class TaobaoCrawler:
             price = self.commodityList[i].price
             if ((not ('insta' in name)) or (not ('nano' in name)) or ('gear' in name) or (price < 500) or (
                         price > 1500)):
-                del self.commodityList[i]
-                i -= 1
-            i += 1
-
-    def distinct(self):
-        i = 0
-        s = set()
-        while i < len(self.commodityList):
-            id = self.commodityList[i].id
-            if not id in s:
-                s.add(id)
-            else:
                 del self.commodityList[i]
                 i -= 1
             i += 1
@@ -187,12 +180,6 @@ class TaobaoCrawler:
                 i -= 1
             i += 1
 
-    def showList(self):
-        count = 1
-        for commodity in self.commodityList:
-            # print count
-            commodity.show()
-            count += 1
 
     def getTotalSales(self):
         totalSales = 0
@@ -200,29 +187,7 @@ class TaobaoCrawler:
             totalSales += commodity.sales
         return totalSales
 
-    def save(self):
-        file = open(self.product + '.txt', 'w')
-        string = ''
-        count = 1
-        totalSales = 0
-        totalPrice = 0.0
-        for commodity in self.commodityList:
-            source = "淘宝"
-            if commodity.isTmall == True:
-                source = "天猫"
-            string = string + str(count) + '\n'
-            string = string + '商品名: ' + commodity.name + '\n' + '价格: ' + str(
-                commodity.price) + ' 元' + '\n' + '销量: ' + str(commodity.sales) + '\n' + '收货: ' + str(
-                commodity.pay) + '\n' + '店铺: ' + commodity.shop + '\n' + '掌柜: ' + commodity.shopKeeper + '\n' + '地区: ' + commodity.location + '\n' + '链接: ' + commodity.link + '\n' + 'ID: ' + commodity.id + '\n' + '来源: ' + source + '\n' + '\n'
-            count += 1
-            totalSales += commodity.sales
-            totalPrice += commodity.price
-        averagePrice = round(totalPrice / count, 2)
-        string = '产品： ' + self.product + '\n' + '总销售量: ' + str(totalSales) + '\n' + '平均价格: ' + str(
-            averagePrice) + ' 元' + '\n' + '\n' + '\n' + string
-        file.write(string)
-        file.close()
-
+    #获取销量
     def getSalesByRequest(self):
         headers = {}
         headers['User-Agent'] = "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:47.0) Gecko/20100101 Firefox/47.0"
@@ -253,16 +218,28 @@ class TaobaoCrawler:
             except:
                 sales = 0
                 # print "Fail",commodity.id
-            # print sales
             commodity.setSales(int(sales))
             commodity.setShop(shop)
             if count % 40 == 0:
                 time.sleep(5)
             count += 1
 
+    #按销量排序
     def sort(self):
         self.commodityList.sort(key=lambda commodity: commodity.sales, reverse=True)
 
+    # 去重
+    def distinct(self):
+        i = 0
+        s = set()
+        while i < len(self.commodityList):
+            id = self.commodityList[i].id
+            if not id in s:
+                s.add(id)
+            else:
+                del self.commodityList[i]
+                i -= 1
+            i += 1
 
 if __name__ == "__main__":
     crawler = TaobaoCrawler()

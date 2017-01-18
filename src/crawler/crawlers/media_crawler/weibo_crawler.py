@@ -1,4 +1,8 @@
 # -*- coding: UTF-8 -*-
+'''
+官方接口（只能显示最近六条）
+最近6条动态的评论、点赞、转发总和
+'''
 import urllib
 import datetime
 import time

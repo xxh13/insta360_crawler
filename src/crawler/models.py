@@ -2,9 +2,9 @@
 from __future__ import unicode_literals
 from django.db import models
 
-
 # Create your models here.
 
+#用户概况
 class UseCondition(models.Model):
     new_user = models.IntegerField(default=0)
     active_user = models.IntegerField(default=0)
@@ -15,7 +15,7 @@ class UseCondition(models.Model):
     def __unicode__(self):
         return str(self.id)
 
-
+#百度指数
 class SearchIndex(models.Model):
     key = models.CharField(max_length=200)
     baidu_index = models.IntegerField(default=0)
@@ -25,6 +25,7 @@ class SearchIndex(models.Model):
     def __unicode__(self):
         return str(self.id)
 
+#谷歌指数
 class GoogleIndex(models.Model):
     key = models.CharField(max_length=200)
     google_index = models.IntegerField(default=0)
@@ -34,12 +35,12 @@ class GoogleIndex(models.Model):
     def __unicode__(self):
         return str(self.id)
 
-
+#淘宝京东销量（包括竞品）
 class CompetitorSales(models.Model):
     commodity = models.CharField(max_length=200)
-    taobao_sales = models.IntegerField(default=0)
+    taobao_sales = models.IntegerField(default=0)    #这个字段用不到
     taobao_total_sales = models.IntegerField(default=0)
-    jd_sales = models.IntegerField(default=0)
+    jd_sales = models.IntegerField(default=0)        #这个字段用不到
     jd_total_sales = models.IntegerField(default=0)
     date = models.DateField(auto_now=False, auto_now_add=False)
     date_created = models.DateTimeField(auto_now_add=True)
@@ -47,7 +48,7 @@ class CompetitorSales(models.Model):
     def __unicode__(self):
         return str(self.id)
 
-
+#亚马逊评论数
 class GlobalElectronicSales(models.Model):
     commodity = models.CharField(max_length=200, default='insta360 Nano')
     country = models.CharField(max_length=200, default='中国')
@@ -61,20 +62,7 @@ class GlobalElectronicSales(models.Model):
     def __unicode__(self):
         return str(self.id)
 
-
-class AbroadSales(models.Model):
-    commodity = models.CharField(max_length=200)
-    country = models.CharField(max_length=200)
-    comment = models.IntegerField(default=0)
-    total_comment = models.IntegerField(default=0)
-    site = models.CharField(max_length=200)
-    date = models.DateField(auto_now=False, auto_now_add=False)
-    date_created = models.DateTimeField(auto_now_add=True)
-
-    def __unicode__(self):
-        return str(self.id)
-
-
+#用户分布
 class UserDistribution(models.Model):
     location = models.CharField(max_length=200)
     active_user = models.IntegerField(default=0)
@@ -90,7 +78,7 @@ class UserDistribution(models.Model):
     def __unicode__(self):
         return str(self.id)
 
-
+#app错误情况
 class ErrorCondition(models.Model):
     total_error = models.IntegerField(default=0)
     error_rate = models.FloatField(default=0.0)
@@ -100,7 +88,7 @@ class ErrorCondition(models.Model):
     def __unicode__(self):
         return str(self.id)
 
-
+#app内容分享渠道
 class ShareChannel(models.Model):
     event_group_id = models.CharField(max_length=200, blank=True)
     channel = models.CharField(max_length=200, blank=True)
@@ -115,7 +103,7 @@ class ShareChannel(models.Model):
     def __unicode__(self):
         return str(self.id)
 
-
+#分享数量和转化率
 class ShareCount(models.Model):
     type = models.CharField(max_length=200, blank=True)
     date = models.DateField(auto_now=False, auto_now_add=False)
@@ -131,7 +119,7 @@ class ShareCount(models.Model):
     def __unicode__(self):
         return str(self.id)
 
-
+#分享数量和转化率
 class TakeCount(models.Model):
     date = models.DateField(auto_now=False, auto_now_add=False)
     version = models.CharField(max_length=200, blank=True)
@@ -147,14 +135,12 @@ class TakeCount(models.Model):
     def __unicode__(self):
         return str(self.id)
 
-
+#销售录入系统的销售情况
 class SalesStatus(models.Model):
-
     location = models.CharField(max_length=200)
     week = models.DateField(auto_now=False, auto_now_add=False)
     agent_name = models.CharField(max_length=200, blank=True)
     agent_type = models.CharField(max_length=200, blank=True)
-
     agent_price = models.IntegerField(default=0)
     pick_up = models.IntegerField(default=0)
     sales_online = models.IntegerField(default=0)
@@ -164,13 +150,12 @@ class SalesStatus(models.Model):
     inventory_lower = models.IntegerField(default=0)
     reject = models.IntegerField(default=0)
     is_native = models.IntegerField(default=0)
-
     date_created = models.DateTimeField(auto_now_add=True)
 
     def __unicode__(self):
         return str(self.id)
 
-
+#销售录入系统的电商销售情况
 class ElectronicSales(models.Model):
     week = models.DateField(auto_now=False, auto_now_add=False)
     location = models.CharField(max_length=200)
@@ -184,7 +169,7 @@ class ElectronicSales(models.Model):
     def __unicode__(self):
         return str(self.id)
 
-
+#销售录入系统的日志
 class Log(models.Model):
     username = models.CharField(max_length=200)
     week = models.DateField(auto_now=False, auto_now_add=False)
@@ -196,10 +181,10 @@ class Log(models.Model):
     def __unicode__(self):
         return str(self.id)
 
-
+#新媒体粉丝数
 class MediaFan(models.Model):
     platform = models.CharField(max_length=200)
-    fans_increment = models.IntegerField(default=0)
+    fans_increment = models.IntegerField(default=0)  #这个字段暂时没用
     fans = models.IntegerField(default=0)
     date = models.DateField(auto_now=False, auto_now_add=False)
     date_created = models.DateTimeField(auto_now_add=True)
@@ -207,7 +192,7 @@ class MediaFan(models.Model):
     def __unicode__(self):
         return str(self.id)
 
-
+#新媒体互动数
 class MediaData(models.Model):
     platform = models.CharField(max_length=200)
     date = models.DateField(auto_now=False, auto_now_add=False)
@@ -222,7 +207,7 @@ class MediaData(models.Model):
     def __unicode__(self):
         return str(self.id)
 
-
+#淘宝店铺每日销量详情
 class TaobaoDetail(models.Model):
     shop = models.CharField(max_length=200)
     shop_keeper = models.CharField(max_length=200)
@@ -240,12 +225,3 @@ class TaobaoDetail(models.Model):
 
     def __unicode__(self):
         return str(self.id)
-
-# class Content(models.Model):
-#     image = models.CharField(max_length=200)
-#     video = models.CharField(max_length=200)
-#     videoLength = models.CharField(max_length=200)
-#     date = models.DateTimeField(max_length=200, unique=True)
-#     date_created = models.DateTimeField(auto_now_add=True)
-#     def __unicode__(self):
-#         return str(self.date)

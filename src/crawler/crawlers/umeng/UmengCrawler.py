@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
-# from selenium import webdriver
-# from selenium.webdriver.support.ui import WebDriverWait
-# from selenium.common.exceptions import WebDriverException
+'''
+使用urllib2，都是通过网页上抓到的接口，主要参数就是start_date和end_date，可以自己定
+'''
 import datetime
 import time
 import urllib2
@@ -29,6 +29,7 @@ class UmengCrawler:
         self.headers['X-CSRF-Token'] = 'gnRA365zNecgXvbLpUca20a4uSLO40G/gFNp1sCqJZA='
         self.start()
 
+    #使用urllib2 登录，获取登陆后的cookie并保存
     def start(self):
         request = urllib2.Request('https://i.umeng.com')
         response = urllib2.urlopen(request)
@@ -65,6 +66,7 @@ class UmengCrawler:
             self.cookie = self.cookie + c.name + '=' + c.value + ';'
         self.headers['Cookie'] = self.cookie
 
+    # 获取新增用户
     def getNewUser(self, start_date, end_date):
         self.headers['Referer'] = 'http://mobile.umeng.com/apps/cf41008f4de85e761c647675/reports/installation'
         request = urllib2.Request(
@@ -82,6 +84,7 @@ class UmengCrawler:
             if hasattr(e, "reason"):
                 print e.reason
 
+    #获取活跃用户
     def getActiveUser(self, start_date, end_date):
         self.headers['Referer'] = 'http://mobile.umeng.com/apps/cf41008f4de85e761c647675/reports/active_user'
         request = urllib2.Request(
@@ -99,6 +102,7 @@ class UmengCrawler:
             if hasattr(e, "reason"):
                 print e.reason
 
+    # 获取使用时长
     def getDuration(self, date):
         self.headers['Referer'] = 'http://mobile.umeng.com/apps/cf41008f4de85e761c647675/reports/duration'
         request = urllib2.Request(
@@ -163,7 +167,7 @@ class UmengCrawler:
         jsonResult = json.dumps(result)
         return jsonResult
 
-
+    #错误情况
     def getErrorDetail(self, start_date, end_date):
         # start_date 必须在今天的前15天之后
         self.headers['Referer'] = 'http://mobile.umeng.com/apps/cf41008f4de85e761c647675/error_types'
@@ -219,6 +223,7 @@ class UmengCrawler:
         except KeyError:
             return {}
 
+    #用户分布
     def getUserDistribution(self, start_date, end_date):
         start = datetime.datetime.strptime(start_date, '%Y-%m-%d').date()
         end = datetime.datetime.strptime(end_date, '%Y-%m-%d').date()
@@ -245,6 +250,7 @@ class UmengCrawler:
         jsonResult = json.dumps(result)
         return jsonResult
 
+    #使用情况
     def getUseCondition(self, start_date, end_date):
         result = []
         newUser = self.getNewUser(start_date, end_date)
@@ -263,7 +269,7 @@ class UmengCrawler:
         jsonResult = json.dumps(result)
         return jsonResult
 
-
+    #获取自定义事件
     def getEvent(self, start_date, end_date, event_group_id, version):
         self.headers['Referer'] = 'http://mobile.umeng.com/apps/cf41008f4de85e761c647675/events/' + event_group_id + '?version='
         request = urllib2.Request(
@@ -282,7 +288,7 @@ class UmengCrawler:
             if hasattr(e, "reason"):
                 print e.reason
 
-
+    #获取版本号
     def getVersions(self):
         self.headers['Referer'] = 'http://mobile.umeng.com/apps/cf41008f4de85e761c647675/events/dashboard'
         request = urllib2.Request(
@@ -304,7 +310,7 @@ class UmengCrawler:
             if hasattr(e, "reason"):
                 print e.reason
 
-
+    #分享渠道
     def getShareChannel(self, start_date, end_date):
         event_group_ids = {
             '微信_img': '57afe74767e58ea4ca000428',
@@ -354,7 +360,7 @@ class UmengCrawler:
         jsonResult = json.dumps(result)
         return jsonResult
 
-
+    #分享转化率
     def getShareCount(self, start_date, end_date):
         event_group_ids = {
             'video_success': '576ba13767e58eb24f001ee5',
@@ -382,7 +388,7 @@ class UmengCrawler:
         jsonResult = json.dumps(result)
         return jsonResult
 
-
+    #拍照、摄像数
     def getTakeCount(self, start_date, end_date):
         event_group_ids = {
             'video': '5767490667e58e557e002902',
@@ -409,8 +415,6 @@ class UmengCrawler:
                 result.append(temp)
         jsonResult = json.dumps(result)
         return jsonResult
-
-
 
 
 if __name__ == "__main__":

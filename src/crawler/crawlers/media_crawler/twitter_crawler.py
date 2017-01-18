@@ -1,4 +1,8 @@
 # -*- coding: UTF-8 -*-
+'''
+官方接口
+最近一周动态的点赞、转发总和
+'''
 import urllib2
 import urllib
 import json
