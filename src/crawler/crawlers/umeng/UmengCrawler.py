@@ -269,6 +269,7 @@ class UmengCrawler:
         jsonResult = json.dumps(result)
         return jsonResult
 
+
     #获取自定义事件
     def getEvent(self, start_date, end_date, event_group_id, version):
         self.headers['Referer'] = 'http://mobile.umeng.com/apps/cf41008f4de85e761c647675/events/' + event_group_id + '?version='

@@ -1,4 +1,15 @@
 # -*- coding: UTF-8 -*-
+'''
+get_google_index()
+get_fans()
+get_media_data()
+需要翻墙
+
+get_amazon_sales()
+get_taobao_sales()
+get_jd_sales()
+不是很稳定
+'''
 from __future__ import absolute_import
 from celery import shared_task
 from celery.utils.log import get_task_logger
@@ -80,7 +91,7 @@ def get_baidu_index():
         SearchIndex.objects.update_or_create(date=item['date'], key=item['key'], defaults=item)
     return 'Finished.'
 
-#谷歌指数 对应model： GoogleIndex
+#谷歌指数 对应model： GoogleIndex    （需要翻墙）
 @shared_task
 def get_google_index():
     result = '[]'
@@ -452,7 +463,7 @@ def get_user_distribution():
 
     return 'Finished.'
 
-#新媒体粉丝数 对应model： MediaFan
+#新媒体粉丝数 对应model： MediaFan     （需要翻墙）
 @shared_task
 def get_fans():
     result = '[]'
@@ -479,7 +490,7 @@ def get_fans():
         MediaFan.objects.update_or_create(date=item['date'], platform=item['platform'], defaults=item)
     return 'Finished.'
 
-#新媒体互动数（热度） 对应model： MediaData
+#新媒体互动数（热度） 对应model： MediaData  （需要翻墙）
 @shared_task
 def get_media_data():
     result = '[]'
