@@ -4,11 +4,6 @@ get_google_index()
 get_fans()
 get_media_data()
 需要翻墙
-
-get_amazon_sales()
-get_taobao_sales()
-get_jd_sales()
-不是很稳定
 '''
 from __future__ import absolute_import
 from celery import shared_task
