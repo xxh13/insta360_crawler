@@ -40,9 +40,12 @@ from .util.admin import password_updater
 import datetime
 import time
 import urllib2
+import sys
+
+reload(sys)
+sys.setdefaultencoding('utf-8')
 
 logger = get_task_logger(__name__)
-
 
 #用户概况 对应model： UseCondition
 @shared_task
