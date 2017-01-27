@@ -518,6 +518,14 @@ def refresh_active():
     result = response.read()
     return result
 
+#调用公司电脑的本地接口，完成vpn爬虫调用
+@shared_task
+def vpn_crawler():
+    request = urllib2.Request(url='http://fuck.fe.ngrok.insta360.com/crawler/test/')
+    response = urllib2.urlopen(request)
+    result = response.read()
+    return result
+
 #更新bi系统中insta_admin账号的密码，并发送邮件给指定的人
 @shared_task
 def update_password():
