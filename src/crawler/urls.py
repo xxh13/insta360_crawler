@@ -33,6 +33,9 @@ urlpatterns = [
     # bi系统->Nano内容分享->分享渠道占比
     url(r'^share_channel/$', views.share_channel, name='share_channel'),
 
+    # bi系统->Nano内容分享->分享模式占比
+    url(r'^share_mode/$', views.share_mode, name='share_mode'),
+
     # bi系统->Nano App使用情况->分享转化率
     url(r'^share_count/$', views.share_count, name='share_count'),
 

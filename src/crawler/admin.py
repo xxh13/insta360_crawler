@@ -8,6 +8,7 @@ from .models import SalesStatus
 from .models import ElectronicSales
 from .models import ErrorCondition
 from .models import ShareChannel
+from .models import ShareMode
 from .models import ShareCount
 from .models import TakeCount
 from .models import Log
@@ -50,6 +51,10 @@ class ShareChannelAdmin(admin.ModelAdmin):
     list_display = ('id', 'event_group_id', 'channel', 'type', 'date',
                     'version', 'count', 'device', 'count_per_launch', 'date_created')
 
+
+class ShareModeAdmin(admin.ModelAdmin):
+    list_display = ('id', 'event_group_id', 'mode', 'date',
+                    'version', 'count', 'device', 'count_per_launch', 'date_created')
 
 class ShareCountAdmin(admin.ModelAdmin):
     list_display = ('id', 'type', 'date',
@@ -98,6 +103,7 @@ admin.site.register(CompetitorSales, CompetitorSalesAdmin)
 admin.site.register(UserDistribution, UserDistributionAdmin)
 admin.site.register(ErrorCondition, ErrorConditionAdmin)
 admin.site.register(ShareChannel, ShareChannelAdmin)
+admin.site.register(ShareMode, ShareModeAdmin)
 admin.site.register(ShareCount, ShareCountAdmin)
 admin.site.register(TakeCount, TakeCountAdmin)
 admin.site.register(SalesStatus, SalesStatusAdmin)

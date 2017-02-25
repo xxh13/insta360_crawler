@@ -16,6 +16,7 @@ from .models import CompetitorSales
 from .models import UserDistribution
 from .models import ErrorCondition
 from .models import ShareChannel
+from .models import ShareMode
 from .models import ShareCount
 from .models import TakeCount
 from .models import MediaFan
@@ -291,6 +292,49 @@ def get_share_channel():
                                                   defaults=temp)
     return 'Finished.'
 
+#app分享模式 对应model： ShareMode
+@shared_task
+def get_share_mode():
+    today = datetime.datetime.today()
+    end_date = today.strftime('%Y-%m-%d')
+    start_date = (today - datetime.timedelta(days=5)).strftime('%Y-%m-%d')
+    result = '[]'
+    count = 0
+    while True:
+        try:
+            count += 1
+            crawler = UmengCrawler()
+            result = crawler.getShareMode(start_date, end_date)
+            break
+        except:
+            print 'error'
+            if count >= 3:
+                break
+            time.sleep(5)
+    data = json.loads(result)
+    for item in data:
+        event_group_id = item['event_group_id']
+        mode = item['mode']
+        version = item['version']
+        detail = item['data']
+
+        for i in detail:
+            try:
+                device = int(i['device'])
+            except:
+                device = 0
+            temp = {
+                'mode': mode,
+                'count': i['count'],
+                'device': device,
+                'count_per_launch': i['count_per_launch']
+            }
+            ShareMode.objects.update_or_create(date=i['date'],
+                                                  event_group_id=event_group_id,
+                                                  version=version,
+                                                  defaults=temp)
+    return 'Finished.'
+
 #app分享数量和转化率 对应model： ShareCount
 @shared_task
 def get_share_count():
@@ -514,14 +558,6 @@ def get_media_data():
 @shared_task
 def refresh_active():
     request = urllib2.Request(url='http://sales.internal.insta360.com/sales/util/refresh_active')
-    response = urllib2.urlopen(request)
-    result = response.read()
-    return result
-
-#调用公司电脑的本地接口，完成vpn爬虫调用
-@shared_task
-def vpn_crawler():
-    request = urllib2.Request(url='http://fuck.fe.ngrok.insta360.com/crawler/test/')
     response = urllib2.urlopen(request)
     result = response.read()
     return result

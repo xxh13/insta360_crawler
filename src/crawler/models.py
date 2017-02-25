@@ -103,6 +103,20 @@ class ShareChannel(models.Model):
     def __unicode__(self):
         return str(self.id)
 
+# app内容分享模式
+class ShareMode(models.Model):
+    event_group_id = models.CharField(max_length=200, blank=True)
+    mode = models.CharField(max_length=200, blank=True)
+    date = models.DateField(auto_now=False, auto_now_add=False)
+    version = models.CharField(max_length=200, blank=True)
+    count = models.IntegerField(default=0)
+    device = models.IntegerField(default=0)
+    count_per_launch = models.FloatField(default=0.0)
+    date_created = models.DateTimeField(auto_now_add=True)
+
+    def __unicode__(self):
+        return str(self.id)
+
 #分享数量和转化率
 class ShareCount(models.Model):
     type = models.CharField(max_length=200, blank=True)

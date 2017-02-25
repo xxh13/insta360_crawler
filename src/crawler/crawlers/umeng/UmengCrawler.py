@@ -361,6 +361,33 @@ class UmengCrawler:
         jsonResult = json.dumps(result)
         return jsonResult
 
+    #分享模式
+    def getShareMode(self, start_date, end_date):
+        event_group_ids = {
+            '小行星截图': '58817174bbea834daf0000f5',
+            '全景图片': '58817174bbea834daf0000f4',
+            '全景视频': '58817174bbea834daf0000f7',
+            '广角视频': '58817174bbea834daf0000f6',
+        }
+        versions = self.getVersions()
+        result = []
+        for version in versions:
+            if version < '1.7.0':
+                continue
+            for index in event_group_ids:
+                event_group_id = event_group_ids[index]
+                data = self.getEvent(start_date, end_date, event_group_id, version)
+                print data
+                temp = {
+                    'version': version,
+                    'event_group_id': event_group_id,
+                    'mode': index,
+                    'data': data
+                }
+                result.append(temp)
+        jsonResult = json.dumps(result)
+        return jsonResult
+
     #分享转化率
     def getShareCount(self, start_date, end_date):
         event_group_ids = {

@@ -15,6 +15,7 @@ from models import GoogleIndex
 from models import CompetitorSales
 from models import GlobalElectronicSales
 from models import ShareChannel
+from models import ShareMode
 from models import ShareCount
 from models import TakeCount
 from models import MediaFan
@@ -552,6 +553,64 @@ def share_channel(request):
     else:
         return HttpResponse('Error.')
 
+# bi系统->Nano内容分享->分享模式占比
+@csrf_exempt
+def share_mode(request):
+    if request.method == 'POST':
+        return HttpResponse('Task submitted.')
+    elif request.method == 'GET':
+        para = request.GET
+        today = datetime.datetime.today()
+        start_time = (today - datetime.timedelta(days=6)).strftime('%Y-%m-%d')
+        end_time = (today + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
+        if para.__contains__('start_time'):
+            start_time = para.__getitem__('start_time')
+        if para.__contains__('end_time'):
+            end_time = para.__getitem__('end_time')
+        version = 'all'
+        if para.__contains__('version'):
+            version = para.__getitem__('version')
+        result = collections.OrderedDict()
+
+        if version == 'all':
+            res = ShareMode.objects.filter(
+                date__range=(start_time, end_time),
+            ).values(
+                'date','mode'
+            ).annotate(
+                count_total=Sum('count')
+            ).order_by('date')
+            dates = res.dates('date', 'day')
+            for date in dates:
+                res_temp = res.filter(date=date).order_by('count_total')
+                temp = collections.OrderedDict()
+                for item in res_temp:
+                    temp[item['mode']] = item['count_total']
+                result[date.strftime('%m-%d')] = temp
+            versions = ShareMode.objects.values('version').distinct()
+            temp1 = []
+            for item in versions:
+                temp1.append(item['version'])
+            return JsonResponse({'versions': temp1, 'data': result}, safe=False)
+
+        res = ShareMode.objects.filter(date__range=(start_time, end_time), version=version).order_by(
+            'date')
+        dates = res.dates('date', 'day')
+        for date in dates:
+            res_temp = res.filter(date=date).order_by('count')
+            temp = collections.OrderedDict()
+            for item in res_temp:
+                temp[item.mode] = item.count
+            result[date.strftime('%m-%d')] = temp
+        versions = ShareMode.objects.values('version').distinct()
+        temp1 = []
+        for item in versions:
+            temp1.append(item['version'])
+        return JsonResponse({'versions': temp1, 'data': result}, safe=False)
+    else:
+        return HttpResponse('Error.')
+
+
 #bi系统->Nano App使用情况->分享转化率
 @csrf_exempt
 def share_count(request):
@@ -979,6 +1038,8 @@ def test(request):
         # f()
         # g()
         # get_media_data()
+        # get_share_channel()
+        get_share_mode()
         return HttpResponse('Success')
     else:
         return HttpResponse('Error.')
