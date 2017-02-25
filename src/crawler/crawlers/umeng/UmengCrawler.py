@@ -364,7 +364,7 @@ class UmengCrawler:
     #分享模式
     def getShareMode(self, start_date, end_date):
         event_group_ids = {
-            '小行星截图': '58817174bbea834daf0000f5',
+            '小行星图片': '58817174bbea834daf0000f5',
             '全景图片': '58817174bbea834daf0000f4',
             '全景视频': '58817174bbea834daf0000f7',
             '广角视频': '58817174bbea834daf0000f6',

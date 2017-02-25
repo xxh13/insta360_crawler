@@ -1038,8 +1038,6 @@ def test(request):
         # f()
         # g()
         # get_media_data()
-        # get_share_channel()
-        get_share_mode()
         return HttpResponse('Success')
     else:
         return HttpResponse('Error.')
