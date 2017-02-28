@@ -17,7 +17,7 @@ password_list = [
     'yesmylord',
     'nowornever'
 ]
-address_list = 'eric@arashivision.com,562421167@qq.com,jk.liu@vzhibo.tv,leon@insta360.com,cjy@vzhibo.tv'
+address_list = 'eric@arashivision.com,562421167@qq.com,jk.liu@vzhibo.tv,leon@insta360.com,cjy@vzhibo.tv,dee@arashivision.com,liuyanhong@arashivision.com'
 
 config = {}
 config['username'] = 'insta360_admin'
