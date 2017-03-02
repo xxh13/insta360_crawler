@@ -221,6 +221,20 @@ class MediaData(models.Model):
     def __unicode__(self):
         return str(self.id)
 
+
+# 新媒体标签内容数
+class MediaTag(models.Model):
+    platform = models.CharField(max_length=200)
+    count = models.IntegerField(default=0)
+    tag = models.CharField(max_length=200)
+    date = models.DateField(auto_now=False, auto_now_add=False)
+    created_time = models.DateTimeField(auto_now_add=True)
+    update_time = models.DateTimeField(auto_now=True)
+
+    def __unicode__(self):
+        return str(self.id)
+
+
 #淘宝店铺每日销量详情
 class TaobaoDetail(models.Model):
     shop = models.CharField(max_length=200)

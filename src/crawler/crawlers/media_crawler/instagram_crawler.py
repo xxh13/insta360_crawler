@@ -7,6 +7,7 @@ import urllib2
 import json
 import datetime
 import time
+import re
 
 
 def get_by_api():
@@ -45,5 +46,18 @@ def get_by_api():
     print  jsonResult
     return jsonResult
 
+def get_tag(tag):
+    url = 'https://www.instagram.com/explore/tags/' + str(tag) + '/'
+    request = urllib2.Request(url=url)
+    response = urllib2.urlopen(request)
+    page = response.read()
+    pattern = re.compile("window._sharedData = (.+);</script>", re.S)
+    items = re.findall(pattern, page)
+    jsonData = json.loads(items[0])
+    count = jsonData['entry_data']['TagPage'][0]['tag']['media']['count']
+    print count
+    return count
+
 if __name__ == "__main__":
     get_by_api()
+    # get_tag('insta360')

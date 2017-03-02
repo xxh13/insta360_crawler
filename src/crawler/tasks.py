@@ -21,6 +21,7 @@ from .models import ShareCount
 from .models import TakeCount
 from .models import MediaFan
 from .models import MediaData
+from .models import MediaTag
 from .models import TaobaoDetail
 from .models import GlobalElectronicSales
 from .crawlers.umeng.UmengCrawler import UmengCrawler
@@ -31,6 +32,7 @@ from .crawlers.amazon.amazon_crawler import main as amanzon_crawler
 from .crawlers.google_index.google_trends import google_index
 from .crawlers.fans_crawler.main import main as fans_crawler
 from .crawlers.media_crawler.main import main as media_crawler
+from .crawlers.media_crawler.tag_main import main as tag_crawler
 from .util.admin import password_updater
 
 import datetime
@@ -552,6 +554,26 @@ def get_media_data():
         date = item['date']
         platform = item['platform']
         MediaData.objects.update_or_create(date=date, platform=platform, defaults=item)
+    return 'Finished.'
+
+#新媒体粉丝数 对应model： MediaFan     （需要翻墙）
+@shared_task
+def get_media_tag():
+    result = '[]'
+    count = 0
+    while True:
+        try:
+            count += 1
+            result = tag_crawler()
+            break
+        except:
+            print 'error'
+            if count >= 3:
+                break
+            time.sleep(5)
+    items = json.loads(result)
+    for item in items:
+        MediaTag.objects.update_or_create(date=item['date'], platform=item['platform'], tag=item['tag'], defaults=item)
     return 'Finished.'
 
 #调用销售支持系统的一个接口，用于每天刷新数据库中卖出去的nano的激活状态

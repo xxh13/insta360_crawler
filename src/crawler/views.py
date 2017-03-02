@@ -19,6 +19,8 @@ from models import ShareMode
 from models import ShareCount
 from models import TakeCount
 from models import MediaFan
+from models import MediaData
+from models import MediaTag
 from models import Log
 from models import TaobaoDetail
 from tasks import *
@@ -959,6 +961,33 @@ def media_fans(request):
     else:
         return HttpResponse('Error.')
 
+# bi系统->新媒体监控->标签内容数走势
+@csrf_exempt
+def media_tag(request):
+    if request.method == 'POST':
+        return HttpResponse('Task submitted.')
+    elif request.method == 'GET':
+        para = request.GET
+        today = datetime.datetime.today()
+        start_time = (today - datetime.timedelta(days=6)).strftime('%Y-%m-%d')
+        end_time = (today + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
+        if para.__contains__('start_time'):
+            start_time = para.__getitem__('start_time')
+        if para.__contains__('end_time'):
+            end_time = para.__getitem__('end_time')
+        result = collections.OrderedDict()
+        res = MediaTag.objects.filter(date__range=(start_time, end_time)).order_by('date')
+        dates = res.dates('date', 'day')
+        for date in dates:
+            res_temp = res.filter(date=date).order_by('count')
+            temp = collections.OrderedDict()
+            for item in res_temp:
+                temp[item.platform + '#' + item.tag] = item.count
+            result[date.strftime('%m-%d')] = temp
+        return JsonResponse(result, safe=False)
+    else:
+        return HttpResponse('Error.')
+
 #bi系统->Nano市场环境->30天评论/销量->淘宝店铺详情
 @csrf_exempt
 def taobao_detail(request):
@@ -1035,9 +1064,11 @@ def test(request):
     if request.method == 'POST':
         return HttpResponse('Task submitted.')
     elif request.method == 'GET':
-        # f()
-        # g()
+        # get_fans()
+        # get_media_tag()
         # get_media_data()
-        return HttpResponse('Success')
+        # get_google_index()
+        # get_amazon_sales()
+        return HttpResponse('success')
     else:
         return HttpResponse('Error.')

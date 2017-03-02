@@ -14,6 +14,7 @@ from .models import TakeCount
 from .models import Log
 from .models import MediaFan
 from .models import MediaData
+from .models import MediaTag
 from .models import TaobaoDetail
 from .models import GlobalElectronicSales
 
@@ -87,6 +88,9 @@ class MediaFanAdmin(admin.ModelAdmin):
 class MediaDataAdmin(admin.ModelAdmin):
     list_display = ('id', 'platform', 'date', 'comment', 'like', 'dislike', 'share', 'view', 'created_time', 'update_time')
 
+class MediaTagAdmin(admin.ModelAdmin):
+    list_display = ('id', 'platform', 'tag', 'count', 'date', 'created_time', 'update_time')
+
 class TaobaoDetailAdmin(admin.ModelAdmin):
     list_display = ('id', 'shop', 'shop_keeper',
                     'name', 'commodity', 'price',
@@ -111,5 +115,6 @@ admin.site.register(ElectronicSales, ElectronicSalesAdmin)
 admin.site.register(Log, LogAdmin)
 admin.site.register(MediaFan, MediaFanAdmin)
 admin.site.register(MediaData, MediaDataAdmin)
+admin.site.register(MediaTag, MediaTagAdmin)
 admin.site.register(TaobaoDetail, TaobaoDetailAdmin)
 admin.site.register(GlobalElectronicSales, GlobalElectronicSalesAdmin)
