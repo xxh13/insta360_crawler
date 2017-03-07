@@ -407,15 +407,18 @@ def user_distribution(request):
         today = datetime.datetime.today()
         start_time = (today - datetime.timedelta(days=6)).strftime('%Y-%m-%d')
         end_time = (today + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
+        product = 'nano'
         if para.__contains__('start_time'):
             start_time = para.__getitem__('start_time')
         if para.__contains__('end_time'):
             end_time = para.__getitem__('end_time')
+        if para.__contains__('product_type'):
+            product = para.__getitem__('product_type')
         res_native = []
         res_abroad = []
-        native = UserDistribution.objects.filter(date__range=(start_time, end_time), is_native=1).values(
+        native = UserDistribution.objects.filter(date__range=(start_time, end_time), product=product, is_native=1).values(
             'location').annotate(total=Sum('new_user')).order_by('-total')
-        abroad = UserDistribution.objects.filter(date__range=(start_time, end_time), is_native=0).values(
+        abroad = UserDistribution.objects.filter(date__range=(start_time, end_time), product=product, is_native=0).values(
             'location').annotate(total=Sum('new_user')).order_by('-total')
         fp = open('crawler/util/dict.json', 'r')
         dict = json.loads(fp.read(), encoding='utf-8')
@@ -445,14 +448,17 @@ def user_area(request):
         start_time = (today - datetime.timedelta(days=29)).strftime('%Y-%m-%d')
         end_time = (today + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
         is_native = 1
+        product = 'nano'
         if para.__contains__('start_time'):
             start_time = para.__getitem__('start_time')
         if para.__contains__('end_time'):
             end_time = para.__getitem__('end_time')
         if para.__contains__('is_native'):
             is_native = para.__getitem__('is_native')
+        if para.__contains__('product_type'):
+            product = para.__getitem__('product_type')
         result = collections.OrderedDict()
-        res = UserDistribution.objects.filter(date__range=(start_time, end_time), is_native=is_native)
+        res = UserDistribution.objects.filter(date__range=(start_time, end_time), product=product, is_native=is_native)
         locations = res.values('location').annotate(total=Sum('new_user')).order_by('-total')[:10]
         location_list = []
         for location in locations:
@@ -481,12 +487,15 @@ def use_condition(request):
         today = datetime.datetime.today()
         start_time = (today - datetime.timedelta(days=6)).strftime('%Y-%m-%d')
         end_time = (today + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
+        product = 'nano'
         if para.__contains__('start_time'):
             start_time = para.__getitem__('start_time')
         if para.__contains__('end_time'):
             end_time = para.__getitem__('end_time')
+        if para.__contains__('product_type'):
+            product = para.__getitem__('product_type')
         result = []
-        res = UseCondition.objects.filter(date__range=(start_time, end_time)).order_by('date')
+        res = UseCondition.objects.filter(date__range=(start_time, end_time), product=product).order_by('date')
         for item in res:
             temp = {'date': item.date.strftime('%m-%d'), 'new_user': item.new_user, 'active_user': item.active_user,
                     'duration': item.duration}
@@ -505,10 +514,13 @@ def share_channel(request):
         today = datetime.datetime.today()
         start_time = (today - datetime.timedelta(days=6)).strftime('%Y-%m-%d')
         end_time = (today + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
+        product = 'nano'
         if para.__contains__('start_time'):
             start_time = para.__getitem__('start_time')
         if para.__contains__('end_time'):
             end_time = para.__getitem__('end_time')
+        if para.__contains__('product_type'):
+            product = para.__getitem__('product_type')
         type = 'img'
         if para.__contains__('type'):
             type = para.__getitem__('type')
@@ -520,7 +532,8 @@ def share_channel(request):
         if version == 'all':
             res = ShareChannel.objects.filter(
                 date__range=(start_time, end_time),
-                type=type
+                type=type,
+                product=product
             ).values(
                 'date', 'channel'
             ).annotate(
@@ -533,13 +546,13 @@ def share_channel(request):
                 for item in res_temp:
                     temp[item['channel']] = item['count_total']
                 result[date.strftime('%m-%d')] = temp
-            versions = ShareChannel.objects.values('version').distinct()
+            versions = ShareChannel.objects.filter(product=product).values('version').distinct()
             temp1 = []
             for item in versions:
                 temp1.append(item['version'])
             return JsonResponse({'versions': temp1, 'data': result}, safe=False)
 
-        res = ShareChannel.objects.filter(date__range=(start_time, end_time), version=version,type=type).order_by('date')
+        res = ShareChannel.objects.filter(date__range=(start_time, end_time), product=product, version=version,type=type).order_by('date')
         dates = res.dates('date', 'day')
         for date in dates:
             res_temp = res.filter(date=date).order_by('count')
@@ -547,7 +560,7 @@ def share_channel(request):
             for item in res_temp:
                 temp[item.channel] = item.count
             result[date.strftime('%m-%d')] = temp
-        versions = ShareChannel.objects.values('version').distinct()
+        versions = ShareChannel.objects.filter(product=product).values('version').distinct()
         temp1 = []
         for item in versions:
             temp1.append(item['version'])
@@ -565,10 +578,14 @@ def share_mode(request):
         today = datetime.datetime.today()
         start_time = (today - datetime.timedelta(days=6)).strftime('%Y-%m-%d')
         end_time = (today + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
+
         if para.__contains__('start_time'):
             start_time = para.__getitem__('start_time')
         if para.__contains__('end_time'):
             end_time = para.__getitem__('end_time')
+        product = 'nano'
+        if para.__contains__('product_type'):
+            product = para.__getitem__('product_type')
         version = 'all'
         if para.__contains__('version'):
             version = para.__getitem__('version')
@@ -576,7 +593,7 @@ def share_mode(request):
 
         if version == 'all':
             res = ShareMode.objects.filter(
-                date__range=(start_time, end_time),
+                date__range=(start_time, end_time), product=product,
             ).values(
                 'date','mode'
             ).annotate(
@@ -589,13 +606,13 @@ def share_mode(request):
                 for item in res_temp:
                     temp[item['mode']] = item['count_total']
                 result[date.strftime('%m-%d')] = temp
-            versions = ShareMode.objects.values('version').distinct()
+            versions = ShareMode.objects.filter(product=product).values('version').distinct()
             temp1 = []
             for item in versions:
                 temp1.append(item['version'])
             return JsonResponse({'versions': temp1, 'data': result}, safe=False)
 
-        res = ShareMode.objects.filter(date__range=(start_time, end_time), version=version).order_by(
+        res = ShareMode.objects.filter(date__range=(start_time, end_time), product=product, version=version).order_by(
             'date')
         dates = res.dates('date', 'day')
         for date in dates:
@@ -604,7 +621,7 @@ def share_mode(request):
             for item in res_temp:
                 temp[item.mode] = item.count
             result[date.strftime('%m-%d')] = temp
-        versions = ShareMode.objects.values('version').distinct()
+        versions = ShareMode.objects.filter(product=product).values('version').distinct()
         temp1 = []
         for item in versions:
             temp1.append(item['version'])
@@ -627,6 +644,9 @@ def share_count(request):
             start_time = para.__getitem__('start_time')
         if para.__contains__('end_time'):
             end_time = para.__getitem__('end_time')
+        product = 'nano'
+        if para.__contains__('product_type'):
+            product = para.__getitem__('product_type')
         type = 'img'
         if para.__contains__('type'):
             type = para.__getitem__('type')
@@ -638,7 +658,8 @@ def share_count(request):
         if version == 'all':
             res = ShareCount.objects.filter(
                 date__range=(start_time, end_time),
-                type=type
+                type=type,
+                product=product
             ).values(
                 'date'
             ).annotate(
@@ -660,13 +681,14 @@ def share_count(request):
                     temp['success_count'] = success_count
                     temp['percent'] = percent
                 result[date.strftime('%m-%d')] = temp
-            versions = ShareCount.objects.values('version').distinct()
+            versions = ShareCount.objects.filter(product=product).values('version').distinct()
             temp1 = []
             for item in versions:
                 temp1.append(item['version'])
             return JsonResponse({'versions': temp1, 'data': result}, safe=False)
 
-        res = ShareCount.objects.filter(date__range=(start_time, end_time), version=version, type=type).order_by('date')
+        res = ShareCount.objects.filter(date__range=(start_time, end_time), version=version, type=type,
+                product=product).order_by('date')
         dates = res.dates('date', 'day')
         for date in dates:
             res_temp = res.filter(date=date).order_by('success_count')
@@ -682,7 +704,7 @@ def share_count(request):
                 temp['success_count'] = success_count
                 temp['percent'] = percent
             result[date.strftime('%m-%d')] = temp
-        versions = ShareCount.objects.values('version').distinct()
+        versions = ShareCount.objects.filter(product=product).values('version').distinct()
         temp1 = []
         for item in versions:
             temp1.append(item['version'])
@@ -704,18 +726,22 @@ def take_count(request):
             start_time = para.__getitem__('start_time')
         if para.__contains__('end_time'):
             end_time = para.__getitem__('end_time')
+        product = 'nano'
+        if para.__contains__('product_type'):
+            product = para.__getitem__('product_type')
         version = 'all'
         if para.__contains__('version'):
             version = para.__getitem__('version')
         result = collections.OrderedDict()
 
-        res = TakeCount.objects.filter(date__range=(start_time, end_time), version=version).order_by('date')
+        res = TakeCount.objects.filter(date__range=(start_time, end_time), version=version,
+                product=product).order_by('date')
         for item in res:
             temp =  collections.OrderedDict()
             temp['img'] = item.img_count
             temp['video'] = item.video_count
             result[item.date.strftime('%m-%d')] = temp
-        versions = ShareCount.objects.values('version').distinct()
+        versions = ShareCount.objects.filter(product=product).values('version').distinct()
         temp1 = []
         for item in versions:
             temp1.append(item['version'])
@@ -738,8 +764,12 @@ def error_condition(request):
             start_time = para.__getitem__('start_time')
         if para.__contains__('end_time'):
             end_time = para.__getitem__('end_time')
+        product = 'nano'
+        if para.__contains__('product_type'):
+            product = para.__getitem__('product_type')
         result = []
-        res = ErrorCondition.objects.filter(date__range=(start_time, end_time)).order_by('date')
+        res = ErrorCondition.objects.filter(date__range=(start_time, end_time),
+                product=product).order_by('date')
         for item in res:
             temp = {'date': item.date.strftime('%m-%d'), 'total_error': item.total_error, 'error_rate': item.error_rate}
             result.append(temp)
@@ -1066,11 +1096,12 @@ def test(request):
     if request.method == 'POST':
         return HttpResponse('Task submitted.')
     elif request.method == 'GET':
+        # get_amazon_sales()
         # get_fans()
         # get_media_tag()
         # get_media_data()
         # get_google_index()
-        # get_amazon_sales()
+        # fill_fans_data('2017-03-03','2017-03-05')
         return HttpResponse('success')
     else:
         return HttpResponse('Error.')

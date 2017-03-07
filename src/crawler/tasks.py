@@ -66,7 +66,7 @@ def get_use_condition():
             time.sleep(5)
     data = json.loads(result)
     for item in data:
-        UseCondition.objects.update_or_create(date=item['date'], defaults=item)
+        UseCondition.objects.update_or_create(date=item['date'], product=item['product'], defaults=item)
     return 'Finished.'
 
 #百度指数 对应model： SearchIndex
@@ -229,7 +229,7 @@ def get_error():
             time.sleep(5)
     data = json.loads(result)
     for item in data:
-        ErrorCondition.objects.update_or_create(date=item['date'], defaults=item)
+        ErrorCondition.objects.update_or_create(date=item['date'], product=item['product'], defaults=item)
 
     result = '[]'
     count = 0
@@ -246,7 +246,7 @@ def get_error():
             time.sleep(5)
     data = json.loads(result)
     for item in data:
-        ErrorCondition.objects.update_or_create(date=item['date'], defaults=item)
+        ErrorCondition.objects.update_or_create(date=item['date'], product=item['product'], defaults=item)
     return 'Finished.'
 
 #app分享渠道 对应model： ShareChannel
@@ -275,6 +275,7 @@ def get_share_channel():
         version = item['version']
         channel = item['channel']
         detail = item['data']
+        product = item['product']
 
         for i in detail:
             try:
@@ -289,6 +290,7 @@ def get_share_channel():
                 'count_per_launch': i['count_per_launch']
             }
             ShareChannel.objects.update_or_create(date=i['date'],
+                                                  product=product,
                                                   event_group_id=event_group_id,
                                                   version=version,
                                                   defaults=temp)
@@ -319,7 +321,7 @@ def get_share_mode():
         mode = item['mode']
         version = item['version']
         detail = item['data']
-
+        product = item['product']
         for i in detail:
             try:
                 device = int(i['device'])
@@ -332,9 +334,10 @@ def get_share_mode():
                 'count_per_launch': i['count_per_launch']
             }
             ShareMode.objects.update_or_create(date=i['date'],
-                                                  event_group_id=event_group_id,
-                                                  version=version,
-                                                  defaults=temp)
+                                               product=product,
+                                               event_group_id=event_group_id,
+                                               version=version,
+                                               defaults=temp)
     return 'Finished.'
 
 #app分享数量和转化率 对应model： ShareCount
@@ -362,6 +365,7 @@ def get_share_count():
         version = item['version']
         flag = item['flag']
         detail = item['data']
+        product = item['product']
         if flag == 'success':
             for i in detail:
                 try:
@@ -375,6 +379,7 @@ def get_share_count():
                 }
                 ShareCount.objects.update_or_create(date=i['date'],
                                                       version=version,
+                                                      product=product,
                                                       type=type,
                                                       defaults=temp)
         else:
@@ -390,6 +395,7 @@ def get_share_count():
                 }
                 ShareCount.objects.update_or_create(date=i['date'],
                                                       version=version,
+                                                      product=product,
                                                       type=type,
                                                       defaults=temp)
     return 'Finished.'
@@ -418,6 +424,7 @@ def get_take_count():
         type = item['type']
         version = item['version']
         detail = item['data']
+        product = item['product']
         if type == 'img':
             for i in detail:
                 try:
@@ -429,7 +436,7 @@ def get_take_count():
                     'img_device': device,
                     'img_count_per_launch': i['count_per_launch']
                 }
-                TakeCount.objects.update_or_create(date=i['date'],
+                TakeCount.objects.update_or_create(date=i['date'],product=product,
                                                       version=version,
                                                       defaults=temp)
         else:
@@ -443,7 +450,7 @@ def get_take_count():
                     'video_device': device,
                     'video_count_per_launch': i['count_per_launch']
                 }
-                TakeCount.objects.update_or_create(date=i['date'],
+                TakeCount.objects.update_or_create(date=i['date'],product=product,
                                                       version=version,
                                                       defaults=temp)
     return 'Finished.'
@@ -472,38 +479,40 @@ def get_user_distribution():
     for item in data:
         if (item['location'] == '内蒙'):
             item['location'] = '内蒙古'
-        UserDistribution.objects.update_or_create(date=item['date'], location=item['location'], is_native=item['is_native'], defaults=item)
+        UserDistribution.objects.update_or_create(date=item['date'], location=item['location'], product=item['product'], is_native=item['is_native'], defaults=item)
 
-    locations = [
-            '香港',
-            '澳门',
-            '台湾'
-        ]
-    start = (today - datetime.timedelta(days=delta))
-    end = (today + datetime.timedelta(days=1))
-    result = UserDistribution.objects.filter(
-        location__in=locations,
-        date__range=(start, end)
-    ).values(
-            'date'
-        ).annotate(
-        launch_data_total=Sum('launch_data'),
-        active_user_total=Sum('active_user'),
-        new_user_total=Sum('new_user'),
-    )
-    for i in result:
-        date = i['date']
-        new_user_total = i['new_user_total']
-        launch_data_total = i['launch_data_total']
-        active_user_total = i['active_user_total']
-        try:
-            china = UserDistribution.objects.get(date=date, location='中国')
-            china.new_user = china.new_user - new_user_total
-            china.launch_data = china.launch_data - launch_data_total
-            china.active_user = china.active_user - active_user_total
-            china.save()
-        except:
-            pass
+    for product in ['nano', 'air']:
+        locations = [
+                '香港',
+                '澳门',
+                '台湾'
+            ]
+        start = (today - datetime.timedelta(days=delta))
+        end = (today + datetime.timedelta(days=1))
+        result = UserDistribution.objects.filter(
+            location__in=locations,
+            product=product,
+            date__range=(start, end)
+        ).values(
+                'date'
+            ).annotate(
+            launch_data_total=Sum('launch_data'),
+            active_user_total=Sum('active_user'),
+            new_user_total=Sum('new_user'),
+        )
+        for i in result:
+            date = i['date']
+            new_user_total = i['new_user_total']
+            launch_data_total = i['launch_data_total']
+            active_user_total = i['active_user_total']
+            try:
+                china = UserDistribution.objects.get(date=date, product=product, location='中国')
+                china.new_user = china.new_user - new_user_total
+                china.launch_data = china.launch_data - launch_data_total
+                china.active_user = china.active_user - active_user_total
+                china.save()
+            except:
+                pass
 
     return 'Finished.'
 
@@ -589,3 +598,28 @@ def refresh_active():
 def update_password():
     password = password_updater()
     return password
+
+import random
+@shared_task
+def fill_fans_data(start_date, end_date):
+    start = datetime.datetime.strptime(start_date, '%Y-%m-%d').date()
+    end = datetime.datetime.strptime(end_date, '%Y-%m-%d').date()
+    platformsQuery = MediaFan.objects.filter(date__range=(start_date, end_date)).values('platform').distinct()
+    platforms = []
+    for item in platformsQuery:
+        platforms.append(item['platform'])
+    for platform in platforms:
+        start_item = MediaFan.objects.get(platform=platform,date=start_date)
+        end_item = MediaFan.objects.get(platform=platform, date=end_date)
+        increment = end_item.fans - start_item.fans
+        delta = (end - start).days
+        avg = int(increment / delta)
+        deviation = abs(int(avg * 0.3))
+        fans = start_item.fans
+        for i in range(1, delta):
+            date = (start + datetime.timedelta(days=i)).strftime('%Y-%m-%d')
+            fans += (avg + random.randint(- deviation, deviation))
+            temp = {
+                'fans': fans
+            }
+            MediaFan.objects.update_or_create(platform=platform,date=date,defaults=temp)

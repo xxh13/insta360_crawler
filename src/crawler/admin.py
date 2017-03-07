@@ -21,7 +21,7 @@ from .models import GlobalElectronicSales
 
 # Register your models here.
 class UseConditionAdmin(admin.ModelAdmin):
-    list_display = ('id', 'date', 'new_user', 'active_user', 'duration', 'date_created')
+    list_display = ('id', 'product', 'date', 'new_user', 'active_user', 'duration', 'date_created')
 
 
 class SearchIndexAdmin(admin.ModelAdmin):
@@ -38,33 +38,33 @@ class CompetitorSalesAdmin(admin.ModelAdmin):
 
 
 class UserDistributionAdmin(admin.ModelAdmin):
-    list_display = ('id', 'date', 'location',
+    list_display = ('id', 'product', 'date', 'location',
                     'active_user', 'active_rate', 'new_user',
                     'new_rate', 'launch_data', 'launch_rate',
                     'is_native', 'date_created')
 
 
 class ErrorConditionAdmin(admin.ModelAdmin):
-    list_display = ('id', 'date', 'total_error', 'error_rate', 'date_created')
+    list_display = ('id', 'product', 'date', 'total_error', 'error_rate', 'date_created')
 
 
 class ShareChannelAdmin(admin.ModelAdmin):
-    list_display = ('id', 'event_group_id', 'channel', 'type', 'date',
+    list_display = ('id', 'product', 'event_group_id', 'channel', 'type', 'date',
                     'version', 'count', 'device', 'count_per_launch', 'date_created')
 
 
 class ShareModeAdmin(admin.ModelAdmin):
-    list_display = ('id', 'event_group_id', 'mode', 'date',
+    list_display = ('id', 'product', 'event_group_id', 'mode', 'date',
                     'version', 'count', 'device', 'count_per_launch', 'date_created')
 
 class ShareCountAdmin(admin.ModelAdmin):
-    list_display = ('id', 'type', 'date',
+    list_display = ('id', 'product', 'type', 'date',
                     'version', 'success_count', 'success_device',
                     'success_count_per_launch', 'try_count', 'try_device',
                     'try_count_per_launch', 'date_created')
 
 class TakeCountAdmin(admin.ModelAdmin):
-    list_display = ('id', 'date', 'version', 'img_count', 'img_device','img_count_per_launch', 'video_count', 'video_device','video_count_per_launch', 'created_time', 'update_time')
+    list_display = ('id', 'product', 'date', 'version', 'img_count', 'img_device','img_count_per_launch', 'video_count', 'video_device','video_count_per_launch', 'created_time', 'update_time')
 
 class SalesStatusAdmin(admin.ModelAdmin):
     list_display = ('id', 'week', 'location', 'pick_up',

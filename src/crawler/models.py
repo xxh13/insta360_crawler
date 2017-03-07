@@ -6,6 +6,7 @@ from django.db import models
 
 #用户概况
 class UseCondition(models.Model):
+    product = models.CharField(max_length=200, default='nano')
     new_user = models.IntegerField(default=0)
     active_user = models.IntegerField(default=0)
     duration = models.IntegerField(default=0)
@@ -64,6 +65,7 @@ class GlobalElectronicSales(models.Model):
 
 #用户分布
 class UserDistribution(models.Model):
+    product = models.CharField(max_length=200, default='nano')
     location = models.CharField(max_length=200)
     active_user = models.IntegerField(default=0)
     active_rate = models.FloatField(default=0.0)
@@ -80,6 +82,7 @@ class UserDistribution(models.Model):
 
 #app错误情况
 class ErrorCondition(models.Model):
+    product = models.CharField(max_length=200, default='nano')
     total_error = models.IntegerField(default=0)
     error_rate = models.FloatField(default=0.0)
     date = models.DateField(auto_now=False, auto_now_add=False)
@@ -90,6 +93,7 @@ class ErrorCondition(models.Model):
 
 #app内容分享渠道
 class ShareChannel(models.Model):
+    product = models.CharField(max_length=200, default='nano')
     event_group_id = models.CharField(max_length=200, blank=True)
     channel = models.CharField(max_length=200, blank=True)
     type = models.CharField(max_length=200, blank=True)
@@ -105,6 +109,7 @@ class ShareChannel(models.Model):
 
 # app内容分享模式
 class ShareMode(models.Model):
+    product = models.CharField(max_length=200, default='nano')
     event_group_id = models.CharField(max_length=200, blank=True)
     mode = models.CharField(max_length=200, blank=True)
     date = models.DateField(auto_now=False, auto_now_add=False)
@@ -119,6 +124,7 @@ class ShareMode(models.Model):
 
 #分享数量和转化率
 class ShareCount(models.Model):
+    product = models.CharField(max_length=200, default='nano')
     type = models.CharField(max_length=200, blank=True)
     date = models.DateField(auto_now=False, auto_now_add=False)
     version = models.CharField(max_length=200, blank=True)
@@ -133,8 +139,9 @@ class ShareCount(models.Model):
     def __unicode__(self):
         return str(self.id)
 
-#分享数量和转化率
+#图片视频数量
 class TakeCount(models.Model):
+    product = models.CharField(max_length=200, default='nano')
     date = models.DateField(auto_now=False, auto_now_add=False)
     version = models.CharField(max_length=200, blank=True)
     img_count = models.IntegerField(default=0)
