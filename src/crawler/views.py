@@ -741,7 +741,7 @@ def take_count(request):
             temp['img'] = item.img_count
             temp['video'] = item.video_count
             result[item.date.strftime('%m-%d')] = temp
-        versions = ShareCount.objects.filter(product=product).values('version').distinct()
+        versions = TakeCount.objects.filter(product=product).values('version').distinct()
         temp1 = []
         for item in versions:
             temp1.append(item['version'])
