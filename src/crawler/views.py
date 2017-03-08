@@ -1008,6 +1008,8 @@ def media_tag(request):
         if para.__contains__('end_time'):
             end_time = para.__getitem__('end_time')
         result = collections.OrderedDict()
+        start_temp = datetime.datetime.strptime(start_time, "%Y-%m-%d")
+        start_time = (start_temp - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
         res = MediaTag.objects.filter(date__range=(start_time, end_time)).order_by('date')
         dates = res.dates('date', 'day')
         for date in dates:
