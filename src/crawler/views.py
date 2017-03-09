@@ -416,10 +416,18 @@ def user_distribution(request):
             product = para.__getitem__('product_type')
         res_native = []
         res_abroad = []
-        native = UserDistribution.objects.filter(date__range=(start_time, end_time), product=product, is_native=1).values(
-            'location').annotate(total=Sum('new_user')).order_by('-total')
-        abroad = UserDistribution.objects.filter(date__range=(start_time, end_time), product=product, is_native=0).values(
-            'location').annotate(total=Sum('new_user')).order_by('-total')
+        if product == 'all':
+            native = UserDistribution.objects.filter(date__range=(start_time, end_time),
+                                                     is_native=1).values(
+                'location').annotate(total=Sum('new_user')).order_by('-total')
+            abroad = UserDistribution.objects.filter(date__range=(start_time, end_time),
+                                                     is_native=0).values(
+                'location').annotate(total=Sum('new_user')).order_by('-total')
+        else:
+            native = UserDistribution.objects.filter(date__range=(start_time, end_time), product=product, is_native=1).values(
+                'location').annotate(total=Sum('new_user')).order_by('-total')
+            abroad = UserDistribution.objects.filter(date__range=(start_time, end_time), product=product, is_native=0).values(
+                'location').annotate(total=Sum('new_user')).order_by('-total')
         fp = open('crawler/util/dict.json', 'r')
         dict = json.loads(fp.read(), encoding='utf-8')
         fp.close()
@@ -458,7 +466,14 @@ def user_area(request):
         if para.__contains__('product_type'):
             product = para.__getitem__('product_type')
         result = collections.OrderedDict()
-        res = UserDistribution.objects.filter(date__range=(start_time, end_time), product=product, is_native=is_native)
+        if product == 'all':
+            res = UserDistribution.objects.filter(date__range=(start_time, end_time),
+                                                  is_native=is_native)
+        else:
+            res = UserDistribution.objects.filter(date__range=(start_time, end_time),
+                                                  product=product,
+                                                  is_native=is_native
+                                                  )
         locations = res.values('location').annotate(total=Sum('new_user')).order_by('-total')[:10]
         location_list = []
         for location in locations:
@@ -467,9 +482,10 @@ def user_area(request):
         data = collections.OrderedDict()
         for date in dates:
             temp = collections.OrderedDict()
-            query = res.filter(date=date, location__in=location_list)
+            query = res.filter(date=date, location__in=location_list).values(
+                'location').annotate(new_user=Sum('new_user'))
             for item in query:
-                temp[item.location] = item.new_user
+                temp[item['location']] = item['new_user']
             data[date.strftime('%m-%d')] = temp
         result['data'] = data
         result['locations'] = location_list
@@ -495,10 +511,19 @@ def use_condition(request):
         if para.__contains__('product_type'):
             product = para.__getitem__('product_type')
         result = []
-        res = UseCondition.objects.filter(date__range=(start_time, end_time), product=product).order_by('date')
+        if product == 'all':
+            res = UseCondition.objects.filter(date__range=(start_time, end_time)).values(
+                'date'
+            ).annotate(
+                new_user=Sum('new_user'),
+                active_user=Sum('active_user'),
+                duration = Sum('duration')
+            ).order_by('date')
+        else:
+            res = UseCondition.objects.filter(date__range=(start_time, end_time), product=product).order_by('date').values()
         for item in res:
-            temp = {'date': item.date.strftime('%m-%d'), 'new_user': item.new_user, 'active_user': item.active_user,
-                    'duration': item.duration}
+            temp = {'date': item['date'].strftime('%m-%d'), 'new_user': item['new_user'], 'active_user': item['active_user'],
+                        'duration': item['duration']}
             result.append(temp)
         return JsonResponse(result, safe=False)
     else:
@@ -592,36 +617,46 @@ def share_mode(request):
         result = collections.OrderedDict()
 
         if version == 'all':
-            res = ShareMode.objects.filter(
-                date__range=(start_time, end_time), product=product,
-            ).values(
-                'date','mode'
-            ).annotate(
-                count_total=Sum('count')
-            ).order_by('date')
-            dates = res.dates('date', 'day')
-            for date in dates:
-                res_temp = res.filter(date=date).order_by('count_total')
-                temp = collections.OrderedDict()
-                for item in res_temp:
-                    temp[item['mode']] = item['count_total']
-                result[date.strftime('%m-%d')] = temp
-            versions = ShareMode.objects.filter(product=product).values('version').distinct()
-            temp1 = []
-            for item in versions:
-                temp1.append(item['version'])
-            return JsonResponse({'versions': temp1, 'data': result}, safe=False)
-
-        res = ShareMode.objects.filter(date__range=(start_time, end_time), product=product, version=version).order_by(
-            'date')
+            if product == 'all':
+                res = ShareMode.objects.filter(
+                    date__range=(start_time, end_time)
+                ).values(
+                    'date', 'mode'
+                ).annotate(
+                    count=Sum('count')
+                ).order_by('date')
+                print res
+            else:
+                res = ShareMode.objects.filter(
+                    date__range=(start_time, end_time), product=product,
+                ).values(
+                    'date','mode'
+                ).annotate(
+                    count=Sum('count')
+                ).order_by('date')
+        else:
+            if product == 'all':
+                res = ShareMode.objects.filter(
+                    date__range=(start_time, end_time), version=version
+                ).values(
+                    'date', 'mode'
+                ).annotate(
+                    count=Sum('count')
+                ).order_by('date')
+            else:
+                res = ShareMode.objects.filter(date__range=(start_time, end_time), product=product, version=version).order_by(
+                'date').values()
         dates = res.dates('date', 'day')
         for date in dates:
             res_temp = res.filter(date=date).order_by('count')
             temp = collections.OrderedDict()
             for item in res_temp:
-                temp[item.mode] = item.count
+                temp[item['mode']] = item['count']
             result[date.strftime('%m-%d')] = temp
-        versions = ShareMode.objects.filter(product=product).values('version').distinct()
+        if product == 'all':
+            versions = ShareMode.objects.values('version').distinct()
+        else:
+            versions = ShareMode.objects.filter(product=product).values('version').distinct()
         temp1 = []
         for item in versions:
             temp1.append(item['version'])
@@ -730,18 +765,29 @@ def take_count(request):
         if para.__contains__('product_type'):
             product = para.__getitem__('product_type')
         version = 'all'
+
         if para.__contains__('version'):
             version = para.__getitem__('version')
         result = collections.OrderedDict()
-
-        res = TakeCount.objects.filter(date__range=(start_time, end_time), version=version,
-                product=product).order_by('date')
+        if product == 'all':
+            res = TakeCount.objects.filter(date__range=(start_time, end_time), version=version).values(
+                'date'
+            ).annotate(
+                img_count=Sum('img_count'),
+                video_count=Sum('video_count')
+            ).order_by('date')
+        else:
+            res = TakeCount.objects.filter(date__range=(start_time, end_time), version=version,
+                product=product).order_by('date').values()
         for item in res:
             temp =  collections.OrderedDict()
-            temp['img'] = item.img_count
-            temp['video'] = item.video_count
-            result[item.date.strftime('%m-%d')] = temp
-        versions = TakeCount.objects.filter(product=product).values('version').distinct()
+            temp['img'] = item['img_count']
+            temp['video'] = item['video_count']
+            result[item['date'].strftime('%m-%d')] = temp
+        if product == 'all':
+            versions = TakeCount.objects.values('version').distinct()
+        else:
+            versions = TakeCount.objects.filter(product=product).values('version').distinct()
         temp1 = []
         for item in versions:
             temp1.append(item['version'])
@@ -768,10 +814,18 @@ def error_condition(request):
         if para.__contains__('product_type'):
             product = para.__getitem__('product_type')
         result = []
-        res = ErrorCondition.objects.filter(date__range=(start_time, end_time),
-                product=product).order_by('date')
+        if product == 'all':
+            res = ErrorCondition.objects.filter(date__range=(start_time, end_time)).values(
+                'date'
+            ).annotate(
+                total_error=Sum('total_error'),
+                error_rate=Sum('error_rate')
+            ).order_by('date')
+        else:
+            res = ErrorCondition.objects.filter(date__range=(start_time, end_time),
+                product=product).order_by('date').values()
         for item in res:
-            temp = {'date': item.date.strftime('%m-%d'), 'total_error': item.total_error, 'error_rate': item.error_rate}
+            temp = {'date': item['date'].strftime('%m-%d'), 'total_error': item['total_error'], 'error_rate': item['error_rate']}
             result.append(temp)
         return JsonResponse(result, safe=False)
     else:
