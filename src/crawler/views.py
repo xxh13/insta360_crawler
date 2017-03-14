@@ -1032,9 +1032,13 @@ def media_fans(request):
             start_time = para.__getitem__('start_time')
         if para.__contains__('end_time'):
             end_time = para.__getitem__('end_time')
+        type = 'total'
+        if para.__contains__('type'):
+            type = para.__getitem__('type')
         result = collections.OrderedDict()
-        start_temp = datetime.datetime.strptime(start_time, "%Y-%m-%d")
-        start_time = (start_temp - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
+        if (type == 'increment'):
+            start_temp = datetime.datetime.strptime(start_time, "%Y-%m-%d")
+            start_time = (start_temp - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
         res = MediaFan.objects.filter(date__range=(start_time, end_time)).order_by('date')
         dates = res.dates('date', 'day')
         for date in dates:
@@ -1043,7 +1047,7 @@ def media_fans(request):
             for item in res_temp:
                 temp[item.platform] = item.fans
             result[date.strftime('%m-%d')] = temp
-        return JsonResponse(result, safe=False)
+        return JsonResponse({'data':result,'type':type}, safe=False)
     else:
         return HttpResponse('Error.')
 
@@ -1157,7 +1161,7 @@ def test(request):
         # get_media_tag()
         # get_media_data()
         # get_google_index()
-        # fill_fans_data('2017-03-03','2017-03-05')
+        # fill_fans_data('2017-03-09','2017-03-11')
         return HttpResponse('success')
     else:
         return HttpResponse('Error.')
