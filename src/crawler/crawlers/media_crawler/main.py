@@ -10,7 +10,7 @@ from weixin_crawler import get_by_request as get_weixin
 from instagram_crawler import get_by_api as get_instagram
 
 def main():
-    platform = ['facebook', 'weibo', 'twitter', 'youtube', 'youku', 'weixin', 'instagram']
+    platform = ['facebook', 'twitter', 'youku', 'weixin', 'instagram', 'weibo', 'youtube', 'weibo']
     result = []
     for i in platform:
         data = '{}'

@@ -1,6 +1,7 @@
 # coding=utf-8
 
 from django.contrib.auth import authenticate, login
+from django.contrib.auth.models import User
 from django.http import HttpResponse, JsonResponse, QueryDict
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Sum
@@ -32,6 +33,7 @@ from util.dict import media_dict
 import json
 import sys
 import datetime
+import urllib
 import collections
 
 reload(sys)
@@ -1018,6 +1020,61 @@ def login(request):
     else:
         return HttpResponse('Error.')
 
+# bi系统->通过钉钉员工账号登录
+@csrf_exempt
+def dtalk_login(request):
+    if request.method == 'POST':
+        return HttpResponse('Task submitted.')
+    elif request.method == 'GET':
+        para = request.GET
+        username = 'jack'
+        password = 'slow fuck'
+        if para.__contains__('username'):
+            username = para.__getitem__('username')
+        if para.__contains__('password'):
+            password = para.__getitem__('password')
+        url = 'http://account.arashivision.com/user/getUserToken'
+        values = {
+            'jobnumber': username,
+            'password': password
+        }
+        data = urllib.urlencode(values)
+        req = urllib2.Request(url=url, data=data)
+        try:
+            res_data = urllib2.urlopen(req)
+        except urllib2.HTTPError, e:
+            print e.code
+            print e.reason
+            user = authenticate(username=username, password=password)
+            if user is not None and user.is_active:
+                username = user.get_username()
+                res = []
+                groups = user.groups.all()
+                for group in groups:
+                    res.append(group.name)
+                return JsonResponse({'result': True, 'username': username, 'group': res}, safe=False)
+            else:
+                return JsonResponse({'result': False}, safe=False)
+        data = json.loads(res_data.read())
+        jobnumber = data['jobNumber']
+        name = data['name']
+        try:
+            user = User.objects.get(username=jobnumber)
+            user.set_password(password)
+            user.first_name = name
+            user.save()
+        except:
+            user = User.objects.create_user(jobnumber, email=None, password=password)
+            user.first_name = name
+            user.save()
+        res = []
+        groups = user.groups.all()
+        for group in groups:
+            res.append(group.name)
+        return JsonResponse({'result': True, 'username': name, 'group': res}, safe=False)
+    else:
+        return HttpResponse('Error.')
+
 #bi系统->新媒体监控->粉丝走势
 @csrf_exempt
 def media_fans(request):
@@ -1160,7 +1217,6 @@ def test(request):
         # get_media_tag()
         # get_media_data()
         # get_google_index()
-        # fill_fans_data('2017-03-09','2017-03-11')
         return HttpResponse('success')
     else:
         return HttpResponse('Error.')

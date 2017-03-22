@@ -66,5 +66,5 @@ def sslwrap(func):
 
 
 if __name__ == "__main__":
-    get_by_api()
-    # get_by_request()
+    # get_by_api()
+    get_by_request()

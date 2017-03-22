@@ -37,17 +37,18 @@ def google_index():
     print jsonResult
     return jsonResult
 
-#得到没个词的token
+#得到每个词的token
 def get_token(key):
     headers = {}
-    headers['Host'] = 'www.google.com'
+    headers['Host'] = 'trends.google.com'
     headers['User-Agent'] = 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:49.0) Gecko/20100101 Firefox/49.0'
-    headers['Referfer'] = 'https://www.google.com/trends/explore?date=today%201-m&q=' + urllib.quote(key)
+    headers['Referfer'] = 'https://trends.google.com/trends/explore?date=today%201-m&q=' + urllib.quote(key)
     headers['Cookie'] = '__utma=173272373.1277331075.1476358092.1476358092.1476415913.2; __utmz=173272373.1476358092.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); __utmb=173272373.2.10.1476415913; __utmc=173272373; __utmt=1; NID=84=lT0Y5iF9rOA6QJn8KF04H5f1N7J7bMkQbUSiA9eJnY3-mBpf6OOz1dBQWJBi9BHnXzb3OmQW0d2DslexTFNU5Mr1dTjfEM2CD22BB5yAM44IL_vi9-BWG1C6QjL6XRFk'
     headers['Connection'] = 'keep-alive'
     headers['Accept'] = 'application/json, text/plain, */*'
     headers['Accept-Language'] = 'zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3'
     headers['Accept-Encoding'] = 'gzip, deflate, br'
+    headers['x-client-data'] = 'CIu2yQEIpLbJAQjBtskBCPqcygEIqZ3KAQ=='
     req = {}
     req['category'] = 0
     req['property'] = ''
@@ -56,10 +57,10 @@ def get_token(key):
     value['hl'] = 'zh-CN'
     value['tz'] = '-480'
     value['req'] = str(req).replace(' ','')
-    url = 'https://www.google.com/trends/api/explore?'
+    url = 'https://trends.google.com/trends/api/explore?'
     for index in value:
         url = url + index + '=' + value[index] + '&'
-    results = requests.get(url, headers=headers)
+    results = requests.get(url, headers=headers, verify=False, allow_redirects=False)
     page = results.content
     jsonData = page[5:]
     data = json.loads(jsonData, encoding="utf-8")
@@ -69,9 +70,9 @@ def get_token(key):
 #获取数据
 def get_google_trend(key):
     headers = {}
-    headers['Host'] = 'www.google.com'
+    headers['Host'] = 'trends.google.com'
     headers['User-Agent'] = 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:49.0) Gecko/20100101 Firefox/49.0'
-    headers['Referfer'] = 'https://www.google.com/trends/explore?date=today%201-m&q=' + urllib.quote(key)
+    headers['Referfer'] = 'https://trends.google.com/trends/explore?date=today%201-m&q=' + urllib.quote(key)
     headers['Cookie'] = '__utma=173272373.1277331075.1476358092.1476358092.1476415913.2; __utmz=173272373.1476358092.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); __utmb=173272373.2.10.1476415913; __utmc=173272373; __utmt=1; NID=84=lT0Y5iF9rOA6QJn8KF04H5f1N7J7bMkQbUSiA9eJnY3-mBpf6OOz1dBQWJBi9BHnXzb3OmQW0d2DslexTFNU5Mr1dTjfEM2CD22BB5yAM44IL_vi9-BWG1C6QjL6XRFk'
     headers['Connection'] = 'keep-alive'
     headers['Accept'] = 'application/json, text/plain, */*'
@@ -90,10 +91,10 @@ def get_google_trend(key):
     value['tz'] = '-480'
     value['req'] = str(req).replace(' ','')
     value['token'] = token[key]
-    url = 'https://www.google.com/trends/api/widgetdata/multiline?'
+    url = 'https://trends.google.com/trends/api/widgetdata/multiline?'
     for index in value:
         url = url + index + '=' + value[index] + '&'
-    results = requests.get(url, headers=headers)
+    results = requests.get(url, headers=headers, verify=False)
     page = results.content
     jsonData = page[5:]
     data = json.loads(jsonData, encoding="utf-8")

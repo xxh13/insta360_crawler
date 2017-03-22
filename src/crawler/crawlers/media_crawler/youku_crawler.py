@@ -8,9 +8,8 @@ import json
 import time
 import datetime
 
-
+client_id = '138c334850478e6b'
 def get_by_api():
-    client_id = '138c334850478e6b'
     username = 'Insta360'
     url = 'https://openapi.youku.com/v2/videos/by_user.json?client_id=' + client_id + '&user_name=' + username + '&count=20'
     now = time.mktime(datetime.date.today().timetuple())
@@ -23,6 +22,7 @@ def get_by_api():
     request = urllib2.Request(url = url)
     response = urllib2.urlopen(request)
     page = response.read()
+    print page
     jsonData = json.loads(page, encoding="utf-8")
     data = jsonData['videos']
     for item in data:
@@ -46,6 +46,17 @@ def get_by_api():
     print  jsonResult
     return jsonResult
 
+def get_tag_count(tag):
+    url = 'https://openapi.youku.com/v2/searches/video/by_tag.json?client_id=' + client_id + '&tag=' + tag + '&count=20'
+    request = urllib2.Request(url = url)
+    response = urllib2.urlopen(request)
+    page = response.read()
+    data = json.loads(page, encoding="utf-8")
+    print page
+    count = data['total']
+    print count
+    return count
+
 if __name__ == '__main__':
     get_by_api()
-
+    # get_tag_count('insta360')

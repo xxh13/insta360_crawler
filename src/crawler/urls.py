@@ -69,6 +69,9 @@ urlpatterns = [
     # bi系统->登录
     url(r'^login/$', views.login, name='login'),
 
+    # bi系统->dtalk登录
+    url(r'^dtalk_login/$', views.dtalk_login, name='dtalk_login'),
+
     url(r'^test/$', views.test, name='test'),
 
 ]

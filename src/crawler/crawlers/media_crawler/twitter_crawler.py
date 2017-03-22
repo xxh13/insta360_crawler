@@ -53,6 +53,33 @@ def get_by_api():
     print  jsonResult
     return jsonResult
 
+def get_tag_count(tag):
+    base_url = 'https://api.twitter.com/1.1/search/tweets.json'
+    url = base_url + '?count=200&q=%23' + tag
+    oauth = OAuth()
+    headers = {}
+    headers['Host'] = 'api.twitter.com'
+    headers['X-Target-URI'] = 'https://api.twitter.com'
+    headers['Content-Type'] = 'application/x-www-form-urlencoded'
+    headers['Connection'] = 'keep-alive'
+    headers['Authorization'] = oauth
+    tag_count = 0
+    while (True):
+        request = urllib2.Request(url=url, headers=headers)
+        response = urllib2.urlopen(request)
+        page = response.read()
+        data = json.loads(page, encoding="utf-8")
+        count = len(data['statuses'])
+        tag_count += count
+        try:
+            next = data['search_metadata']['next_results']
+            url = base_url + next
+        except:
+            break
+    print tag_count
+    return tag_count
+
+
 
 def sslwrap(func):
     @wraps(func)
@@ -78,4 +105,5 @@ def OAuth():
     return result
 
 if __name__ == '__main__':
-    get_by_api()
+    # get_by_api()
+    get_tag_count('insta360')

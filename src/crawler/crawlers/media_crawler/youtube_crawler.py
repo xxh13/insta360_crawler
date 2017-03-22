@@ -9,14 +9,13 @@ import json
 import datetime
 import requests
 
-
+app_key = 'AIzaSyBg_mtqCgH3mhrTFPVOqDnNeN8wVVO_s5I'
 class YoutubeCrawler:
     def __init__(self):
         self.video_ids = []
         self.maxResults = 50
         playlist_id = 'UU3qWcF49rv8VMZO7Vg6kj5w'
-        self.app_key = 'AIzaSyBg_mtqCgH3mhrTFPVOqDnNeN8wVVO_s5I'
-        self.list_api = 'https://www.googleapis.com/youtube/v3/playlistItems?maxResults=' + str(self.maxResults) + '&part=snippet&playlistId=' + playlist_id + '&key=' + self.app_key
+        self.list_api = 'https://www.googleapis.com/youtube/v3/playlistItems?maxResults=' + str(self.maxResults) + '&part=snippet&playlistId=' + playlist_id + '&key=' + app_key
         self.info_api = 'https://www.googleapis.com/youtube/v3/videos'
         now = time.mktime(datetime.date.today().timetuple())
         self.week_ago = now - (3600 * 24 * 30)
@@ -30,13 +29,9 @@ class YoutubeCrawler:
 
     def get_video_ids(self):
         url = self.list_api
-        request = urllib2.Request(url=url)
-        response = urllib2.urlopen(request)
-        page = response.read()
+        response = requests.get(url=url, verify=False)
+        page = response.text
         result = json.loads(page, encoding="utf-8")
-        # total = int(result['pageInfo']['totalResults'])
-        # perPage = int(result['pageInfo']['resultsPerPage'])
-        # self.totalPage = (total/perPage) + (0 if (total%perPage)==0 else 1)
         videos = result['items']
         for video in videos:
             self.video_ids.append(video['snippet']['resourceId']['videoId'])
@@ -62,7 +57,7 @@ class YoutubeCrawler:
             if count % self.maxResults == 0 or count == len(self.video_ids):
                 query = query[:-1]
                 results = requests.get(url,
-                               params={'id': query, 'maxResults': self.maxResults, 'part': 'snippet,statistics', 'key': self.app_key})
+                               params={'id': query, 'maxResults': self.maxResults, 'part': 'snippet,statistics', 'key': app_key}, verify=False)
                 page = results.content
                 videos = json.loads(page, encoding="utf-8")['items']
                 for video in videos:
@@ -95,6 +90,17 @@ class YoutubeCrawler:
         print  jsonResult
         return jsonResult
 
+def get_tag_count(tag):
+    url = 'https://www.googleapis.com/youtube/v3/search?part=snippet&key=' + app_key + '&q=%23' + tag
+    request = urllib2.Request(url=url)
+    response = urllib2.urlopen(request)
+    page = response.read()
+    data = json.loads(page, encoding="utf-8")
+    count = data['pageInfo']['totalResults']
+    print count
+    return count
+
 if __name__ == "__main__":
     c = YoutubeCrawler()
     c.main()
+    # get_tag_count('insta360')

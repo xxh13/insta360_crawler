@@ -40,7 +40,7 @@ def get_comment(url, country):
         'Upgrade-Insecure-Requests': '1'
     }
     try:
-        page = requests.get(url, headers=headers)
+        page = requests.get(url, headers=headers, verify = False)
     except:
         print 'error'
         return 0
