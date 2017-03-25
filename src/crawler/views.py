@@ -28,6 +28,7 @@ from tasks import *
 from tasks import get_fans as f
 from tasks import get_google_index as g
 from util.dict import media_dict
+from view.views_admin import *
 
 
 import json

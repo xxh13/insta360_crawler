@@ -23,7 +23,6 @@ def get_by_api():
     request = urllib2.Request(url = url)
     response = urllib2.urlopen(request)
     page = response.read()
-    print page
     jsonData = json.loads(page, encoding="utf-8")
     data = jsonData['items']
     for item in data:

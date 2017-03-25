@@ -4,9 +4,13 @@
 最近一个月动态的评论、点赞、踩、浏览总和
 '''
 import urllib2
+import urllib
 import json
 import time
+import requests
+import collections
 import datetime
+import hashlib
 
 client_id = '138c334850478e6b'
 def get_by_api():
@@ -22,7 +26,7 @@ def get_by_api():
     request = urllib2.Request(url = url)
     response = urllib2.urlopen(request)
     page = response.read()
-    print page
+    # print page
     jsonData = json.loads(page, encoding="utf-8")
     data = jsonData['videos']
     for item in data:
@@ -52,11 +56,43 @@ def get_tag_count(tag):
     response = urllib2.urlopen(request)
     page = response.read()
     data = json.loads(page, encoding="utf-8")
-    print page
+    # print page
     count = data['total']
     print count
     return count
 
+def api_v3():
+    url = 'http://openapi.youku.com/router/rest.json?'
+    para = {}
+    para['q'] = 'videoid:XMjY0NTE3ODAyNA'
+    para['fd'] = 'total_vv'
+    para['cl'] = 'ns'
+    opensysparams = {}
+    opensysparams['action'] = 'youku.content.video.single.baseinfo.get'
+    opensysparams['client_id'] = client_id
+    opensysparams['timestamp'] = str(int(time.time()))
+    opensysparams['version'] = '3.0'
+    temp = 'action' + urllib.quote(opensysparams['action']) + \
+           'cl' + urllib.quote(para['cl']) + \
+           'client_id' + urllib.quote(opensysparams['client_id']) + \
+           'fd' + urllib.quote(para['fd']) + \
+           'q' + urllib.quote(para['q']) +\
+           'timestamp' + urllib.quote(opensysparams['timestamp']) +\
+           'version' + urllib.quote(opensysparams['version']) + 'secret'
+    m = hashlib.md5()
+    print urllib.quote(temp)
+    m.update(urllib.quote(temp))
+    sign = m.hexdigest()
+    print sign
+    opensysparams['sign'] = sign
+    para['opensysparams'] = str(opensysparams)
+    for index in para:
+        url = url + index + '=' + para[index] + '&'
+    print url
+    response = requests.get(url)
+    print response.text
+
 if __name__ == '__main__':
-    get_by_api()
+    # get_by_api()
+    api_v3()
     # get_tag_count('insta360')

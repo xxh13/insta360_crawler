@@ -8,6 +8,7 @@ import urllib
 import json
 import time
 import datetime
+import requests
 import ssl
 from functools import wraps
 
@@ -65,9 +66,8 @@ def get_tag_count(tag):
     headers['Authorization'] = oauth
     tag_count = 0
     while (True):
-        request = urllib2.Request(url=url, headers=headers)
-        response = urllib2.urlopen(request)
-        page = response.read()
+        response = requests.get(url, headers=headers, verify = False)
+        page = response.text
         data = json.loads(page, encoding="utf-8")
         count = len(data['statuses'])
         tag_count += count

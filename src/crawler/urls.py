@@ -72,6 +72,12 @@ urlpatterns = [
     # bi系统->dtalk登录
     url(r'^dtalk_login/$', views.dtalk_login, name='dtalk_login'),
 
+    # 权限控制后台
+    url(r'^admin/power$', views.admin_power, name='admin_power'),
+
+    # 权限控制后台登录
+    url(r'^admin/login$', views.admin_login, name='admin_login'),
+
     url(r'^test/$', views.test, name='test'),
 
 ]
