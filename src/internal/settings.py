@@ -112,7 +112,7 @@ else:
             'NAME': 'internal_crawler',
             'USER': 'internal_crawler',
             'PASSWORD': 'insta360_crawler',
-            'HOST': 'rm-bp1e80l5b37279267i.mysql.rds.aliyuncs.com',
+            'HOST': 'rm-bp1e80l5b37279267.mysql.rds.aliyuncs.com',
             'PORT': '3306',
             'OPTIONS': {
                 'init_command': 'SET default_storage_engine=INNODB,character_set_connection=utf8,collation_connection=utf8_unicode_ci',
@@ -158,6 +158,5 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
-STATIC_ROOT = os.path.join(os.path.dirname(__file__), 'static')
+STATIC_ROOT = os.path.join(os.path.dirname(__file__), '../crawler/static')
 STATIC_URL = '/static/'
-
