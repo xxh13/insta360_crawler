@@ -899,6 +899,7 @@ def media_data(request):
         items['twitter'] = ['like', 'share']
         items['weibo'] = ['comment', 'like', 'share']
         items['facebook'] = ['comment', 'like', 'share']
+        items[u'腾讯视频'] = ['view']
         result = collections.OrderedDict()
         res = MediaData.objects.filter(date__range=(start_time, end_time), platform=platform).order_by('date')
         dates = res.dates('date', 'day')
