@@ -35,6 +35,7 @@ def get_by_api():
     comment_total = 0
     results = requests.get(url=url, params=data, headers=header, verify=False)
     page = results.content
+    print page
     jsonData = json.loads(page, encoding="utf-8")
     data = jsonData['statuses']
     for item in data:

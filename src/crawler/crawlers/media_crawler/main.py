@@ -8,9 +8,12 @@ from youtube_crawler import YoutubeCrawler
 from youku_crawler import get_by_api as get_youku
 from weixin_crawler import get_by_request as get_weixin
 from instagram_crawler import get_by_api as get_instagram
+from tencent_crawler import get_by_html as get_tencent
+
 
 def main():
-    platform = ['facebook', 'twitter', 'youku', 'weixin', 'instagram', 'weibo', 'youtube', 'weibo']
+    platform = ['facebook', 'twitter', 'youku', 'weixin', 'instagram', 'youtube', 'tencent']
+
     result = []
     for i in platform:
         data = '{}'
@@ -30,6 +33,8 @@ def main():
             data = get_weixin()
         elif i == 'instagram':
             data = get_instagram()
+        elif i == 'tencent':
+            data = get_tencent()
 
         data = json.loads(data)
         result.append(data)

@@ -582,7 +582,17 @@ def get_media_tag():
             time.sleep(5)
     items = json.loads(result)
     for item in items:
-        MediaTag.objects.update_or_create(date=item['date'], platform=item['platform'], tag=item['tag'], defaults=item)
+        if item['platform'] == 'twitter' or item['platform'] == 'youku' or item['platform'] == 'youtube':
+            today = datetime.datetime.strptime(item['date'], "%Y-%m-%d")
+            oneday = datetime.timedelta(days=1)
+            yesterday = (today - oneday).strftime('%Y-%m-%d')
+            try:
+                old = MediaTag.objects.get(date=yesterday, platform=item['platform'], tag=item['tag'])
+                new_count = old.count + item['count']
+                item['count'] = new_count
+            except:
+                pass
+        MediaTag.objects.update_or_create(date=item['date'], platform=item['platform'], tag=item['tag'],defaults=item)
     return 'Finished.'
 
 #调用销售支持系统的一个接口，用于每天刷新数据库中卖出去的nano的激活状态

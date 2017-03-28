@@ -51,7 +51,7 @@ def get_by_api():
     return jsonResult
 
 def get_tag_count(tag):
-    url = 'https://openapi.youku.com/v2/searches/video/by_tag.json?client_id=' + client_id + '&tag=' + tag + '&count=20'
+    url = 'https://openapi.youku.com/v2/searches/video/by_tag.json?client_id=' + client_id + '&tag=' + tag + '&count=20' + '&period=today'
     request = urllib2.Request(url = url)
     response = urllib2.urlopen(request)
     page = response.read()
@@ -94,5 +94,5 @@ def api_v3():
 
 if __name__ == '__main__':
     # get_by_api()
-    api_v3()
-    # get_tag_count('insta360')
+    # api_v3()
+    get_tag_count('insta360')

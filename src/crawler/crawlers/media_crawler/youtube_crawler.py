@@ -91,7 +91,11 @@ class YoutubeCrawler:
         return jsonResult
 
 def get_tag_count(tag):
-    url = 'https://www.googleapis.com/youtube/v3/search?part=snippet&key=' + app_key + '&q=%23' + tag
+    today = datetime.date.today()
+    oneday = datetime.timedelta(days=1)
+    yesterday = (today - oneday).strftime('%Y-%m-%d')
+    date = yesterday + 'T00:00:00Z'
+    url = 'https://www.googleapis.com/youtube/v3/search?part=snippet&key=' + app_key + '&q=%23' + tag + '&publishedAfter=' + date
     request = urllib2.Request(url=url)
     response = urllib2.urlopen(request)
     page = response.read()
@@ -101,6 +105,6 @@ def get_tag_count(tag):
     return count
 
 if __name__ == "__main__":
-    c = YoutubeCrawler()
-    c.main()
-    # get_tag_count('insta360')
+    # c = YoutubeCrawler()
+    # c.main()
+    get_tag_count('insta360')

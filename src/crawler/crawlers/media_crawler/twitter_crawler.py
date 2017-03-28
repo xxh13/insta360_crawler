@@ -23,9 +23,9 @@ def get_by_api():
     headers['Connection'] = 'keep-alive'
     headers['Authorization'] = oauth
     index = 1
+    today = datetime.datetime.now().strftime('%Y-%m-%d')
     now = time.mktime(datetime.date.today().timetuple())
     week_ago = now - (3600 * 24 * 7)
-    today = datetime.datetime.now().strftime('%Y-%m-%d')
     share_total = 0
     like_total = 0
     while(True):
@@ -55,8 +55,11 @@ def get_by_api():
     return jsonResult
 
 def get_tag_count(tag):
+    today = datetime.date.today()
+    oneday = datetime.timedelta(days=1)
+    yesterday = (today - oneday).strftime('%Y-%m-%d')
     base_url = 'https://api.twitter.com/1.1/search/tweets.json'
-    url = base_url + '?count=200&q=%23' + tag
+    url = base_url
     oauth = OAuth()
     headers = {}
     headers['Host'] = 'api.twitter.com'
@@ -65,8 +68,14 @@ def get_tag_count(tag):
     headers['Connection'] = 'keep-alive'
     headers['Authorization'] = oauth
     tag_count = 0
+    value = {}
+    value['count'] = 200
+    value['q'] = '#' + tag + ' ' + 'since:' + yesterday
+    value['count'] = 200
+    value['count'] = 200
+    value = urllib.urlencode(value)
     while (True):
-        response = requests.get(url, headers=headers, verify = False)
+        response = requests.get(url,params = value, headers=headers, verify = False)
         page = response.text
         data = json.loads(page, encoding="utf-8")
         count = len(data['statuses'])
