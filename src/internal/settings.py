@@ -112,7 +112,7 @@ else:
             'NAME': 'internal_crawler',
             'USER': 'internal_crawler',
             'PASSWORD': 'insta360_crawler',
-            'HOST': 'rm-bp1e80l5b37279267.mysql.rds.aliyuncs.com',
+            'HOST': 'rm-bp1e80l5b37279267i.mysql.rds.aliyuncs.com',
             'PORT': '3306',
             'OPTIONS': {
                 'init_command': 'SET default_storage_engine=INNODB,character_set_connection=utf8,collation_connection=utf8_unicode_ci',
