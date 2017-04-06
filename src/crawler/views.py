@@ -542,21 +542,14 @@ def share_channel(request):
         today = datetime.datetime.today()
         start_time = (today - datetime.timedelta(days=6)).strftime('%Y-%m-%d')
         end_time = (today + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
-        product = 'nano'
-        if para.__contains__('start_time'):
-            start_time = para.__getitem__('start_time')
-        if para.__contains__('end_time'):
-            end_time = para.__getitem__('end_time')
-        if para.__contains__('product_type'):
-            product = para.__getitem__('product_type')
-        type = 'img'
-        if para.__contains__('type'):
-            type = para.__getitem__('type')
-        version = 'all'
-        if para.__contains__('version'):
-            version = para.__getitem__('version')
+        start_time = para.get('start_time', start_time)
+        end_time = para.get('end_time', end_time)
+        product = para.get('product_type', 'nano')
+        mode = para.get('mode', 'day')
+        type = para.get('type', 'img')
+        version = para.get('version', 'all')
         result = collections.OrderedDict()
-
+        versions = list(ShareChannel.objects.filter(product=product,type=type).order_by('-version').values_list('version', flat=True).distinct())
         if version == 'all':
             res = ShareChannel.objects.filter(
                 date__range=(start_time, end_time),
@@ -568,31 +561,62 @@ def share_channel(request):
                 count_total=Sum('count')
             ).order_by('date')
             dates = res.dates('date', 'day')
+            items = list(ShareChannel.objects.filter(
+                date__range=(start_time, end_time),
+                type=type,
+                product=product
+            ).values_list('channel',flat=True).distinct())
+            index = []
             for date in dates:
+                index.append(date.strftime('%m-%d'))
+                month_start = (date - datetime.timedelta(days=29)).strftime('%Y-%m-%d')
                 res_temp = res.filter(date=date).order_by('count_total')
                 temp = collections.OrderedDict()
                 for item in res_temp:
-                    temp[item['channel']] = item['count_total']
+                    item_temp = {
+                        'today': item['count_total']
+                    }
+                    if mode == 'month':
+                        month_res = ShareChannel.objects.filter(
+                            date__range=(month_start, date.strftime('%Y-%m-%d')),
+                            type=type,
+                            product=product,
+                            channel=item['channel']
+                        ).values('channel').annotate(
+                            count_total=Sum('count')
+                        )
+                        item_temp['month'] =  month_res[0]['count_total']
+                    temp[item['channel']] = item_temp
                 result[date.strftime('%m-%d')] = temp
-            versions = ShareChannel.objects.filter(product=product).values('version').distinct()
-            temp1 = []
-            for item in versions:
-                temp1.append(item['version'])
-            return JsonResponse({'versions': temp1, 'data': result}, safe=False)
+            return JsonResponse({'versions': versions, 'data': result, 'index':index, 'items': items, 'mode': mode}, safe=False)
 
         res = ShareChannel.objects.filter(date__range=(start_time, end_time), product=product, version=version,type=type).order_by('date')
         dates = res.dates('date', 'day')
+        items = list(ShareChannel.objects.filter(date__range=(start_time, end_time), product=product, version=version,type=type).values_list('channel', flat=True).distinct())
+        index = []
         for date in dates:
+            index.append(date.strftime('%m-%d'))
+            month_start = (date - datetime.timedelta(days=29)).strftime('%Y-%m-%d')
             res_temp = res.filter(date=date).order_by('count')
             temp = collections.OrderedDict()
             for item in res_temp:
-                temp[item.channel] = item.count
+                item_temp = {
+                    'today': item.count
+                }
+                if mode == 'month':
+                    month_res = ShareChannel.objects.filter(
+                        date__range=(month_start, date.strftime('%Y-%m-%d')),
+                        version=version,
+                        type=type,
+                        product=product,
+                        channel=item.channel
+                    ).values('channel').annotate(
+                        count_total=Sum('count')
+                    )
+                    item_temp['month'] = month_res[0]['count_total']
+                temp[item.channel] = item_temp
             result[date.strftime('%m-%d')] = temp
-        versions = ShareChannel.objects.filter(product=product).values('version').distinct()
-        temp1 = []
-        for item in versions:
-            temp1.append(item['version'])
-        return JsonResponse({'versions': temp1, 'data': result}, safe=False)
+        return JsonResponse({'versions': versions, 'data': result, 'index':index, 'items': items, 'mode': mode}, safe=False)
     else:
         return HttpResponse('Error.')
 
@@ -1215,10 +1239,10 @@ def test(request):
         return HttpResponse('Task submitted.')
     elif request.method == 'GET':
         # get_amazon_sales()
-        # get_fans()
-        # get_media_tag()
-        # get_media_data()
-        # get_google_index()
+        get_fans()
+        get_media_data()
+        get_google_index()
+        get_media_tag()
         return HttpResponse('success')
     else:
         return HttpResponse('Error.')
