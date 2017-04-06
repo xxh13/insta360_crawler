@@ -95,10 +95,10 @@ class ErrorCondition(models.Model):
 class ShareChannel(models.Model):
     product = models.CharField(max_length=200, default='nano')
     event_group_id = models.CharField(max_length=200, blank=True)
-    channel = models.CharField(max_length=200, blank=True)
+    channel = models.CharField(max_length=200, blank=True, db_index=True)
     type = models.CharField(max_length=200, blank=True)
-    date = models.DateField(auto_now=False, auto_now_add=False)
-    version = models.CharField(max_length=200, blank=True)
+    date = models.DateField(auto_now=False, auto_now_add=False, db_index=True)
+    version = models.CharField(max_length=200, blank=True, db_index=True)
     count = models.IntegerField(default=0)
     device = models.IntegerField(default=0)
     count_per_launch = models.FloatField(default=0.0)
