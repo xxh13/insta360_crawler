@@ -32,12 +32,12 @@ def get_token():
     value = {}
     value['grant_type'] = 'client_credential'
     value['appid'] = 'wxa01ae38d52e5b020'
-    value['secret'] = 'c19d7334e7e6be29888d2ed728972318'
+    value['secret'] = '0fe9e5d06bb55e1142e6834f9e26202d'
     data = urllib.urlencode(value)
     request = urllib2.Request(url = url, data = data)
     response = urllib2.urlopen(request)
     page = response.read()
-    # print page
+    print page
     data = json.loads(page, encoding="utf-8")
     result = ''
     try:
