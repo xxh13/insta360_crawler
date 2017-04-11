@@ -1005,7 +1005,7 @@ def competitor_sales(request):
             res_temp = res.filter(date=date)
             temp = collections.OrderedDict()
             for item in res_temp:
-                temp[item.commodity] = item.taobao_total_sales + int(item.jd_total_sales * 0.15)
+                temp[item.commodity] = item.taobao_total_sales + int(item.jd_total_sales / 0.15)
             result[date.strftime('%m-%d')] = temp
         return JsonResponse(result, safe=False)
     else:
