@@ -48,6 +48,9 @@ urlpatterns = [
     # bi系统->Nano市场环境->30天销量/评论
     url(r'^competitor_data/$', views.competitor_data, name='competitor_data'),
 
+    # bi系统->Nano市场环境->30天销量/评论
+    url(r'^competitor_sales/$', views.competitor_sales, name='competitor_sales'),
+
     # bi系统->Nano市场环境->亚马逊评论
     url(r'^global_sales/$', views.global_sales, name='global_sales'),
 

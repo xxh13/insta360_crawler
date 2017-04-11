@@ -986,6 +986,31 @@ def competitor_data(request):
     else:
         return HttpResponse('Error.')
 
+# bi系统->Nano市场环境->30天销量/评论
+@csrf_exempt
+def competitor_sales(request):
+    if request.method == 'POST':
+        return HttpResponse('Task submitted.')
+    elif request.method == 'GET':
+        para = request.GET
+        today = datetime.datetime.today()
+        start_time = (today - datetime.timedelta(days=6)).strftime('%Y-%m-%d')
+        end_time = (today + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
+        start_time = para.get('start_time', start_time)
+        end_time = para.get('end_time', end_time)
+        result = collections.OrderedDict()
+        res = CompetitorSales.objects.filter(date__range=(start_time, end_time)).order_by('date')
+        dates = res.dates('date', 'day')
+        for date in dates:
+            res_temp = res.filter(date=date)
+            temp = collections.OrderedDict()
+            for item in res_temp:
+                temp[item.commodity] = item.taobao_total_sales + int(item.jd_total_sales * 0.15)
+            result[date.strftime('%m-%d')] = temp
+        return JsonResponse(result, safe=False)
+    else:
+        return HttpResponse('Error.')
+
 #bi系统->Nano市场环境->亚马逊评论
 @csrf_exempt
 def global_sales(request):
@@ -1238,7 +1263,6 @@ def test(request):
     if request.method == 'POST':
         return HttpResponse('Task submitted.')
     elif request.method == 'GET':
-        # get_amazon_sales()
         get_fans()
         get_media_data()
         get_google_index()
