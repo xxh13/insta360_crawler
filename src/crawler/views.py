@@ -1002,10 +1002,18 @@ def competitor_sales(request):
         res = CompetitorSales.objects.filter(date__range=(start_time, end_time)).order_by('date')
         dates = res.dates('date', 'day')
         for date in dates:
+            month_age = (date - datetime.timedelta(days=30)).strftime('%Y-%m-%d')
             res_temp = res.filter(date=date)
             temp = collections.OrderedDict()
             for item in res_temp:
-                temp[item.commodity] = item.taobao_total_sales + int(item.jd_total_sales / 0.15)
+                try:
+                    month_age_res = CompetitorSales.objects.get(date=month_age, commodity=item.commodity)
+                    jd_sales = item.jd_total_sales - month_age_res.jd_total_sales
+                except:
+                    jd_sales = int(item.jd_total_sales / 2)
+                if jd_sales < 0:
+                    jd_sales = 0
+                temp[item.commodity] = item.taobao_total_sales + int(jd_sales / 0.15)
             result[date.strftime('%m-%d')] = temp
         return JsonResponse(result, safe=False)
     else:
@@ -1266,7 +1274,7 @@ def test(request):
         get_fans()
         get_media_data()
         get_google_index()
-        get_media_tag()
+        # get_media_tag()
         return HttpResponse('success')
     else:
         return HttpResponse('Error.')
