@@ -26,7 +26,7 @@ from .models import TaobaoDetail
 from .models import GlobalElectronicSales
 from .crawlers.umeng.UmengCrawler import UmengCrawler
 from .crawlers.taobao.TaobaoCrawler import TaobaoCrawler
-from .crawlers.jd.JDCrawler import JDCrawler
+from .crawlers.jd.JDmobileCrawler import JDCrawler
 from .crawlers.baidu_index.main import *
 from .crawlers.amazon.amazon_crawler import main as amanzon_crawler
 from .crawlers.google_index.google_trends import google_index
@@ -172,8 +172,6 @@ def get_jd_sales():
     data = json.loads(result)
     for item in data:
         date = item['date']
-        # temp = datetime.datetime.strptime(date, '%Y-%m-%d').date()
-        # yesterday = (temp - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
         commodity = item['commodity']
         old = CompetitorSales.objects.filter(date__lt=date, commodity=commodity).order_by('-date').first()
         if (old != None):
@@ -582,7 +580,7 @@ def get_media_tag():
             time.sleep(5)
     items = json.loads(result)
     for item in items:
-        if item['platform'] == 'twitter' or item['platform'] == 'youku' or item['platform'] == 'youtube':
+        if item['platform'] == 'twitter' or item['platform'] == 'youku' or item['platform'] == 'youtube' or item['platform'] == 'facebook':
             today = datetime.datetime.strptime(item['date'], "%Y-%m-%d")
             oneday = datetime.timedelta(days=1)
             yesterday = (today - oneday).strftime('%Y-%m-%d')
