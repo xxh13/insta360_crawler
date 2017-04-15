@@ -67,7 +67,7 @@ class TakeCountAdmin(admin.ModelAdmin):
     list_display = ('id', 'product', 'date', 'version', 'img_count', 'img_device','img_count_per_launch', 'video_count', 'video_device','video_count_per_launch', 'created_time', 'update_time')
 
 class SalesStatusAdmin(admin.ModelAdmin):
-    list_display = ('id', 'week', 'location', 'pick_up',
+    list_display = ('id', 'product', 'week', 'location', 'pick_up',
                     'agent_name', 'agent_type', 'agent_price',
                     'sales_online', 'sales_offline', 'sales_offline_count',
                     'inventory_first', 'inventory_lower',
@@ -75,7 +75,7 @@ class SalesStatusAdmin(admin.ModelAdmin):
 
 
 class ElectronicSalesAdmin(admin.ModelAdmin):
-    list_display = ('id', 'week', 'location', 'view', 'visitor',
+    list_display = ('id', 'product', 'week', 'location', 'view', 'visitor',
                     'payment', 'number', 'buyer', 'date_created')
 
 

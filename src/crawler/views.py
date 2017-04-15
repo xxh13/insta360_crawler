@@ -47,6 +47,7 @@ def sales_status(request):
         body = json.loads(request.body, encoding='utf-8')
         data = body['data']
         week = body['week']
+        product = body['product']
         username = body['username']
         table = '国内销售'
         is_native = body['is_native']
@@ -55,7 +56,7 @@ def sales_status(request):
 
         week_date = datetime.datetime.strptime(week, '%Y-%m-%d').date()
         next_week = (week_date + datetime.timedelta(days=7)).strftime('%Y-%m-%d')
-        old = SalesStatus.objects.filter(week=week, is_native=is_native).values('location')
+        old = SalesStatus.objects.filter(week=week, is_native=is_native, product=product).values('location')
         s = set()
         for item in old:
             s.add(item['location'])
@@ -65,6 +66,8 @@ def sales_status(request):
             result = SalesStatus.objects.update_or_create(
                 week=item['week'],
                 location=item['location'],
+                product=item['product'],
+                is_native=is_native,
                 defaults=item
             )
 
@@ -91,6 +94,7 @@ def sales_status(request):
             SalesStatus.objects.update_or_create(
                 week=next_week,
                 location=item['location'],
+                product=item['product'],
                 is_native=is_native,
                 defaults = temp
             )
@@ -102,7 +106,8 @@ def sales_status(request):
             SalesStatus.objects.filter(
                 week=week,
                 is_native=is_native,
-                location=i
+                location=i,
+                product=product
             ).delete()
 
             Log.objects.create(
@@ -120,28 +125,26 @@ def sales_status(request):
         para = request.GET
         today = datetime.datetime.today()
         delta = today.weekday()
-        is_native = 1
-
-        if para.__contains__('is_native'):
-            is_native = para.__getitem__('is_native')
+        product = para.get('product', 'nano')
+        is_native = para.get('is_native', 1)
         week = (today - datetime.timedelta(days=delta)).strftime('%Y-%m-%d')
-
         if para.__contains__('week'):
             week = para.__getitem__('week')
         else:
-            weeks = SalesStatus.objects.filter(is_native=is_native).order_by('-week')
+            weeks = SalesStatus.objects.filter(is_native=is_native, product=product).order_by('-week')
             for item in weeks:
                 week = (item.week - datetime.timedelta(days=7)).strftime('%Y-%m-%d')
                 break
 
         data = []
-        res = SalesStatus.objects.filter(week=week, is_native=is_native)
+        res = SalesStatus.objects.filter(week=week, is_native=is_native, product=product)
 
         for item in res:
             temp = {
                 'week': item.week,
-                'pick_up': item.pick_up,
+                'product': item.product,
                 'location': item.location,
+                'pick_up': item.pick_up,
 
                 'agent_name': item.agent_name,
                 'agent_type': item.agent_type,
@@ -306,53 +309,75 @@ def electronic_sales(request):
         body = json.loads(request.body, encoding='utf-8')
         data = body['data']
         week = body['week']
+        product = body['product']
         username = body['username']
         table = '电商销售'
         week_date = datetime.datetime.strptime(week, '%Y-%m-%d').date()
         next_week = (week_date + datetime.timedelta(days=7)).strftime('%Y-%m-%d')
-        old = ElectronicSales.objects.filter(week=week).values('location')
+        old = ElectronicSales.objects.filter(week=week, product=product).values('location')
         s = set()
         for item in old:
             s.add(item['location'])
         for item in data:
-            result = ElectronicSales.objects.update_or_create(week=item['week'], location=item['location'],
-                                                              defaults=item)
+            result = ElectronicSales.objects.update_or_create(
+                week=item['week'],
+                product=item['product'],
+                location=item['location'],
+                defaults=item
+            )
             if result[1]:
                 operator = 'add'
             else:
                 operator = 'update'
-            Log.objects.create(username=username, week=item['week'], table=table, location=item['location'],
-                               operator=operator)
-            ElectronicSales.objects.update_or_create(week=next_week, location=item['location'])
+            Log.objects.create(
+                username=username,
+                week=item['week'],
+                table=table,
+                location=item['location'],
+                operator=operator
+            )
+            ElectronicSales.objects.update_or_create(
+                week=next_week,
+                product=product,
+                location=item['location']
+            )
             if item['location'] in s:
                 s.remove(item['location'])
         for i in s:
-            ElectronicSales.objects.filter(week=week, location=i).delete()
+            ElectronicSales.objects.filter(week=week, location=i, product=product).delete()
             Log.objects.create(username=username, week=week, table=table, location=i, operator='delete')
         return HttpResponse('Task submitted.')
     elif request.method == 'GET':
         para = request.GET
+        product = para.get('product', 'nano')
         today = datetime.datetime.today()
         delta = today.weekday()
         week = (today - datetime.timedelta(days=delta)).strftime('%Y-%m-%d')
         if para.__contains__('week'):
             week = para.__getitem__('week')
         else:
-            weeks = ElectronicSales.objects.dates('week', 'day', order='DESC')
+            weeks = ElectronicSales.objects.filter(product=product).dates('week', 'day', order='DESC')
             for item in weeks:
                 week = (item - datetime.timedelta(days=7)).strftime('%Y-%m-%d')
                 break
         data = []
-        res = ElectronicSales.objects.filter(week=week)
+        res = ElectronicSales.objects.filter(week=week, product=product)
         for item in res:
-            temp = {'week': item.week, 'location': item.location, 'view': item.view, 'visitor': item.visitor,
-                    'payment': item.payment, 'number': item.number, 'buyer': item.buyer}
+            temp = {
+                'week': item.week,
+                'location': item.location,
+                'product': item.product,
+                'view': item.view,
+                'visitor': item.visitor,
+                'payment': item.payment,
+                'number': item.number,
+                'buyer': item.buyer
+            }
             data.append(temp)
         result = {'week': week, 'data': data}
         return JsonResponse(result, safe=False)
     else:
         return HttpResponse('Error.')
-
 
 #bi系统->Nano 零售渠道->自有电商渠道
 @csrf_exempt
@@ -1273,8 +1298,8 @@ def test(request):
     elif request.method == 'GET':
         get_fans()
         get_media_data()
-        get_google_index()
-        # get_media_tag()
+        # get_google_index()
+        get_media_tag()
         return HttpResponse('success')
     else:
         return HttpResponse('Error.')

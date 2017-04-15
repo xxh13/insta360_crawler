@@ -158,6 +158,7 @@ class TakeCount(models.Model):
 
 #销售录入系统的销售情况
 class SalesStatus(models.Model):
+    product = models.CharField(max_length=200, default='nano')
     location = models.CharField(max_length=200)
     week = models.DateField(auto_now=False, auto_now_add=False)
     agent_name = models.CharField(max_length=200, blank=True)
@@ -178,6 +179,7 @@ class SalesStatus(models.Model):
 
 #销售录入系统的电商销售情况
 class ElectronicSales(models.Model):
+    product = models.CharField(max_length=200, default='nano')
     week = models.DateField(auto_now=False, auto_now_add=False)
     location = models.CharField(max_length=200)
     view = models.IntegerField(default=0)
