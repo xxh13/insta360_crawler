@@ -174,32 +174,26 @@ def get_sales_status(request):
     if request.method == 'POST':
         return HttpResponse('Do Nothing.')
     elif request.method == 'GET':
-
         para = request.GET
         today = datetime.datetime.today()
         start_time = (today - datetime.timedelta(days=29)).strftime('%Y-%m-%d')
         end_time = (today + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
-        is_native = 1
-        location = "all"
 
-        if para.__contains__('is_native'):
-            is_native = para.__getitem__('is_native')
-
+        product = para.get('product', 'nano')
+        is_native = para.get('is_native', 1)
+        end_time = para.get('end_time', end_time)
+        location = para.get('location', 'all')
         if para.__contains__('start_time'):
             startTime = datetime.datetime.strptime(para.__getitem__('start_time'), '%Y-%m-%d').date()
             start_time = (startTime - datetime.timedelta(days=6)).strftime('%Y-%m-%d')
-
-        if para.__contains__('end_time'):
-            end_time = para.__getitem__('end_time')
-        if para.__contains__('location'):
-            location = para.__getitem__('location')
 
         result = collections.OrderedDict()
 
         if location == 'all':
             res = SalesStatus.objects.filter(
                 week__range=(start_time, end_time),
-                is_native=is_native
+                is_native=is_native,
+                product=product
             ).values(
                 'week'
             ).annotate(
@@ -225,10 +219,10 @@ def get_sales_status(request):
                 end = (item['week'] + datetime.timedelta(days=6)).strftime('%m-%d')
                 result[item['week'].strftime('%m-%d') + '~' + end] = temp
 
-
             last_res = SalesStatus.objects.filter(
                 week__lt=start_time,
-                is_native=is_native
+                is_native=is_native,
+                product=product
             ).values(
                 'week'
             ).annotate(
@@ -258,6 +252,7 @@ def get_sales_status(request):
             res = SalesStatus.objects.filter(
                 week__range=(start_time, end_time),
                 is_native=is_native,
+                product=product,
                 location=location).order_by('week')
             for item in res:
                 temp = {
@@ -273,7 +268,11 @@ def get_sales_status(request):
                 end = (item.week + datetime.timedelta(days=6)).strftime('%m-%d')
                 result[item.week.strftime('%m-%d') + '~' + end] = temp
 
-            last = SalesStatus.objects.filter(week__lt=start_time, is_native=is_native, location=location).order_by('-week').first()
+            last = SalesStatus.objects.filter(week__lt=start_time,
+                                              is_native=is_native,
+                                              location=location,
+                                              product=product
+                                              ).order_by('-week').first()
             last_inventory_first = 0
             last_inventory_lower = 0
             last_reject = 0
@@ -287,10 +286,10 @@ def get_sales_status(request):
             res_last['inventory_lower'] = last_inventory_lower
             res_last['reject'] = last_reject
 
-        locations = SalesStatus.objects.filter(is_native=is_native).values('location').distinct()
+        locations = SalesStatus.objects.filter(is_native=is_native, product=product).values('location').distinct()
         temp = []
         for item in locations:
-            res_temp = SalesStatus.objects.filter(is_native=is_native, location=item['location']).order_by('-week').first()
+            res_temp = SalesStatus.objects.filter(is_native=is_native, product=product, location=item['location']).order_by('-week').first()
             location_agent = {
                 'location': item['location'],
                 'agent_name': res_temp.agent_name,
@@ -389,35 +388,50 @@ def get_electronic_sales(request):
         today = datetime.datetime.today()
         start_time = (today - datetime.timedelta(days=29)).strftime('%Y-%m-%d')
         end_time = (today + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
-        location = "all"
+        product = para.get('product', 'nano')
+        end_time = para.get('end_time', end_time)
+        location = para.get('location', 'all')
         if para.__contains__('start_time'):
             startTime = datetime.datetime.strptime(para.__getitem__('start_time'), '%Y-%m-%d').date()
             start_time = (startTime - datetime.timedelta(days=6)).strftime('%Y-%m-%d')
-        if para.__contains__('end_time'):
-            end_time = para.__getitem__('end_time')
-            # endTime = datetime.datetime.strptime(para.__getitem__('end_time'), '%Y-%m-%d').date()
-            # end_time = (endTime + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
-        if para.__contains__('location'):
-            location = para.__getitem__('location')
-
         result = collections.OrderedDict()
         if location == 'all':
-            res = ElectronicSales.objects.filter(week__range=(start_time, end_time)).values('week').annotate(
-                view_total=Sum('view'), visitor_total=Sum('visitor'), payment_total=Sum('payment'),
-                number_total=Sum('number'), buyer_total=Sum('buyer')).order_by('week')
+            res = ElectronicSales.objects.filter(
+                week__range=(start_time, end_time),
+                product=product
+            ).values('week').annotate(
+                view_total=Sum('view'),
+                visitor_total=Sum('visitor'),
+                payment_total=Sum('payment'),
+                number_total=Sum('number'),
+                buyer_total=Sum('buyer')).order_by('week')
             for item in res:
-                temp = {'view': item['view_total'], 'visitor': item['visitor_total'], 'payment': item['payment_total'],
-                        'number': item['number_total'], 'buyer': item['buyer_total']}
+                temp = {
+                    'view': item['view_total'],
+                    'visitor': item['visitor_total'],
+                    'payment': item['payment_total'],
+                    'number': item['number_total'],
+                    'buyer': item['buyer_total']
+                }
                 end = (item['week'] + datetime.timedelta(days=6)).strftime('%m-%d')
                 result[item['week'].strftime('%m-%d') + '~' + end] = temp
         else:
-            res = ElectronicSales.objects.filter(week__range=(start_time, end_time), location=location).order_by('week')
+            res = ElectronicSales.objects.filter(
+                week__range=(start_time, end_time),
+                location=location,
+                product=product
+            ).order_by('week')
             for item in res:
-                temp = {'view': item.view, 'visitor': item.visitor, 'payment': item.payment, 'number': item.number,
-                        'buyer': item.buyer}
+                temp = {
+                    'view': item.view,
+                    'visitor': item.visitor,
+                    'payment': item.payment,
+                    'number': item.number,
+                    'buyer': item.buyer
+                }
                 end = (item.week + datetime.timedelta(days=6)).strftime('%m-%d')
                 result[item.week.strftime('%m-%d') + '~' + end] = temp
-        locations = ElectronicSales.objects.values('location').distinct()
+        locations = ElectronicSales.objects.filter(product=product).values('location').distinct()
         temp = []
         for item in locations:
             temp.append(item['location'])
@@ -1298,7 +1312,7 @@ def test(request):
     elif request.method == 'GET':
         get_fans()
         get_media_data()
-        # get_google_index()
+        get_google_index()
         get_media_tag()
         return HttpResponse('success')
     else:
