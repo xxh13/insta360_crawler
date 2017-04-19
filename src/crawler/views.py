@@ -22,6 +22,7 @@ from models import TakeCount
 from models import MediaFan
 from models import MediaData
 from models import MediaTag
+from models import Meltwater
 from models import Log
 from models import TaobaoDetail
 from tasks import *
@@ -730,7 +731,6 @@ def share_mode(request):
     else:
         return HttpResponse('Error.')
 
-
 #bi系统->Nano App使用情况->分享转化率
 @csrf_exempt
 def share_count(request):
@@ -860,7 +860,6 @@ def take_count(request):
         return JsonResponse({'versions': temp1, 'data': result}, safe=False)
     else:
         return HttpResponse('Error.')
-
 
 #bi系统->Nano App使用情况->错误异常
 @csrf_exempt
@@ -1234,6 +1233,61 @@ def media_tag(request):
     else:
         return HttpResponse('Error.')
 
+# bi系统->新媒体监控->Meltwater
+@csrf_exempt
+def meltwater(request):
+    if request.method == 'POST':
+        return HttpResponse('Task submitted.')
+    elif request.method == 'GET':
+        para = request.GET
+        today = datetime.datetime.today()
+        start_time = (today - datetime.timedelta(days=6)).strftime('%Y-%m-%d')
+        end_time = (today + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
+        start_time = para.get('start_time', start_time)
+        end_time = para.get('end_time', end_time)
+        type = para.get('type', 'social')
+        country = para.get('country', 'all')
+        result = []
+        country_list = list(Meltwater.objects.filter().values_list('country', flat=True).distinct())
+
+        if country == 'all':
+            res = Meltwater.objects.filter(
+                date__range=(start_time, end_time),
+                type=type
+            )
+            items = list(res.values_list('key', flat=True).distinct())
+            res = res.values(
+                'date', 'key'
+            ).annotate(
+                value_total=Sum('value')
+            ).order_by('date')
+            dates = res.dates('date', 'day')
+            index = []
+            for date in dates:
+                index.append(date.strftime('%m-%d'))
+                res_temp = res.filter(date=date).order_by('value')
+                temp = collections.OrderedDict()
+                for item in res_temp:
+                    temp[item['key']] = item['value_total']
+                result.append(temp)
+            country = '全部'
+            return JsonResponse({'data': result, 'index': index, 'items': items, 'country': country, 'country_list': country_list}, safe=False)
+        res = Meltwater.objects.filter(date__range=(start_time, end_time),type=type,country=country)
+        items = list(res.values_list('key', flat=True).distinct())
+        res = res.order_by('date')
+        dates = res.dates('date', 'day')
+        index = []
+        for date in dates:
+            index.append(date.strftime('%m-%d'))
+            res_temp = res.filter(date=date).order_by('value')
+            temp = collections.OrderedDict()
+            for item in res_temp:
+                temp[item.key] = item.value
+            result.append(temp)
+        return JsonResponse({'data': result, 'index':index, 'items':items, 'country':country, 'country_list': country_list}, safe=False)
+    else:
+        return HttpResponse('Error.')
+
 #bi系统->Nano市场环境->30天评论/销量->淘宝店铺详情
 @csrf_exempt
 def taobao_detail(request):
@@ -1310,10 +1364,10 @@ def test(request):
     if request.method == 'POST':
         return HttpResponse('Task submitted.')
     elif request.method == 'GET':
-        get_fans()
-        get_media_data()
-        get_google_index()
-        get_media_tag()
+        # get_fans()
+        # get_media_data()
+        # get_google_index()
+        # get_media_tag()
         return HttpResponse('success')
     else:
         return HttpResponse('Error.')

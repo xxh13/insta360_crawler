@@ -17,6 +17,7 @@ from .models import MediaData
 from .models import MediaTag
 from .models import TaobaoDetail
 from .models import GlobalElectronicSales
+from .models import Meltwater
 
 
 # Register your models here.
@@ -100,6 +101,9 @@ class TaobaoDetailAdmin(admin.ModelAdmin):
 class GlobalElectronicSalesAdmin(admin.ModelAdmin):
     list_display = ('id', 'commodity', 'site', 'country', 'comment', 'sale', 'date', 'created_time', 'update_time')
 
+class MeltwaterAdmin(admin.ModelAdmin):
+    list_display = ('id', 'key', 'type', 'country', 'value', 'date', 'created_time', 'update_time')
+
 admin.site.register(UseCondition, UseConditionAdmin)
 admin.site.register(SearchIndex, SearchIndexAdmin)
 admin.site.register(GoogleIndex, GoogleIndexAdmin)
@@ -118,3 +122,4 @@ admin.site.register(MediaData, MediaDataAdmin)
 admin.site.register(MediaTag, MediaTagAdmin)
 admin.site.register(TaobaoDetail, TaobaoDetailAdmin)
 admin.site.register(GlobalElectronicSales, GlobalElectronicSalesAdmin)
+admin.site.register(Meltwater, MeltwaterAdmin)

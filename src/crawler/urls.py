@@ -63,6 +63,9 @@ urlpatterns = [
     # bi系统->新媒体监控->标签内容数走势
     url(r'^media_tag/$', views.media_tag, name='media_tag'),
 
+    # bi系统->新媒体监控->Meltwater
+    url(r'^meltwater/$', views.meltwater, name='meltwater'),
+
     # bi系统->Nano市场环境->30天评论/销量->淘宝店铺详情
     url(r'^taobao_detail/$', views.taobao_detail, name='taobao_detail'),
 

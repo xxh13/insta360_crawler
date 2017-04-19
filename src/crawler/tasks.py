@@ -24,9 +24,11 @@ from .models import MediaData
 from .models import MediaTag
 from .models import TaobaoDetail
 from .models import GlobalElectronicSales
+from .models import Meltwater
 from .crawlers.umeng.UmengCrawler import UmengCrawler
 from .crawlers.taobao.TaobaoCrawler import TaobaoCrawler
 from .crawlers.jd.JDmobileCrawler import JDCrawler
+from .crawlers.meltwater.MeltwaterCrawler import MeltwaterCrawler
 from .crawlers.baidu_index.main import *
 from .crawlers.amazon.amazon_crawler import main as amanzon_crawler
 from .crawlers.google_index.google_trends import google_index
@@ -591,6 +593,30 @@ def get_media_tag():
             except:
                 pass
         MediaTag.objects.update_or_create(date=item['date'], platform=item['platform'], tag=item['tag'],defaults=item)
+    return 'Finished.'
+
+#meltwater 对应model： Meltwater
+@shared_task
+def get_meltwater():
+    today = datetime.datetime.today()
+    end_date = today.strftime('%Y-%m-%d')
+    start_date = (today - datetime.timedelta(days=6)).strftime('%Y-%m-%d')
+    result = []
+    count = 0
+    while True:
+        try:
+            count += 1
+            crawler = MeltwaterCrawler()
+            result = crawler.main(start_date, end_date)
+            break
+        except:
+            print 'error'
+            if count >= 3:
+                break
+            time.sleep(5)
+    data = result
+    for item in data:
+        Meltwater.objects.update_or_create(date=item['date'], key=item['key'], type=item['type'], country=item['country'], defaults=item)
     return 'Finished.'
 
 #调用销售支持系统的一个接口，用于每天刷新数据库中卖出去的nano的激活状态

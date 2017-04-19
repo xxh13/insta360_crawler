@@ -63,6 +63,19 @@ class GlobalElectronicSales(models.Model):
     def __unicode__(self):
         return str(self.id)
 
+# Meltwater统计
+class Meltwater(models.Model):
+    key = models.CharField(max_length=200)
+    type = models.CharField(max_length=200, default='social')
+    country = models.CharField(max_length=200)
+    value = models.IntegerField(default=0)
+    date = models.DateField(auto_now=False, auto_now_add=False)
+    created_time = models.DateTimeField(auto_now_add=True)
+    update_time = models.DateTimeField(auto_now=True)
+
+    def __unicode__(self):
+        return str(self.id)
+
 #用户分布
 class UserDistribution(models.Model):
     product = models.CharField(max_length=200, default='nano')
