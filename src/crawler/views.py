@@ -1271,7 +1271,7 @@ def meltwater(request):
                     temp[item['key']] = item['value_total']
                 result.append(temp)
             country = '全部'
-            return JsonResponse({'data': result, 'index': index, 'items': items, 'country': country, 'country_list': country_list}, safe=False)
+            return JsonResponse({'data': result, 'index': index, 'items': items, 'country': country, 'type': type, 'country_list': country_list}, safe=False)
         res = Meltwater.objects.filter(date__range=(start_time, end_time),type=type,country=country)
         items = list(res.values_list('key', flat=True).distinct())
         res = res.order_by('date')
@@ -1284,7 +1284,7 @@ def meltwater(request):
             for item in res_temp:
                 temp[item.key] = item.value
             result.append(temp)
-        return JsonResponse({'data': result, 'index':index, 'items':items, 'country':country, 'country_list': country_list}, safe=False)
+        return JsonResponse({'data': result, 'index':index, 'items':items, 'country':country, 'type': type, 'country_list': country_list}, safe=False)
     else:
         return HttpResponse('Error.')
 
