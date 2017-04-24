@@ -34,6 +34,7 @@ class JDCrawler:
         # }
         self.products ={
             'insta360 Nano': 'insta360 Nano',
+            'insta360 Air': 'insta360 Air',
             'Gear 360': 'Gear 360 全景相机',
             'theta': 'Ricoh theta',
             'LG 360 CAM': 'LG 360 CAM'
@@ -72,7 +73,6 @@ class JDCrawler:
             ware_info = data['wareList']
             try:
                 ware_list = ware_info['wareList']
-                print json.dumps(ware_list)
             except:
                 break
             count += 1
