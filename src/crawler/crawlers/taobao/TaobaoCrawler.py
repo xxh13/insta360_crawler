@@ -36,7 +36,7 @@ class TaobaoCrawler:
         self.headers = {'User-Agent': user_agent, 'pragma': pragma, 'cache-control': cache_control, 'upgrade-insecure-requests':upgrade_insecure_requests, 'cookie':cookie}
 
     def main(self):
-        products = ['insta360 Nano', 'insta360 Air', 'Gear 360', 'theta', 'LG 360 CAM']
+        products = ['insta360 Nano', 'insta360 Air', 'Gear 360', 'theta', 'LG 360 CAM', '小米米家全景相机']
         result = []
         for product in products:
             self.product = product
@@ -82,7 +82,10 @@ class TaobaoCrawler:
             # print jsonResult
             result = json.loads(jsonResult, encoding="utf-8")
             # print result
-            self.totalPage = result['mods']['pager']['data']['totalPage']
+            try:
+                self.totalPage = result['mods']['pager']['data']['totalPage']
+            except:
+                self.totalPage = 1
             # print self.totalPage
         except urllib2.URLError, e:
             if hasattr(e, "code"):
@@ -136,6 +139,8 @@ class TaobaoCrawler:
             self.filterTheta()
         elif self.product == 'LG 360 CAM':
             self.filterLG()
+        elif self.product == '小米米家全景相机':
+            self.filterMi()
         self.distinct()
         self.getSalesByRequest()
         self.sort()
@@ -187,6 +192,15 @@ class TaobaoCrawler:
             name = self.commodityList[i].name.lower()
             price = self.commodityList[i].price
             if (('头盔' in name) or (price < 800) or (price > 7000)):
+                del self.commodityList[i]
+                i -= 1
+            i += 1
+
+    def filterMi(self):
+        i = 0
+        while i < len(self.commodityList):
+            name = self.commodityList[i].name.lower()
+            if ((not ('小米米家' in name)) or (not ('360' in name))):
                 del self.commodityList[i]
                 i -= 1
             i += 1
