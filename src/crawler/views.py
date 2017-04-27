@@ -188,8 +188,8 @@ def get_sales_status(request):
             startTime = datetime.datetime.strptime(para.__getitem__('start_time'), '%Y-%m-%d').date()
             start_time = (startTime - datetime.timedelta(days=6)).strftime('%Y-%m-%d')
 
-        result = collections.OrderedDict()
-
+        data = []
+        index = []
         if location == 'all':
             res = SalesStatus.objects.filter(
                 week__range=(start_time, end_time),
@@ -218,7 +218,8 @@ def get_sales_status(request):
                     'reject': item['reject_total']
                 }
                 end = (item['week'] + datetime.timedelta(days=6)).strftime('%m-%d')
-                result[item['week'].strftime('%m-%d') + '~' + end] = temp
+                index.append(item['week'].strftime('%m-%d') + '~' + end)
+                data.append(temp)
 
             last_res = SalesStatus.objects.filter(
                 week__lt=start_time,
@@ -267,7 +268,8 @@ def get_sales_status(request):
                 }
 
                 end = (item.week + datetime.timedelta(days=6)).strftime('%m-%d')
-                result[item.week.strftime('%m-%d') + '~' + end] = temp
+                index.append(item.week.strftime('%m-%d') + '~' + end)
+                data.append(temp)
 
             last = SalesStatus.objects.filter(week__lt=start_time,
                                               is_native=is_native,
@@ -298,7 +300,13 @@ def get_sales_status(request):
                 'agent_price': res_temp.agent_price
             }
             temp.append(location_agent)
-        return JsonResponse({'locations': temp, 'data': result, 'last': res_last}, safe=False)
+        result = {
+            'locations': temp,
+            'data': data,
+            'last': res_last,
+            'index': index
+        }
+        return JsonResponse(result, safe=False)
     else:
         return HttpResponse('Error.')
 
@@ -395,7 +403,8 @@ def get_electronic_sales(request):
         if para.__contains__('start_time'):
             startTime = datetime.datetime.strptime(para.__getitem__('start_time'), '%Y-%m-%d').date()
             start_time = (startTime - datetime.timedelta(days=6)).strftime('%Y-%m-%d')
-        result = collections.OrderedDict()
+        data = []
+        index = []
         if location == 'all':
             res = ElectronicSales.objects.filter(
                 week__range=(start_time, end_time),
@@ -415,7 +424,8 @@ def get_electronic_sales(request):
                     'buyer': item['buyer_total']
                 }
                 end = (item['week'] + datetime.timedelta(days=6)).strftime('%m-%d')
-                result[item['week'].strftime('%m-%d') + '~' + end] = temp
+                index.append(item['week'].strftime('%m-%d') + '~' + end)
+                data.append(temp)
         else:
             res = ElectronicSales.objects.filter(
                 week__range=(start_time, end_time),
@@ -431,12 +441,15 @@ def get_electronic_sales(request):
                     'buyer': item.buyer
                 }
                 end = (item.week + datetime.timedelta(days=6)).strftime('%m-%d')
-                result[item.week.strftime('%m-%d') + '~' + end] = temp
-        locations = ElectronicSales.objects.filter(product=product).values('location').distinct()
-        temp = []
-        for item in locations:
-            temp.append(item['location'])
-        return JsonResponse({'locations': temp, 'data': result}, safe=False)
+                index.append(item.week.strftime('%m-%d') + '~' + end)
+                data.append(temp)
+        locations = list(ElectronicSales.objects.filter(product=product).values_list('location', flat=True).distinct())
+        result = {
+            'locations': locations,
+            'data': data,
+            'index': index
+        }
+        return JsonResponse(result, safe=False)
     else:
         return HttpResponse('Error.')
 
