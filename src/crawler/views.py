@@ -450,13 +450,9 @@ def user_distribution(request):
         today = datetime.datetime.today()
         start_time = (today - datetime.timedelta(days=6)).strftime('%Y-%m-%d')
         end_time = (today + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
-        product = 'nano'
-        if para.__contains__('start_time'):
-            start_time = para.__getitem__('start_time')
-        if para.__contains__('end_time'):
-            end_time = para.__getitem__('end_time')
-        if para.__contains__('product_type'):
-            product = para.__getitem__('product_type')
+        start_time = para.get('start_time', start_time)
+        end_time = para.get('end_time', end_time)
+        product = para.get('product_type', 'nano')
         res_native = []
         res_abroad = []
         if product == 'all':
@@ -498,17 +494,11 @@ def user_area(request):
         today = datetime.datetime.today()
         start_time = (today - datetime.timedelta(days=29)).strftime('%Y-%m-%d')
         end_time = (today + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
-        is_native = 1
-        product = 'nano'
-        if para.__contains__('start_time'):
-            start_time = para.__getitem__('start_time')
-        if para.__contains__('end_time'):
-            end_time = para.__getitem__('end_time')
-        if para.__contains__('is_native'):
-            is_native = para.__getitem__('is_native')
-        if para.__contains__('product_type'):
-            product = para.__getitem__('product_type')
-        result = collections.OrderedDict()
+        start_time = para.get('start_time', start_time)
+        end_time = para.get('end_time', end_time)
+        product = para.get('product_type', 'nano')
+        is_native = para.get('is_native', 1)
+
         if product == 'all':
             res = UserDistribution.objects.filter(date__range=(start_time, end_time),
                                                   is_native=is_native)
@@ -522,16 +512,21 @@ def user_area(request):
         for location in locations:
             location_list.append(location['location'])
         dates = res.dates('date', 'day')
-        data = collections.OrderedDict()
+        data = []
+        index = []
         for date in dates:
+            index.append(date.strftime('%m-%d'))
             temp = collections.OrderedDict()
             query = res.filter(date=date, location__in=location_list).values(
                 'location').annotate(new_user=Sum('new_user'))
             for item in query:
                 temp[item['location']] = item['new_user']
-            data[date.strftime('%m-%d')] = temp
-        result['data'] = data
-        result['locations'] = location_list
+            data.append(temp)
+        result = {
+            'data': data,
+            'locations': location_list,
+            'index': index
+        }
         return JsonResponse(result, safe=False)
     else:
         return HttpResponse('Error.')
@@ -546,14 +541,10 @@ def use_condition(request):
         today = datetime.datetime.today()
         start_time = (today - datetime.timedelta(days=6)).strftime('%Y-%m-%d')
         end_time = (today + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
-        product = 'nano'
-        if para.__contains__('start_time'):
-            start_time = para.__getitem__('start_time')
-        if para.__contains__('end_time'):
-            end_time = para.__getitem__('end_time')
-        if para.__contains__('product_type'):
-            product = para.__getitem__('product_type')
-        result = []
+        start_time = para.get('start_time', start_time)
+        end_time = para.get('end_time', end_time)
+        product = para.get('product_type', 'nano')
+        data = []
         if product == 'all':
             res = UseCondition.objects.filter(date__range=(start_time, end_time)).values(
                 'date'
@@ -564,10 +555,16 @@ def use_condition(request):
             ).order_by('date')
         else:
             res = UseCondition.objects.filter(date__range=(start_time, end_time), product=product).order_by('date').values()
+        index = []
         for item in res:
+            index.append(item['date'].strftime('%m-%d'))
             temp = {'date': item['date'].strftime('%m-%d'), 'new_user': item['new_user'], 'active_user': item['active_user'],
                         'duration': item['duration']}
-            result.append(temp)
+            data.append(temp)
+        result = {
+            'data': data,
+            'index': index
+        }
         return JsonResponse(result, safe=False)
     else:
         return HttpResponse('Error.')
@@ -588,7 +585,7 @@ def share_channel(request):
         mode = para.get('mode', 'day')
         type = para.get('type', 'img')
         version = para.get('version', 'all')
-        result = collections.OrderedDict()
+        data = []
         versions = list(ShareChannel.objects.filter(product=product,type=type).order_by('-version').values_list('version', flat=True).distinct())
         if version == 'all':
             res = ShareChannel.objects.filter(
@@ -627,8 +624,15 @@ def share_channel(request):
                         )
                         item_temp['month'] =  month_res[0]['count_total']
                     temp[item['channel']] = item_temp
-                result[date.strftime('%m-%d')] = temp
-            return JsonResponse({'versions': versions, 'data': result, 'index':index, 'items': items, 'mode': mode}, safe=False)
+                data.append(temp)
+            result = {
+                'versions': versions,
+                'data': data,
+                'index': index,
+                'items': items,
+                'mode': mode
+            }
+            return JsonResponse(result, safe=False)
 
         res = ShareChannel.objects.filter(date__range=(start_time, end_time), product=product, version=version,type=type).order_by('date')
         dates = res.dates('date', 'day')
@@ -655,8 +659,15 @@ def share_channel(request):
                     )
                     item_temp['month'] = month_res[0]['count_total']
                 temp[item.channel] = item_temp
-            result[date.strftime('%m-%d')] = temp
-        return JsonResponse({'versions': versions, 'data': result, 'index':index, 'items': items, 'mode': mode}, safe=False)
+            data.append(temp)
+        result = {
+            'versions': versions,
+            'data': data,
+            'index': index,
+            'items': items,
+            'mode': mode
+        }
+        return JsonResponse(result, safe=False)
     else:
         return HttpResponse('Error.')
 
@@ -670,18 +681,12 @@ def share_mode(request):
         today = datetime.datetime.today()
         start_time = (today - datetime.timedelta(days=6)).strftime('%Y-%m-%d')
         end_time = (today + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
+        start_time = para.get('start_time', start_time)
+        end_time = para.get('end_time', end_time)
+        product = para.get('product_type', 'nano')
+        version = para.get('version', 'all')
 
-        if para.__contains__('start_time'):
-            start_time = para.__getitem__('start_time')
-        if para.__contains__('end_time'):
-            end_time = para.__getitem__('end_time')
-        product = 'nano'
-        if para.__contains__('product_type'):
-            product = para.__getitem__('product_type')
-        version = 'all'
-        if para.__contains__('version'):
-            version = para.__getitem__('version')
-        result = collections.OrderedDict()
+        data = []
 
         if version == 'all':
             if product == 'all':
@@ -714,20 +719,26 @@ def share_mode(request):
                 res = ShareMode.objects.filter(date__range=(start_time, end_time), product=product, version=version).order_by(
                 'date').values()
         dates = res.dates('date', 'day')
+        index = []
         for date in dates:
+            index.append(date.strftime('%m-%d'))
             res_temp = res.filter(date=date).order_by('count')
             temp = collections.OrderedDict()
             for item in res_temp:
                 temp[item['mode']] = item['count']
-            result[date.strftime('%m-%d')] = temp
+            data.append(temp)
         if product == 'all':
-            versions = ShareMode.objects.values('version').distinct()
+            versions = list(ShareMode.objects.values_list('version', flat=True).distinct())
         else:
-            versions = ShareMode.objects.filter(product=product).values('version').distinct()
-        temp1 = []
-        for item in versions:
-            temp1.append(item['version'])
-        return JsonResponse({'versions': temp1, 'data': result}, safe=False)
+            versions = list(ShareMode.objects.filter(product=product).values_list('version', flat=True).distinct())
+        items = list(ShareMode.objects.filter(date__range=(start_time, end_time)).values_list('mode', flat=True).distinct())
+        result = {
+            'versions': versions,
+            'data': data,
+            'index': index,
+            'items': items
+        }
+        return JsonResponse(result, safe=False)
     else:
         return HttpResponse('Error.')
 
@@ -741,21 +752,12 @@ def share_count(request):
         today = datetime.datetime.today()
         start_time = (today - datetime.timedelta(days=6)).strftime('%Y-%m-%d')
         end_time = (today + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
-        if para.__contains__('start_time'):
-            start_time = para.__getitem__('start_time')
-        if para.__contains__('end_time'):
-            end_time = para.__getitem__('end_time')
-        product = 'nano'
-        if para.__contains__('product_type'):
-            product = para.__getitem__('product_type')
-        type = 'img'
-        if para.__contains__('type'):
-            type = para.__getitem__('type')
-        version = 'all'
-        if para.__contains__('version'):
-            version = para.__getitem__('version')
-        result = collections.OrderedDict()
-
+        start_time = para.get('start_time', start_time)
+        end_time = para.get('end_time', end_time)
+        product = para.get('product_type', 'nano')
+        version = para.get('version', 'all')
+        type = para.get('type', 'img')
+        data = []
         if version == 'all':
             res = ShareCount.objects.filter(
                 date__range=(start_time, end_time),
@@ -764,39 +766,21 @@ def share_count(request):
             ).values(
                 'date'
             ).annotate(
-                try_total=Sum('try_count'),
-                success_total = Sum('success_count')
+                try_count=Sum('try_count'),
+                success_count = Sum('success_count')
             ).order_by('date')
-            dates = res.dates('date', 'day')
-            for date in dates:
-                res_temp = res.filter(date=date).order_by('success_total')
-                temp = collections.OrderedDict()
-                for item in res_temp:
-                    try_count = item['try_total']
-                    success_count = item['success_total']
-                    if try_count == 0:
-                        percent = 0
-                    else:
-                        percent = round(success_count * 100.0 / try_count, 1)
-                    temp['share_count'] = try_count
-                    temp['success_count'] = success_count
-                    temp['percent'] = percent
-                result[date.strftime('%m-%d')] = temp
-            versions = ShareCount.objects.filter(product=product).values('version').distinct()
-            temp1 = []
-            for item in versions:
-                temp1.append(item['version'])
-            return JsonResponse({'versions': temp1, 'data': result}, safe=False)
-
-        res = ShareCount.objects.filter(date__range=(start_time, end_time), version=version, type=type,
-                product=product).order_by('date')
+        else:
+            res = ShareCount.objects.filter(date__range=(start_time, end_time), version=version, type=type,
+                                            product=product).order_by('date').values()
         dates = res.dates('date', 'day')
+        index = []
         for date in dates:
+            index.append(date.strftime('%m-%d'))
             res_temp = res.filter(date=date).order_by('success_count')
             temp = collections.OrderedDict()
             for item in res_temp:
-                try_count = item.try_count
-                success_count = item.success_count
+                try_count = item['try_count']
+                success_count = item['success_count']
                 if try_count == 0:
                     percent = 0
                 else:
@@ -804,12 +788,14 @@ def share_count(request):
                 temp['share_count'] = try_count
                 temp['success_count'] = success_count
                 temp['percent'] = percent
-            result[date.strftime('%m-%d')] = temp
-        versions = ShareCount.objects.filter(product=product).values('version').distinct()
-        temp1 = []
-        for item in versions:
-            temp1.append(item['version'])
-        return JsonResponse({'versions': temp1, 'data': result}, safe=False)
+            data.append(temp)
+        versions = list(ShareCount.objects.filter(product=product).values_list('version',flat=True).distinct())
+        result = {
+            'data': data,
+            'index': index,
+            'versions': versions
+        }
+        return JsonResponse(result, safe=False)
     else:
         return HttpResponse('Error.')
 
@@ -823,18 +809,12 @@ def take_count(request):
         today = datetime.datetime.today()
         start_time = (today - datetime.timedelta(days=6)).strftime('%Y-%m-%d')
         end_time = (today + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
-        if para.__contains__('start_time'):
-            start_time = para.__getitem__('start_time')
-        if para.__contains__('end_time'):
-            end_time = para.__getitem__('end_time')
-        product = 'nano'
-        if para.__contains__('product_type'):
-            product = para.__getitem__('product_type')
-        version = 'all'
-
-        if para.__contains__('version'):
-            version = para.__getitem__('version')
-        result = collections.OrderedDict()
+        start_time = para.get('start_time', start_time)
+        end_time = para.get('end_time', end_time)
+        product = para.get('product_type', 'nano')
+        version = para.get('version', 'all')
+        data = []
+        index = []
         if product == 'all':
             res = TakeCount.objects.filter(date__range=(start_time, end_time), version=version).values(
                 'date'
@@ -846,18 +826,21 @@ def take_count(request):
             res = TakeCount.objects.filter(date__range=(start_time, end_time), version=version,
                 product=product).order_by('date').values()
         for item in res:
-            temp =  collections.OrderedDict()
+            index.append(item['date'].strftime('%m-%d'))
+            temp = collections.OrderedDict()
             temp['img'] = item['img_count']
             temp['video'] = item['video_count']
-            result[item['date'].strftime('%m-%d')] = temp
+            data.append(temp)
         if product == 'all':
-            versions = TakeCount.objects.values('version').distinct()
+            versions = list(TakeCount.objects.values_list('version', flat=True).distinct())
         else:
-            versions = TakeCount.objects.filter(product=product).values('version').distinct()
-        temp1 = []
-        for item in versions:
-            temp1.append(item['version'])
-        return JsonResponse({'versions': temp1, 'data': result}, safe=False)
+            versions = list(TakeCount.objects.filter(product=product).values_list('version', flat=True).distinct())
+        result = {
+            'data': data,
+            'index': index,
+            'versions': versions
+        }
+        return JsonResponse(result, safe=False)
     else:
         return HttpResponse('Error.')
 
@@ -871,14 +854,9 @@ def error_condition(request):
         today = datetime.datetime.today()
         start_time = (today - datetime.timedelta(days=6)).strftime('%Y-%m-%d')
         end_time = (today + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
-        if para.__contains__('start_time'):
-            start_time = para.__getitem__('start_time')
-        if para.__contains__('end_time'):
-            end_time = para.__getitem__('end_time')
-        product = 'nano'
-        if para.__contains__('product_type'):
-            product = para.__getitem__('product_type')
-        result = []
+        start_time = para.get('start_time', start_time)
+        end_time = para.get('end_time', end_time)
+        product = para.get('product_type', 'nano')
         if product == 'all':
             res = ErrorCondition.objects.filter(date__range=(start_time, end_time)).values(
                 'date'
@@ -889,9 +867,16 @@ def error_condition(request):
         else:
             res = ErrorCondition.objects.filter(date__range=(start_time, end_time),
                 product=product).order_by('date').values()
+        data = []
+        index = []
         for item in res:
+            index.append(item['date'].strftime('%m-%d'))
             temp = {'date': item['date'].strftime('%m-%d'), 'total_error': item['total_error'], 'error_rate': item['error_rate']}
-            result.append(temp)
+            data.append(temp)
+        result = {
+            'data': data,
+            'index': index
+        }
         return JsonResponse(result, safe=False)
     else:
         return HttpResponse('Error.')
@@ -906,32 +891,39 @@ def market_environment(request):
         today = datetime.datetime.today()
         start_time = (today - datetime.timedelta(days=6)).strftime('%Y-%m-%d')
         end_time = (today + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
-        site = 'baidu'
-        if para.__contains__('start_time'):
-            start_time = para.__getitem__('start_time')
-        if para.__contains__('end_time'):
-            end_time = para.__getitem__('end_time')
-        if para.__contains__('site'):
-                site = para.__getitem__('site')
-        result = collections.OrderedDict()
+        start_time = para.get('start_time', start_time)
+        end_time = para.get('end_time', end_time)
+        site = para.get('site', 'baidu')
+        data = []
+        index = []
+        items = []
         if site == 'baidu':
             res = SearchIndex.objects.filter(date__range=(start_time, end_time)).order_by('date')
+            items = list(SearchIndex.objects.filter(date__range=(start_time, end_time)).values_list('key', flat=True).distinct())
             dates = res.dates('date', 'day')
             for date in dates:
+                index.append(date.strftime('%m-%d'))
                 res_temp = res.filter(date=date)
                 temp = {}
                 for item in res_temp:
                     temp[item.key] = item.baidu_index
-                result[date.strftime('%m-%d')] = temp
+                data.append(temp)
         elif site == 'google':
             res = GoogleIndex.objects.filter(date__range=(start_time, end_time)).order_by('date')
+            items = list(GoogleIndex.objects.filter(date__range=(start_time, end_time)).values_list('key', flat=True).distinct())
             dates = res.dates('date', 'day')
             for date in dates:
+                index.append(date.strftime('%m-%d'))
                 res_temp = res.filter(date=date)
                 temp = {}
                 for item in res_temp:
                     temp[item.key] = item.google_index
-                result[date.strftime('%m-%d')] = temp
+                data.append(temp)
+        result = {
+            'data': data,
+            'index': index,
+            'items': items
+        }
         return JsonResponse(result, safe=False)
     else:
         return HttpResponse('Error.')
@@ -946,13 +938,10 @@ def media_data(request):
         today = datetime.datetime.today()
         start_time = (today - datetime.timedelta(days=6)).strftime('%Y-%m-%d')
         end_time = (today + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
-        platform = 'facebook'
-        if para.__contains__('start_time'):
-            start_time = para.__getitem__('start_time')
-        if para.__contains__('end_time'):
-            end_time = para.__getitem__('end_time')
-        if para.__contains__('platform'):
-            platform = para.__getitem__('platform')
+        start_time = para.get('start_time', start_time)
+        end_time = para.get('end_time', end_time)
+        platform = para.get('platform', 'facebook')
+
         items = {}
         items['instagram'] = ['comment', 'like']
         items['weixin'] = ['view', 'like']
@@ -962,27 +951,33 @@ def media_data(request):
         items['weibo'] = ['comment', 'like', 'share']
         items['facebook'] = ['comment', 'like', 'share']
         items[u'腾讯视频'] = ['view']
-        result = collections.OrderedDict()
+        data = []
+        index = []
         res = MediaData.objects.filter(date__range=(start_time, end_time), platform=platform).order_by('date')
         dates = res.dates('date', 'day')
         for date in dates:
             try:
                 res_temp = res.get(date=date)
+                index.append(date.strftime('%m-%d'))
             except:
                 continue
             res_temp = model_to_dict(res_temp)
             temp = {}
             for item in items[platform]:
                 temp[media_dict[item]] = res_temp[item]
-            result[date.strftime('%m-%d')] = temp
-        platforms = MediaData.objects.values('platform').distinct()
-        temp1 = []
-        for item in platforms:
-            temp1.append(item['platform'])
+            data.append(temp)
+        platforms = list(MediaData.objects.values_list('platform', flat=True).distinct())
         indexes = []
         for item in items[platform]:
             indexes.append(media_dict[item])
-        return JsonResponse({'platform': platform,'platforms': temp1, 'data': result, 'indexes': indexes}, safe=False)
+        result = {
+            'platform': platform,
+            'platforms': platforms,
+            'data': data,
+            'items': indexes,
+            'index': index
+        }
+        return JsonResponse(result, safe=False)
     else:
         return HttpResponse('Error.')
 
@@ -996,17 +991,15 @@ def competitor_data(request):
         today = datetime.datetime.today()
         start_time = (today - datetime.timedelta(days=6)).strftime('%Y-%m-%d')
         end_time = (today + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
-        source = 'all'
-        if para.__contains__('start_time'):
-            start_time = para.__getitem__('start_time')
-        if para.__contains__('end_time'):
-            end_time = para.__getitem__('end_time')
-        if para.__contains__('source'):
-            source = para.__getitem__('source')
-        result = collections.OrderedDict()
+        start_time = para.get('start_time', start_time)
+        end_time = para.get('end_time', end_time)
+        source = para.get('source', 'all')
+        data = []
+        index = []
         res = CompetitorSales.objects.filter(date__range=(start_time, end_time)).order_by('date')
         dates = res.dates('date', 'day')
         for date in dates:
+            index.append(date.strftime('%m-%d'))
             res_temp = res.filter(date=date)
             temp = collections.OrderedDict()
             if source == 'all':
@@ -1019,7 +1012,11 @@ def competitor_data(request):
             elif source == 'jd':
                 for item in res_temp:
                     temp[item.commodity + ' 京东'] = item.jd_total_sales
-            result[date.strftime('%m-%d')] = temp
+            data.append(temp)
+        result = {
+            'data': data,
+            'index': index
+        }
         return JsonResponse(result, safe=False)
     else:
         return HttpResponse('Error.')
@@ -1036,10 +1033,12 @@ def competitor_sales(request):
         end_time = (today + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
         start_time = para.get('start_time', start_time)
         end_time = para.get('end_time', end_time)
-        result = collections.OrderedDict()
+        data = []
+        index = []
         res = CompetitorSales.objects.filter(date__range=(start_time, end_time)).order_by('date')
         dates = res.dates('date', 'day')
         for date in dates:
+            index.append(date.strftime('%m-%d'))
             month_age = (date - datetime.timedelta(days=30)).strftime('%Y-%m-%d')
             res_temp = res.filter(date=date)
             temp = collections.OrderedDict()
@@ -1052,7 +1051,11 @@ def competitor_sales(request):
                 if jd_sales < 0:
                     jd_sales = 0
                 temp[item.commodity] = item.taobao_total_sales + int(jd_sales / 0.15)
-            result[date.strftime('%m-%d')] = temp
+            data.append(temp)
+        result = {
+            'data': data,
+            'index': index
+        }
         return JsonResponse(result, safe=False)
     else:
         return HttpResponse('Error.')
@@ -1067,22 +1070,27 @@ def global_sales(request):
         today = datetime.datetime.today()
         start_time = (today - datetime.timedelta(days=6)).strftime('%Y-%m-%d')
         end_time = (today + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
-        site = 'amazon'
-        if para.__contains__('start_time'):
-            start_time = para.__getitem__('start_time')
-        if para.__contains__('end_time'):
-            end_time = para.__getitem__('end_time')
-        if para.__contains__('site'):
-            site = para.__getitem__('site')
-        result = collections.OrderedDict()
-        res = GlobalElectronicSales.objects.filter(date__range=(start_time, end_time), site=site).order_by('date')
+        start_time = para.get('start_time', start_time)
+        end_time = para.get('end_time', end_time)
+        site = para.get('site', 'amazon')
+        data = []
+        index = []
+        res = GlobalElectronicSales.objects.filter(date__range=(start_time, end_time), site=site)
+        items = list(res.values_list('country', flat=True).distinct())
+        res = res.order_by('date')
         dates = res.dates('date', 'day')
         for date in dates:
+            index.append(date.strftime('%m-%d'))
             res_temp = res.filter(date=date).order_by('-comment')
             temp = collections.OrderedDict()
             for item in res_temp:
                 temp[item.country] = item.comment
-            result[date.strftime('%m-%d')] = temp
+            data.append(temp)
+        result = {
+            'data': data,
+            'index': index,
+            'items': items
+        }
         return JsonResponse(result, safe=False)
     else:
         return HttpResponse('Error.')
@@ -1182,25 +1190,35 @@ def media_fans(request):
         today = datetime.datetime.today()
         start_time = (today - datetime.timedelta(days=6)).strftime('%Y-%m-%d')
         end_time = (today + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
-        if para.__contains__('start_time'):
-            start_time = para.__getitem__('start_time')
-        if para.__contains__('end_time'):
-            end_time = para.__getitem__('end_time')
-        type = 'total'
-        if para.__contains__('type'):
-            type = para.__getitem__('type')
-        result = collections.OrderedDict()
+        start_time = para.get('start_time', start_time)
+        end_time = para.get('end_time', end_time)
+        type = para.get('type', 'total')
+        data = []
+        index = []
         start_temp = datetime.datetime.strptime(start_time, "%Y-%m-%d")
         start_time = (start_temp - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
         res = MediaFan.objects.filter(date__range=(start_time, end_time)).order_by('date')
+        items = list(res.values_list('platform', flat=True).distinct())
+        res.order_by('date')
         dates = res.dates('date', 'day')
+        count = 0
         for date in dates:
+            if count > 0:
+                index.append(date.strftime('%m-%d'))
+            else:
+                count += 1
             res_temp = res.filter(date=date).order_by('fans')
             temp = collections.OrderedDict()
             for item in res_temp:
                 temp[item.platform] = item.fans
-            result[date.strftime('%m-%d')] = temp
-        return JsonResponse({'data':result,'type':type}, safe=False)
+            data.append(temp)
+        result = {
+            'data': data,
+            'index': index,
+            'type': type,
+            'items': items
+        }
+        return JsonResponse(result, safe=False)
     else:
         return HttpResponse('Error.')
 
@@ -1214,21 +1232,29 @@ def media_tag(request):
         today = datetime.datetime.today()
         start_time = (today - datetime.timedelta(days=6)).strftime('%Y-%m-%d')
         end_time = (today + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
-        if para.__contains__('start_time'):
-            start_time = para.__getitem__('start_time')
-        if para.__contains__('end_time'):
-            end_time = para.__getitem__('end_time')
-        result = collections.OrderedDict()
+        start_time = para.get('start_time', start_time)
+        end_time = para.get('end_time', end_time)
+        data = []
+        index = []
         start_temp = datetime.datetime.strptime(start_time, "%Y-%m-%d")
         start_time = (start_temp - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
         res = MediaTag.objects.filter(date__range=(start_time, end_time)).order_by('date')
         dates = res.dates('date', 'day')
+        count = 0
         for date in dates:
+            if count > 0:
+                index.append(date.strftime('%m-%d'))
+            else:
+                count += 1
             res_temp = res.filter(date=date).order_by('count')
             temp = collections.OrderedDict()
             for item in res_temp:
                 temp[item.platform + '#' + item.tag] = item.count
-            result[date.strftime('%m-%d')] = temp
+            data.append(temp)
+        result = {
+            'data': data,
+            'index': index
+        }
         return JsonResponse(result, safe=False)
     else:
         return HttpResponse('Error.')
@@ -1247,7 +1273,8 @@ def meltwater(request):
         end_time = para.get('end_time', end_time)
         type = para.get('type', 'social')
         country = para.get('country', 'all')
-        result = []
+        data = []
+        index = []
         country_list = list(Meltwater.objects.filter().values_list('country', flat=True).distinct())
 
         if country == 'all':
@@ -1261,30 +1288,28 @@ def meltwater(request):
             ).annotate(
                 value_total=Sum('value')
             ).order_by('date')
-            dates = res.dates('date', 'day')
-            index = []
-            for date in dates:
-                index.append(date.strftime('%m-%d'))
-                res_temp = res.filter(date=date).order_by('value')
-                temp = collections.OrderedDict()
-                for item in res_temp:
-                    temp[item['key']] = item['value_total']
-                result.append(temp)
             country = '全部'
-            return JsonResponse({'data': result, 'index': index, 'items': items, 'country': country, 'type': type, 'country_list': country_list}, safe=False)
-        res = Meltwater.objects.filter(date__range=(start_time, end_time),type=type,country=country)
-        items = list(res.values_list('key', flat=True).distinct())
-        res = res.order_by('date')
+        else:
+            res = Meltwater.objects.filter(date__range=(start_time, end_time), type=type, country=country)
+            items = list(res.values_list('key', flat=True).distinct())
+            res = res.order_by('date')
         dates = res.dates('date', 'day')
-        index = []
         for date in dates:
             index.append(date.strftime('%m-%d'))
             res_temp = res.filter(date=date).order_by('value')
             temp = collections.OrderedDict()
             for item in res_temp:
-                temp[item.key] = item.value
-            result.append(temp)
-        return JsonResponse({'data': result, 'index':index, 'items':items, 'country':country, 'type': type, 'country_list': country_list}, safe=False)
+                temp[item['key']] = item['value_total']
+            data.append(temp)
+        result = {
+            'data': data,
+            'index': index,
+            'items': items,
+            'country': country,
+            'type': type,
+            'country_list': country_list
+        }
+        return JsonResponse(result, safe=False)
     else:
         return HttpResponse('Error.')
 
@@ -1297,11 +1322,8 @@ def taobao_detail(request):
         para = request.GET
         today = datetime.datetime.today()
         date = (today - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
-        commodity = 'insta360 Nano'
-        if para.__contains__('date'):
-            date = para.__getitem__('date')
-        if para.__contains__('commodity'):
-            commodity = para.__getitem__('commodity')
+        date = para.get('date', date)
+        commodity = para.get('commodity', 'insta360 Nano')
         res = TaobaoDetail.objects.filter(
             date=date,
             commodity=commodity
@@ -1341,21 +1363,23 @@ def store_detail(request):
         today = datetime.datetime.today()
         start_time = (today - datetime.timedelta(days=29)).strftime('%Y-%m-%d')
         end_time = (today + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
-        if para.__contains__('start_time'):
-            start_time = para.__getitem__('start_time')
-        if para.__contains__('end_time'):
-            end_time = para.__getitem__('end_time')
+        start_time = para.get('start_time', start_time)
+        end_time = para.get('end_time', end_time)
         res = TaobaoDetail.objects.filter(store_id=store_id, date__range=(start_time, end_time)).order_by('date')
-        result = {}
+        data = []
+        index = []
         shop = ''
-        data = collections.OrderedDict()
         for item in res:
             date = item.date
+            index.append(date.strftime('%m-%d'))
             sales = item.sales
             shop = item.shop
-            data[date.strftime('%m-%d')] = sales
-        result['data'] = data
-        result['store'] = shop
+            data.append(sales)
+        result = {
+            'data': data,
+            'store': shop,
+            'index': index
+        }
         return JsonResponse(result, safe=False)
 
 #用于本地调用测试
