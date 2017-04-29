@@ -25,11 +25,13 @@ from .models import MediaTag
 from .models import TaobaoDetail
 from .models import GlobalElectronicSales
 from .models import Meltwater
+from .models import YoukuData
 from .crawlers.umeng.UmengCrawler import UmengCrawler
 from .crawlers.taobao.TaobaoCrawler import TaobaoCrawler
 from .crawlers.jd.JDmobileCrawler import JDCrawler
 from .crawlers.meltwater.MeltwaterCrawler import MeltwaterCrawler
 from .crawlers.baidu_index.main import *
+from .crawlers.youku_crawler.youku_crawler import get_videos_info
 from .crawlers.amazon.amazon_crawler import main as amanzon_crawler
 from .crawlers.google_index.google_trends import google_index
 from .crawlers.fans_crawler.main import main as fans_crawler
@@ -617,6 +619,26 @@ def get_meltwater():
     data = result
     for item in data:
         Meltwater.objects.update_or_create(date=item['date'], key=item['key'], type=item['type'], country=item['country'], defaults=item)
+    return 'Finished.'
+
+#优酷视频统计 对应model： YoukuData
+@shared_task
+def get_youku():
+    result = []
+    count = 0
+    while True:
+        try:
+            count += 1
+            result = get_videos_info()
+            break
+        except:
+            print 'error'
+            if count >= 3:
+                break
+            time.sleep(5)
+    data = result
+    for item in data:
+        YoukuData.objects.update_or_create(video_id=item['video_id'], date=item['date'], defaults=item)
     return 'Finished.'
 
 #调用销售支持系统的一个接口，用于每天刷新数据库中卖出去的nano的激活状态

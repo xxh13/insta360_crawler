@@ -63,6 +63,7 @@ class MeltwaterCrawler:
             self.params['country'] = country
             data = json.dumps(self.params)
             req = requests.post(self.url, data=data,headers=self.headers)
+            print req.text
             jsonData = json.loads(req.text)
             for item in jsonData['data']:
                 for key in item:
@@ -101,6 +102,7 @@ class MeltwaterCrawler:
             self.params['country'] = country
             data = json.dumps(self.params)
             req = requests.post(self.url, data=data,headers=self.headers)
+            print req.text
             jsonData = json.loads(req.text)
             for item in jsonData['data']:
                 for key in item:
@@ -128,5 +130,5 @@ class MeltwaterCrawler:
 
 if __name__ == '__main__':
     crawler = MeltwaterCrawler()
-    crawler.main('2017-04-01', '2017-04-16')
+    crawler.main('2017-01-01', '2017-04-12')
 

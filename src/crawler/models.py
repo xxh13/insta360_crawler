@@ -243,6 +243,26 @@ class MediaData(models.Model):
     def __unicode__(self):
         return str(self.id)
 
+# 优酷视频数据
+class YoukuData(models.Model):
+    video_id = models.CharField(max_length=200)
+    title = models.CharField(max_length=200)
+    date = models.DateField(auto_now=False, auto_now_add=False)
+    comment = models.IntegerField(default=0)
+    like = models.IntegerField(default=0)
+    dislike = models.IntegerField(default=0)
+    view = models.IntegerField(default=0)
+    duration = models.IntegerField(default=0)
+    link = models.CharField(max_length=200)
+    thumb = models.CharField(max_length=200)
+    tags = models.CharField(max_length=200)
+    category = models.CharField(max_length=200)
+    published_time = models.DateTimeField(auto_now=False, auto_now_add=False)
+    created_time = models.DateTimeField(auto_now_add=True)
+    update_time = models.DateField(auto_now=True)
+
+    def __unicode__(self):
+        return str(self.id)
 
 # 新媒体标签内容数
 class MediaTag(models.Model):
