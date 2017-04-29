@@ -33,12 +33,11 @@ def get_videos_info():
             comment = int(item['comment_count'])
             link = item['link']
             title = item['title']
-            tags = item['tags']
             duration = int(item['duration'])
             thumb = item['bigThumbnail']
             id = item['id']
-            category = item['category']
             temp = {
+                'platform': 'youku',
                 'video_id': id,
                 'title': title,
                 'published_time': published_time,
@@ -48,9 +47,7 @@ def get_videos_info():
                 'comment': comment,
                 'link': link,
                 'thumb': thumb,
-                'tags': tags,
                 'duration': duration,
-                'category': category,
                 'date': today
             }
             result.append(temp)

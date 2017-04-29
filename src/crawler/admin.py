@@ -14,7 +14,7 @@ from .models import TakeCount
 from .models import Log
 from .models import MediaFan
 from .models import MediaData
-from .models import YoukuData
+from .models import VideoInfo
 from .models import MediaTag
 from .models import TaobaoDetail
 from .models import GlobalElectronicSales
@@ -90,8 +90,8 @@ class MediaFanAdmin(admin.ModelAdmin):
 class MediaDataAdmin(admin.ModelAdmin):
     list_display = ('id', 'platform', 'date', 'comment', 'like', 'dislike', 'share', 'view', 'created_time', 'update_time')
 
-class YoukuDataAdmin(admin.ModelAdmin):
-    list_display = ('id', 'video_id', 'title', 'date', 'comment', 'like', 'dislike', 'view', 'duration', 'link', 'thumb', 'tags', 'category', 'published_time', 'created_time', 'update_time')
+class VideoInfoAdmin(admin.ModelAdmin):
+    list_display = ('id', 'platform', 'video_id', 'title', 'date', 'comment', 'like', 'dislike', 'view', 'duration', 'link', 'thumb', 'published_time', 'created_time', 'update_time')
 
 class MediaTagAdmin(admin.ModelAdmin):
     list_display = ('id', 'platform', 'tag', 'count', 'date', 'created_time', 'update_time')
@@ -124,7 +124,7 @@ admin.site.register(Log, LogAdmin)
 admin.site.register(MediaFan, MediaFanAdmin)
 admin.site.register(MediaData, MediaDataAdmin)
 admin.site.register(MediaTag, MediaTagAdmin)
-admin.site.register(YoukuData, YoukuDataAdmin)
+admin.site.register(VideoInfo, VideoInfoAdmin)
 admin.site.register(TaobaoDetail, TaobaoDetailAdmin)
 admin.site.register(GlobalElectronicSales, GlobalElectronicSalesAdmin)
 admin.site.register(Meltwater, MeltwaterAdmin)
