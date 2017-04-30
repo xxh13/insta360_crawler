@@ -30,7 +30,7 @@ from tasks import get_fans as f
 from tasks import get_google_index as g
 from util.dict import media_dict
 from view.views_admin import *
-
+from view.views_video import *
 
 import json
 import sys
@@ -1405,6 +1405,7 @@ def test(request):
         # get_media_data()
         # get_google_index()
         # get_media_tag()
+        get_videos_info()
         return HttpResponse('success')
     else:
         return HttpResponse('Error.')
