@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-
+from urllib import unquote
 import requests
 import json
 import sys
@@ -26,7 +26,7 @@ class MeltwaterCrawler:
         self.headers['Accept-Encoding'] = 'gzip, deflate, br'
         self.headers['Accept-Language'] = 'zh-CN,zh;q=0.8'
         self.headers['Content-Type'] = 'application/json;charset=UTF-8'
-        self.headers['Authorization'] = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ1c2VyIjp7Il9pZCI6IjU3YzdhODA0MmIyZjJkMmZhMWUyMjBmNSIsImZpcnN0TmFtZSI6IkJpYW5jYSIsImxhc3ROYW1lIjoiWmhhbmciLCJlbWFpbCI6ImJpYW5jYUBpbnN0YTM2MC5jb20iLCJwYXNzd29yZCI6IiQyYSQxMCRkQ2tiZnRMbHQzYmROeklxemdqNjMua3daRXdUWnJGMm1XaS5uMVhLTDVERFN0eVg1STNvZSIsImFjdGl2ZUNvbXBhbnlJZCI6IjU3MGRiMjBiZDI1MjQ0NDBiZmVlYzU4MSIsImxhbmd1YWdlIjoiZW4iLCJ0aW1lem9uZSI6IkFzaWEvU2luZ2Fwb3JlIiwiaXNJbnRlcm5hbCI6ZmFsc2UsImNyZWF0ZWQiOiIyMDE2LTA5LTAxVDA0OjAxOjA4LjIyNVoiLCJtb2RpZmllZCI6IjIwMTctMDQtMTdUMDQ6MzI6NDcuNDM3WiIsInRpdGxlIjoiR2xvYmFsIE1hcmtldGluZyBIZWFkIn0sImNvbXBhbnkiOnsiX2lkIjoiNTcwZGIyMGJkMjUyNDQ0MGJmZWVjNTgxIiwibmFtZSI6Ikluc3RhMzYwIC0gRmFpcmhhaXIiLCJjb3VudHJ5IjoiaGsiLCJhY2NvdW50SWQiOjE1Mzg5OTUsIm9wcG9ydHVuaXR5SWQiOjIwOTI0NTEsImNyZWF0ZWQiOiIyMDE2LTA0LTEzVDAyOjQyOjE5LjQ0MloiLCJtb2RpZmllZCI6IjIwMTctMDMtMjlUMDQ6MDQ6MDQuMjEwWiJ9LCJleHAiOjE0OTMxODYxODI1MTh9.NE-vCGKXaLErbTMbJJaj2UP-JNZW9vEds9RfgFu7yEfOHAtkiCpKxV-3fvgP_tiLmx6l2gSQUpnDcynsQZbj5SlYKsXe6hk8G0d1ZGTFMH-SbOIE-1lVA2wEnz-ZlCm_0ECvpDJymiJIUBQtfCIEo6vyriT4FewAFMxogUOZAfm7VM_yOnq8AMVh10vb8MMloJe9rIeEG-iGX_uG_GtuV13KDD_RaMy3FEzPZa5BApo84we413ipIKP1CkM2XyIc6DPfYnmbHzbHETRcodrzCLoF7U_X3OmPHYwrLMPW97pGopMA8avnWF89vrq8dgYK0Jp3u-5fC_WroK--wCqItA'
+        self.headers['Authorization'] = self.login()
 
         self.params = {}
         # params['dateQueryStart'] = '2017-04-19T06:00:42.263Z'
@@ -42,6 +42,35 @@ class MeltwaterCrawler:
         self.params['sortField'] = 'date'
         self.params['sortOrder'] = 'DESC'
         self.params['tags'] = []
+
+    def login(self):
+        url = 'https://app.meltwater.com/login'
+        headers = {
+            'Host': 'app.meltwater.com',
+            'Connection': 'keep-alive',
+            'Cache-Control': 'max-age=0',
+            'Origin': 'https://app.meltwater.com',
+            'Upgrade-Insecure-Requests': '1',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36',
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+            'Referer': 'https://app.meltwater.com/login',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Accept-Language': 'zh-CN,zh;q=0.8',
+            'Cookie': '_gali=loginForm',
+            'Content-Length': '48'
+        }
+        payload = {
+            'username': 'bianca@insta360.com',
+            'password': 'Insta360'
+        }
+        req = requests.post(url, data=payload, headers=headers, verify=False, allow_redirects=False)
+        temp = req.cookies['gydaToken']
+        temp = unquote(temp)
+        temp = json.loads(temp)
+        token = temp['token']
+        print token
+        return token
 
     def get_social_data(self, start_date, end_date):
         key_dict = {
@@ -63,7 +92,6 @@ class MeltwaterCrawler:
             self.params['country'] = country
             data = json.dumps(self.params)
             req = requests.post(self.url, data=data,headers=self.headers)
-            print req.text
             jsonData = json.loads(req.text)
             for item in jsonData['data']:
                 for key in item:
@@ -102,7 +130,6 @@ class MeltwaterCrawler:
             self.params['country'] = country
             data = json.dumps(self.params)
             req = requests.post(self.url, data=data,headers=self.headers)
-            print req.text
             jsonData = json.loads(req.text)
             for item in jsonData['data']:
                 for key in item:
@@ -124,11 +151,10 @@ class MeltwaterCrawler:
         result = []
         result.extend(self.get_social_data(start_date, end_date))
         result.extend(self.get_news_data(start_date, end_date))
-        print json.dumps(result)
         return result
 
 
 if __name__ == '__main__':
     crawler = MeltwaterCrawler()
-    crawler.main('2017-01-01', '2017-04-12')
+    crawler.main('2017-04-26', '2017-05-02')
 
