@@ -1011,6 +1011,7 @@ def competitor_data(request):
         index = []
         res = CompetitorSales.objects.filter(date__range=(start_time, end_time)).order_by('date')
         dates = res.dates('date', 'day')
+        items = set()
         for date in dates:
             index.append(date.strftime('%m-%d'))
             res_temp = res.filter(date=date)
@@ -1019,16 +1020,22 @@ def competitor_data(request):
                 for item in res_temp:
                     temp[item.commodity + ' 淘宝'] = item.taobao_total_sales
                     temp[item.commodity + ' 京东'] = item.jd_total_sales
+                    items.add(item.commodity + ' 淘宝')
+                    items.add(item.commodity + ' 京东')
             elif source == 'taobao':
                 for item in res_temp:
                     temp[item.commodity + ' 淘宝'] = item.taobao_total_sales
+                    items.add(item.commodity + ' 淘宝')
             elif source == 'jd':
                 for item in res_temp:
                     temp[item.commodity + ' 京东'] = item.jd_total_sales
+                    items.add(item.commodity + ' 京东')
             data.append(temp)
+        items = list(items)
         result = {
             'data': data,
-            'index': index
+            'index': index,
+            'items': items
         }
         return JsonResponse(result, safe=False)
     else:
@@ -1405,7 +1412,6 @@ def test(request):
         # get_media_data()
         # get_google_index()
         # get_media_tag()
-        get_videos_info()
         return HttpResponse('success')
     else:
         return HttpResponse('Error.')
