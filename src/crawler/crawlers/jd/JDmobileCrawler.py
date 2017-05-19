@@ -94,10 +94,17 @@ class JDCrawler:
     def distinct(self):
         i = 0
         s = set()
+        id_set = set()
         while i < len(self.commodityList):
             comment = self.commodityList[i].comment
+            id= self.commodityList[i].id
             good_rate = self.commodityList[i].good_rate
             mark = str(comment) + good_rate
+            if id in id_set:
+                del self.commodityList[i]
+                continue
+            else:
+                id_set.add(id)
             if not mark in s:
                 s.add(mark)
             else:
