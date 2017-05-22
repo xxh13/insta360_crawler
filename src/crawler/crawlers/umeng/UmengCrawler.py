@@ -136,7 +136,6 @@ class UmengCrawler:
                 durationStr = self.getDuration(date, appid)
                 temp = durationStr.split(':')
                 duration = int(temp[0]) * 3600 + int(temp[1]) * 60 + int(temp[2])
-                print date, newUser[i]['data'], activeUser[i]['data'], duration, app
                 temp = {'date': date, 'new_user': newUser[i]['data'], 'active_user': activeUser[i]['data'],
                         'duration': duration, 'product': app}
                 result.append(temp)
@@ -291,7 +290,6 @@ class UmengCrawler:
         try:
             response = urllib2.urlopen(request)
             jsonData = response.read()
-            print jsonData
             result = json.loads(jsonData, encoding="utf-8")
             return result['stats']
         except urllib2.URLError, e:
@@ -364,7 +362,7 @@ class UmengCrawler:
             appid = self.apps[app]
             versions = self.getVersions(appid)
             for version in versions:
-                if version < min_version[app]:
+                if self.compareVersion(version, min_version[app]) < 0:
                     continue
                 for index in event_group_ids[app]:
                     event_group_id = event_group_ids[app][index]
@@ -407,7 +405,7 @@ class UmengCrawler:
             appid = self.apps[app]
             versions = self.getVersions(appid)
             for version in versions:
-                if version < min_version[app]:
+                if self.compareVersion(version, min_version[app]) < 0:
                     continue
                 for index in event_group_ids[app]:
                     event_group_id = event_group_ids[app][index]
@@ -444,7 +442,7 @@ class UmengCrawler:
             appid = self.apps[app]
             versions = self.getVersions(appid)
             for version in versions:
-                if version < min_version[app]:
+                if self.compareVersion(version, min_version[app]) < 0:
                     continue
                 for index in event_group_ids[app]:
                     event_group_id = event_group_ids[app][index]
@@ -484,7 +482,7 @@ class UmengCrawler:
             versions = self.getVersions(appid)
             versions.append('')
             for version in versions:
-                if version < min_version[app] and version != '':
+                if self.compareVersion(version, min_version[app]) < 0 and version != '':
                     continue
                 for index in event_group_ids[app]:
                     event_group_id = event_group_ids[app][index]
@@ -503,7 +501,34 @@ class UmengCrawler:
         jsonResult = json.dumps(result)
         return jsonResult
 
+    def compareVersion(self, version1, version2):
+        temp1 = version1.split('.')
+        temp2 = version2.split('.')
+        ver1 = [0, 0, 0]
+        ver2 = [0, 0, 0]
+        for index in range(len(ver1)):
+            try:
+                num = int(temp1[index])
+            except:
+                num = 0
+            ver1[index] += num
+
+        for index in range(len(ver2)):
+            try:
+                num = int(temp2[index])
+            except:
+                num = 0
+            ver2[index] += num
+
+        for index in range(len(ver1)):
+            if (ver1[index] < ver2[index]):
+                return -1
+            if (ver1[index] > ver2[index]):
+                return 1
+            continue
+        return 0
+
 
 if __name__ == "__main__":
     crawler = UmengCrawler()
-    print crawler.getShareCount('2017-02-25', '2017-02-27')
+    # print crawler.getShareCount('2017-02-25', '2017-02-27')
