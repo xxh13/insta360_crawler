@@ -33,7 +33,7 @@ from .crawlers.meltwater.MeltwaterCrawler import MeltwaterCrawler
 from .crawlers.baidu_index.main import *
 from .crawlers.videos_crawler.youku_crawler import get_videos_info
 from .crawlers.amazon.amazon_crawler import main as amanzon_crawler
-from .crawlers.google_index.google_trends import google_index
+from .crawlers.google_index.trends_compare import google_index
 from .crawlers.fans_crawler.main import main as fans_crawler
 from .crawlers.media_crawler.main import main as media_crawler
 from .crawlers.media_crawler.tag_main import main as tag_crawler

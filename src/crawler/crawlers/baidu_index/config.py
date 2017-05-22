@@ -35,4 +35,4 @@ num_of_threads = 40
 # 要获取趋势的类别，默认是三种趋势都获取。all代表整体趋势，pc代表PC趋势, wise代表移动趋势
 index_type_list = ['all']  #, 'pc', 'wise'
 #关键字列表
-key_list = ['insta360', 'gear 360', 'theta s', 'okaa', 'eyesir', 'ZMER', 'VR相机', '全景相机', '全景摄像头']
+key_list = ['insta360', 'gear 360', 'theta s', 'ZMER', 'VR相机', '全景相机', '360相机', 'GoPro']

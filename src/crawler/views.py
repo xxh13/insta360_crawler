@@ -912,23 +912,23 @@ def market_environment(request):
         items = []
         if site == 'baidu':
             res = SearchIndex.objects.filter(date__range=(start_time, end_time)).order_by('date')
-            items = list(SearchIndex.objects.filter(date__range=(start_time, end_time)).values_list('key', flat=True).distinct())
             dates = res.dates('date', 'day')
             for date in dates:
                 index.append(date.strftime('%m-%d'))
                 res_temp = res.filter(date=date)
                 temp = {}
+                items = list(res_temp.values_list('key', flat=True).distinct())
                 for item in res_temp:
                     temp[item.key] = item.baidu_index
                 data.append(temp)
         elif site == 'google':
             res = GoogleIndex.objects.filter(date__range=(start_time, end_time)).order_by('date')
-            items = list(GoogleIndex.objects.filter(date__range=(start_time, end_time)).values_list('key', flat=True).distinct())
             dates = res.dates('date', 'day')
             for date in dates:
                 index.append(date.strftime('%m-%d'))
                 res_temp = res.filter(date=date)
                 temp = {}
+                items = list(res_temp.values_list('key', flat=True).distinct())
                 for item in res_temp:
                     temp[item.key] = item.google_index
                 data.append(temp)
