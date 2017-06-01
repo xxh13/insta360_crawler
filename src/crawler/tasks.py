@@ -207,6 +207,15 @@ def get_amazon_sales():
             time.sleep(5)
     data = json.loads(result, encoding="utf-8")
     for item in data:
+        today = datetime.datetime.strptime(item['date'], "%Y-%m-%d")
+        oneday = datetime.timedelta(days=1)
+        yesterday = (today - oneday).strftime('%Y-%m-%d')
+        try:
+            old = GlobalElectronicSales.objects.get(date=yesterday, country=item['country'], commodity=item['commodity'], site=item['site'])
+            if item['comment'] < old.comment:
+                item['comment'] = old.comment
+        except:
+            pass
         GlobalElectronicSales.objects.update_or_create(date=item['date'],country=item['country'], commodity=item['commodity'], site=item['site'], defaults=item)
     return 'Finished.'
 
