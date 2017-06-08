@@ -957,7 +957,7 @@ def media_data(request):
 
         items = {}
         items['instagram'] = ['comment', 'like']
-        items['weixin'] = ['view', 'like']
+        items['weixin'] = ['view', 'share']
         items['youku'] = ['comment', 'like', 'dislike', 'view']
         items['youtube'] = ['comment', 'like', 'dislike', 'view']
         items['twitter'] = ['like', 'share']
@@ -1410,7 +1410,7 @@ def test(request):
     elif request.method == 'GET':
         # get_fans()
         # get_media_data()
-        # get_google_index()
+        # # get_google_index()
         # get_media_tag()
         return HttpResponse('success')
     else:
