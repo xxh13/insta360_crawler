@@ -10,6 +10,7 @@ from ..util.dict import group_dict
 import sys
 import urllib
 import urllib2
+import requests
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -121,5 +122,11 @@ def admin_power(request):
                         user.groups.add(group)
                     except:
                         pass
+                    if index == 'nano_sales':
+                        data = {
+                            'job_number': job_number,
+                            'bi': 1
+                        }
+                        requests.post('http://sales.internal.insta360.com/sales/admin/power_update', data)
         user.save()
         return HttpResponse('success')
