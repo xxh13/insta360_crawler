@@ -22,7 +22,7 @@ group_dict = {
     'nano_share': 'BI->内容分享情况',
     'nano_support': 'BI->服务与支持',
     'nano_use_condition': 'BI->App使用情况',
-    'divided_share' '内容分享后台'
+    'divided_share': '内容分享后台',
     'native_sales': '录入系统->国内销售录入',
     'abroad_sales': '录入系统->国外销售录入',
     'electronic_sales': '录入系统->电商销售录入'
