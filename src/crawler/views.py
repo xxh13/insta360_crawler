@@ -448,7 +448,7 @@ def get_electronic_sales(request):
                 # index.append(item.week.strftime('%m-%d') + '~' + end)
                 index.append(item.week.strftime('%m-%d'))
                 data.append(temp)
-        locations = list(ElectronicSales.objects.filter(product=product).values_list('location', flat=True).distinct())
+        locations = list(ElectronicSales.objects.values_list('location', flat=True).distinct())
         products = list(ElectronicSales.objects.values_list('product', flat=True).distinct())
         result = {
             'locations': locations,
@@ -1415,10 +1415,10 @@ def test(request):
     if request.method == 'POST':
         return HttpResponse('Task submitted.')
     elif request.method == 'GET':
-        # get_fans()
-        # get_media_data()
+        get_fans()
+        get_media_data()
         get_google_index()
-        # get_media_tag()
+        get_media_tag()
         return HttpResponse('success')
     else:
         return HttpResponse('Error.')
