@@ -399,16 +399,19 @@ def get_electronic_sales(request):
         end_time = (today + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
         product = para.get('product', 'nano')
         end_time = para.get('end_time', end_time)
+        start_time = para.get('start_time', start_time)
         location = para.get('location', 'all')
-        if para.__contains__('start_time'):
-            startTime = datetime.datetime.strptime(para.__getitem__('start_time'), '%Y-%m-%d').date()
-            start_time = (startTime - datetime.timedelta(days=6)).strftime('%Y-%m-%d')
+        products = product.split(',')
+        print products
+        # if para.__contains__('start_time'):
+        #     startTime = datetime.datetime.strptime(para.__getitem__('start_time'), '%Y-%m-%d').date()
+        #     start_time = (startTime - datetime.timedelta(days=6)).strftime('%Y-%m-%d')
         data = []
         index = []
         if location == 'all':
             res = ElectronicSales.objects.filter(
                 week__range=(start_time, end_time),
-                product=product
+                product__in=products
             ).values('week').annotate(
                 view_total=Sum('view'),
                 visitor_total=Sum('visitor'),
@@ -423,14 +426,15 @@ def get_electronic_sales(request):
                     'number': item['number_total'],
                     'buyer': item['buyer_total']
                 }
-                end = (item['week'] + datetime.timedelta(days=6)).strftime('%m-%d')
-                index.append(item['week'].strftime('%m-%d') + '~' + end)
+                # end = (item['week'] + datetime.timedelta(days=6)).strftime('%m-%d')
+                # index.append(item['week'].strftime('%m-%d') + '~' + end)
+                index.append(item['week'].strftime('%m-%d'))
                 data.append(temp)
         else:
             res = ElectronicSales.objects.filter(
                 week__range=(start_time, end_time),
                 location=location,
-                product=product
+                product__in=products
             ).order_by('week')
             for item in res:
                 temp = {
@@ -440,12 +444,15 @@ def get_electronic_sales(request):
                     'number': item.number,
                     'buyer': item.buyer
                 }
-                end = (item.week + datetime.timedelta(days=6)).strftime('%m-%d')
-                index.append(item.week.strftime('%m-%d') + '~' + end)
+                # end = (item.week + datetime.timedelta(days=6)).strftime('%m-%d')
+                # index.append(item.week.strftime('%m-%d') + '~' + end)
+                index.append(item.week.strftime('%m-%d'))
                 data.append(temp)
         locations = list(ElectronicSales.objects.filter(product=product).values_list('location', flat=True).distinct())
+        products = list(ElectronicSales.objects.values_list('product', flat=True).distinct())
         result = {
             'locations': locations,
+            'products': products,
             'data': data,
             'index': index
         }
@@ -1410,7 +1417,7 @@ def test(request):
     elif request.method == 'GET':
         # get_fans()
         # get_media_data()
-        # # get_google_index()
+        get_google_index()
         # get_media_tag()
         return HttpResponse('success')
     else:
