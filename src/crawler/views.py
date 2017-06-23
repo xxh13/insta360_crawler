@@ -321,7 +321,7 @@ def electronic_sales(request):
         username = body['username']
         table = '电商销售'
         week_date = datetime.datetime.strptime(week, '%Y-%m-%d').date()
-        next_week = (week_date + datetime.timedelta(days=7)).strftime('%Y-%m-%d')
+        next_week = (week_date + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
         old = ElectronicSales.objects.filter(week=week, product=product).values('location')
         s = set()
         for item in old:
@@ -358,15 +358,13 @@ def electronic_sales(request):
     elif request.method == 'GET':
         para = request.GET
         product = para.get('product', 'nano')
-        today = datetime.datetime.today()
-        delta = today.weekday()
-        week = (today - datetime.timedelta(days=delta)).strftime('%Y-%m-%d')
+        week = datetime.datetime.today().strftime('%Y-%m-%d')
         if para.__contains__('week'):
             week = para.__getitem__('week')
         else:
             weeks = ElectronicSales.objects.filter(product=product).dates('week', 'day', order='DESC')
             for item in weeks:
-                week = (item - datetime.timedelta(days=7)).strftime('%Y-%m-%d')
+                week = item.strftime('%Y-%m-%d')
                 break
         data = []
         res = ElectronicSales.objects.filter(week=week, product=product)
