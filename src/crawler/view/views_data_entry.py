@@ -152,9 +152,9 @@ def access_data(request):
                 'date': item.date,
                 'location': item.location,
                 'product': item.product,
-                'view': item.show,
-                'visitor': item.click,
-                'customer': item.cost,
+                'view': item.view,
+                'visitor': item.visitor,
+                'customer': item.customer,
                 'order': item.order
             }
             data.append(temp)
