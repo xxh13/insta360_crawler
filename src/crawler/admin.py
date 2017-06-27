@@ -6,6 +6,8 @@ from .models import CompetitorSales
 from .models import UserDistribution
 from .models import SalesStatus
 from .models import ElectronicSales
+from .models import ElectronicPromotion
+from .models import AccessData
 from .models import ErrorCondition
 from .models import ShareChannel
 from .models import ShareMode
@@ -81,6 +83,16 @@ class ElectronicSalesAdmin(admin.ModelAdmin):
                     'payment', 'number', 'buyer', 'date_created')
 
 
+class ElectronicPromotionAdmin(admin.ModelAdmin):
+    list_display = ('id', 'product', 'date', 'location', 'show', 'click',
+                    'cost', 'order', 'turnover', 'created_time', 'update_time')
+
+
+class AccessDataAdmin(admin.ModelAdmin):
+    list_display = ('id', 'product', 'date', 'location', 'view', 'visitor',
+                    'customer', 'order', 'created_time', 'update_time')
+
+
 class LogAdmin(admin.ModelAdmin):
     list_display = ('id', 'week', 'username', 'table', 'operator', 'location', 'date_created')
 
@@ -120,6 +132,8 @@ admin.site.register(ShareCount, ShareCountAdmin)
 admin.site.register(TakeCount, TakeCountAdmin)
 admin.site.register(SalesStatus, SalesStatusAdmin)
 admin.site.register(ElectronicSales, ElectronicSalesAdmin)
+admin.site.register(ElectronicPromotion, ElectronicPromotionAdmin)
+admin.site.register(AccessData, AccessDataAdmin)
 admin.site.register(Log, LogAdmin)
 admin.site.register(MediaFan, MediaFanAdmin)
 admin.site.register(MediaData, MediaDataAdmin)

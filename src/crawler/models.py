@@ -205,6 +205,37 @@ class ElectronicSales(models.Model):
     def __unicode__(self):
         return str(self.id)
 
+# 销售录入系统的电商推广
+class ElectronicPromotion(models.Model):
+    product = models.CharField(max_length=200, default='nano')
+    date = models.DateField(auto_now=False, auto_now_add=False)
+    location = models.CharField(max_length=200)
+    show = models.IntegerField(default=0)
+    click = models.IntegerField(default=0)
+    cost = models.FloatField(default=0.0)
+    order = models.IntegerField(default=0)
+    turnover = models.FloatField(default=0.0)
+    created_time = models.DateTimeField(auto_now_add=True)
+    update_time = models.DateTimeField(auto_now=True)
+
+    def __unicode__(self):
+        return str(self.id)
+
+# 销售录入系统的访问转化
+class AccessData(models.Model):
+    product = models.CharField(max_length=200, default='nano')
+    date = models.DateField(auto_now=False, auto_now_add=False)
+    location = models.CharField(max_length=200)
+    view = models.IntegerField(default=0)
+    visitor = models.IntegerField(default=0)
+    customer = models.IntegerField(default=0)
+    order = models.IntegerField(default=0)
+    created_time = models.DateTimeField(auto_now_add=True)
+    update_time = models.DateTimeField(auto_now=True)
+
+    def __unicode__(self):
+        return str(self.id)
+
 #销售录入系统的日志
 class Log(models.Model):
     username = models.CharField(max_length=200)

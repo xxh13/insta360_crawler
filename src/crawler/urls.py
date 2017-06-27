@@ -12,11 +12,23 @@ urlpatterns = [
     # 销售录入系统电商销售的增删该查接口
     url(r'^electronic_sales/$', views.electronic_sales, name='electronic_sales'),
 
+    # 销售录入系统电商推广的增删该查接口
+    url(r'^electronic_promotion/$', views.electronic_promotion, name='electronic_promotion'),
+
+    # 销售录入系统访问转化的增删该查接口
+    url(r'^access_data/$', views.access_data, name='access_data'),
+
     # bi系统->Nano 零售渠道->国内、海外销售情况
     url(r'^get_sales_status/$', views.get_sales_status, name='get_sales_status'),
 
-    # bi系统->Nano 零售渠道->自有电商渠道
+    # bi系统->Nano 零售渠道->电商销售
     url(r'^get_electronic_sales/$', views.get_electronic_sales, name='get_electronic_sales'),
+
+    # bi系统->Nano 零售渠道->电商推广
+    url(r'^get_electronic_promotion/$', views.get_electronic_promotion, name='get_electronic_promotion'),
+
+    # bi系统->Nano 零售渠道->访问转化
+    url(r'^get_access_data/$', views.get_access_data, name='get_access_data'),
 
     # bi系统->Nano App使用情况->APP用户区域分布
     url(r'^user_distribution/$', views.user_distribution, name='user_distribution'),

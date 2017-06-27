@@ -31,6 +31,7 @@ from tasks import get_google_index as g
 from util.dict import media_dict
 from view.views_admin import *
 from view.views_video import *
+from view.views_data_entry import *
 
 import json
 import sys
@@ -400,52 +401,35 @@ def get_electronic_sales(request):
         start_time = para.get('start_time', start_time)
         location = para.get('location', 'all')
         products = product.split(',')
-        print products
-        # if para.__contains__('start_time'):
-        #     startTime = datetime.datetime.strptime(para.__getitem__('start_time'), '%Y-%m-%d').date()
-        #     start_time = (startTime - datetime.timedelta(days=6)).strftime('%Y-%m-%d')
         data = []
         index = []
         if location == 'all':
             res = ElectronicSales.objects.filter(
                 week__range=(start_time, end_time),
                 product__in=products
-            ).values('week').annotate(
-                view_total=Sum('view'),
-                visitor_total=Sum('visitor'),
-                payment_total=Sum('payment'),
-                number_total=Sum('number'),
-                buyer_total=Sum('buyer')).order_by('week')
-            for item in res:
-                temp = {
-                    'view': item['view_total'],
-                    'visitor': item['visitor_total'],
-                    'payment': item['payment_total'],
-                    'number': item['number_total'],
-                    'buyer': item['buyer_total']
-                }
-                # end = (item['week'] + datetime.timedelta(days=6)).strftime('%m-%d')
-                # index.append(item['week'].strftime('%m-%d') + '~' + end)
-                index.append(item['week'].strftime('%m-%d'))
-                data.append(temp)
+            )
         else:
             res = ElectronicSales.objects.filter(
                 week__range=(start_time, end_time),
                 location=location,
                 product__in=products
-            ).order_by('week')
-            for item in res:
-                temp = {
-                    'view': item.view,
-                    'visitor': item.visitor,
-                    'payment': item.payment,
-                    'number': item.number,
-                    'buyer': item.buyer
-                }
-                # end = (item.week + datetime.timedelta(days=6)).strftime('%m-%d')
-                # index.append(item.week.strftime('%m-%d') + '~' + end)
-                index.append(item.week.strftime('%m-%d'))
-                data.append(temp)
+            )
+        res = res.values('week').annotate(
+            view_total=Sum('view'),
+            visitor_total=Sum('visitor'),
+            payment_total=Sum('payment'),
+            number_total=Sum('number'),
+            buyer_total=Sum('buyer')).order_by('week')
+        for item in res:
+            temp = {
+                'view': item['view_total'],
+                'visitor': item['visitor_total'],
+                'payment': item['payment_total'],
+                'number': item['number_total'],
+                'buyer': item['buyer_total']
+            }
+            index.append(item['week'].strftime('%m-%d'))
+            data.append(temp)
         locations = list(ElectronicSales.objects.values_list('location', flat=True).distinct())
         products = list(ElectronicSales.objects.values_list('product', flat=True).distinct())
         result = {
