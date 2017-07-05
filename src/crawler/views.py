@@ -162,9 +162,11 @@ def sales_status(request):
             }
 
             data.append(temp)
+        product_list = list(SalesStatus.objects.filter(is_native=is_native).values_list('product', flat=True).distinct())
         result = {
             'week': week,
-            'data': data
+            'data': data,
+            'product_list': product_list
         }
         return JsonResponse(result, safe=False)
     else:
@@ -381,7 +383,8 @@ def electronic_sales(request):
                 'buyer': item.buyer
             }
             data.append(temp)
-        result = {'week': week, 'data': data}
+        product_list = list(ElectronicSales.objects.values_list('product', flat=True).distinct())
+        result = {'week': week, 'data': data, 'product_list': product_list}
         return JsonResponse(result, safe=False)
     else:
         return HttpResponse('Error.')
