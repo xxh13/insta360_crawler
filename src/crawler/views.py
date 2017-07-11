@@ -6,6 +6,7 @@ from django.http import HttpResponse, JsonResponse, QueryDict
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Sum
 from django.forms.models import model_to_dict
+from django.utils import timezone
 from models import SalesStatus
 from models import ElectronicSales
 from models import UserDistribution
@@ -23,12 +24,14 @@ from models import MediaFan
 from models import MediaData
 from models import MediaTag
 from models import Meltwater
+from models import ExchangeRate
 from models import Log
 from models import TaobaoDetail
 from tasks import *
 from tasks import get_fans as f
 from tasks import get_google_index as g
 from util.dict import media_dict
+from util.exchange_query import main as exchange_query
 from view.views_admin import *
 from view.views_video import *
 from view.views_data_entry import *
@@ -36,6 +39,7 @@ from view.views_data_entry import *
 import json
 import sys
 import datetime
+import urllib2
 import urllib
 import collections
 
@@ -407,32 +411,74 @@ def get_electronic_sales(request):
         data = []
         index = []
         if location == 'all':
+            now = timezone.now()
+            before = (now - datetime.timedelta(seconds=7200))
+            if not ExchangeRate.objects.filter(update_time__gte=before).exists():
+                exchange_query()
+            usa_rate = ExchangeRate.objects.filter(name='美元').order_by('-update').first().bankConversionPri
+            pd_rate = ExchangeRate.objects.filter(name='英镑').order_by('-update').first().bankConversionPri
+            jp_rate = ExchangeRate.objects.filter(name='日元').order_by('-update').first().bankConversionPri
+
             res = ElectronicSales.objects.filter(
                 week__range=(start_time, end_time),
                 product__in=products
             )
+            res1 = res.values('week').annotate(
+                view_total=Sum('view'),
+                visitor_total=Sum('visitor'),
+                payment_total=Sum('payment'),
+                number_total=Sum('number'),
+                buyer_total=Sum('buyer')).order_by('week')
+            for item in res1:
+                usa = res.filter(location__in=['美国亚马逊', '官方商城（国外）'], week=item['week']).values('week').annotate(
+                    payment_total=Sum('payment'))
+                jp = res.filter(location='日本亚马逊', week=item['week']).values('week').annotate(
+                    payment_total=Sum('payment'))
+                eu = res.filter(location='欧洲亚马逊', week=item['week']).values('week').annotate(
+                    payment_total=Sum('payment'))
+                try:
+                    usa = usa[0]['payment_total']
+                except:
+                    usa = 0
+                try:
+                    jp = jp[0]['payment_total']
+                except:
+                    jp = 0
+                try:
+                    eu = eu[0]['payment_total']
+                except:
+                    eu = 0
+                temp = {
+                    'view': item['view_total'],
+                    'visitor': item['visitor_total'],
+                    'payment': round(item['payment_total'] + usa * ((usa_rate / 100) - 1) + jp * ((jp_rate / 100) - 1) + eu * ((pd_rate / 100) - 1), 2),
+                    'number': item['number_total'],
+                    'buyer': item['buyer_total']
+                }
+                index.append(item['week'].strftime('%m-%d'))
+                data.append(temp)
         else:
             res = ElectronicSales.objects.filter(
                 week__range=(start_time, end_time),
                 location=location,
                 product__in=products
             )
-        res = res.values('week').annotate(
-            view_total=Sum('view'),
-            visitor_total=Sum('visitor'),
-            payment_total=Sum('payment'),
-            number_total=Sum('number'),
-            buyer_total=Sum('buyer')).order_by('week')
-        for item in res:
-            temp = {
-                'view': item['view_total'],
-                'visitor': item['visitor_total'],
-                'payment': item['payment_total'],
-                'number': item['number_total'],
-                'buyer': item['buyer_total']
-            }
-            index.append(item['week'].strftime('%m-%d'))
-            data.append(temp)
+            res = res.values('week').annotate(
+                view_total=Sum('view'),
+                visitor_total=Sum('visitor'),
+                payment_total=Sum('payment'),
+                number_total=Sum('number'),
+                buyer_total=Sum('buyer')).order_by('week')
+            for item in res:
+                temp = {
+                    'view': item['view_total'],
+                    'visitor': item['visitor_total'],
+                    'payment': item['payment_total'],
+                    'number': item['number_total'],
+                    'buyer': item['buyer_total']
+                }
+                index.append(item['week'].strftime('%m-%d'))
+                data.append(temp)
         locations = list(ElectronicSales.objects.values_list('location', flat=True).distinct())
         products = list(ElectronicSales.objects.values_list('product', flat=True).distinct())
         result = {

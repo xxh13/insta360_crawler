@@ -21,6 +21,7 @@ from .models import MediaTag
 from .models import TaobaoDetail
 from .models import GlobalElectronicSales
 from .models import Meltwater
+from .models import ExchangeRate
 
 
 # Register your models here.
@@ -120,6 +121,10 @@ class GlobalElectronicSalesAdmin(admin.ModelAdmin):
 class MeltwaterAdmin(admin.ModelAdmin):
     list_display = ('id', 'key', 'type', 'country', 'value', 'date', 'created_time', 'update_time')
 
+class ExchangeRateAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'fBuyPri', 'mBuyPri', 'mSellPri', 'bankConversionPri', 'update', 'update_time', 'created_time')
+
+
 admin.site.register(UseCondition, UseConditionAdmin)
 admin.site.register(SearchIndex, SearchIndexAdmin)
 admin.site.register(GoogleIndex, GoogleIndexAdmin)
@@ -142,3 +147,4 @@ admin.site.register(VideoInfo, VideoInfoAdmin)
 admin.site.register(TaobaoDetail, TaobaoDetailAdmin)
 admin.site.register(GlobalElectronicSales, GlobalElectronicSalesAdmin)
 admin.site.register(Meltwater, MeltwaterAdmin)
+admin.site.register(ExchangeRate, ExchangeRateAdmin)

@@ -325,3 +325,18 @@ class TaobaoDetail(models.Model):
 
     def __unicode__(self):
         return str(self.id)
+
+
+#人民币汇率
+class ExchangeRate(models.Model):
+    name = models.CharField(max_length=200)
+    fBuyPri = models.FloatField(default=0.0)
+    mBuyPri = models.FloatField(default=0.0)
+    mSellPri = models.FloatField(default=0.0)
+    bankConversionPri = models.FloatField(default=0.0)
+    update = models.DateTimeField(auto_now=False, auto_now_add=False)
+    update_time = models.DateTimeField(auto_now=True)
+    created_time = models.DateTimeField(auto_now_add=True)
+
+    def __unicode__(self):
+        return str(self.id)
