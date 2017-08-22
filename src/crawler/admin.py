@@ -15,6 +15,7 @@ from .models import ShareCount
 from .models import TakeCount
 from .models import Log
 from .models import MediaFan
+from .models import GroupMember
 from .models import MediaData
 from .models import VideoInfo
 from .models import MediaTag
@@ -100,6 +101,9 @@ class LogAdmin(admin.ModelAdmin):
 class MediaFanAdmin(admin.ModelAdmin):
     list_display = ('id', 'platform', 'fans_increment', 'fans', 'date', 'date_created')
 
+class GroupMemberAdmin(admin.ModelAdmin):
+    list_display = ('id', 'platform', 'group_id', 'group_name','member_count', 'date','is_native',  'created_time', 'update_time')
+
 class MediaDataAdmin(admin.ModelAdmin):
     list_display = ('id', 'platform', 'date', 'comment', 'like', 'dislike', 'share', 'view', 'created_time', 'update_time')
 
@@ -141,6 +145,7 @@ admin.site.register(ElectronicPromotion, ElectronicPromotionAdmin)
 admin.site.register(AccessData, AccessDataAdmin)
 admin.site.register(Log, LogAdmin)
 admin.site.register(MediaFan, MediaFanAdmin)
+admin.site.register(GroupMember, GroupMemberAdmin)
 admin.site.register(MediaData, MediaDataAdmin)
 admin.site.register(MediaTag, MediaTagAdmin)
 admin.site.register(VideoInfo, VideoInfoAdmin)

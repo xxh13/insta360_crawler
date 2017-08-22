@@ -259,6 +259,20 @@ class MediaFan(models.Model):
     def __unicode__(self):
         return str(self.id)
 
+# 社区成员数
+class GroupMember(models.Model):
+    platform = models.CharField(max_length=200)
+    group_id = models.CharField(max_length=200)
+    group_name = models.CharField(max_length=200)
+    member_count = models.IntegerField(default=0)
+    date = models.DateField(auto_now=False, auto_now_add=False)
+    is_native = models.IntegerField(default=1)
+    created_time = models.DateTimeField(auto_now_add=True)
+    update_time = models.DateField(auto_now=True)
+
+    def __unicode__(self):
+        return str(self.id)
+
 #新媒体互动数
 class MediaData(models.Model):
     platform = models.CharField(max_length=200)

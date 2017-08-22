@@ -200,7 +200,7 @@ class TaobaoCrawler:
         i = 0
         while i < len(self.commodityList):
             name = self.commodityList[i].name.lower()
-            if ((not ('小米米家' in name)) or (not ('360' in name))):
+            if ((not ('小米米家' in name))):
                 del self.commodityList[i]
                 i -= 1
             i += 1
