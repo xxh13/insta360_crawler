@@ -43,6 +43,7 @@ class CompetitorSales(models.Model):
     taobao_total_sales = models.IntegerField(default=0)
     jd_sales = models.IntegerField(default=0)        #这个字段用不到
     jd_total_sales = models.IntegerField(default=0)
+    ext_sales = models.IntegerField(default=0)
     date = models.DateField(auto_now=False, auto_now_add=False, db_index=True)
     date_created = models.DateTimeField(auto_now_add=True)
 

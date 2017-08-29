@@ -40,7 +40,7 @@ class GoogleIndexAdmin(admin.ModelAdmin):
 
 class CompetitorSalesAdmin(admin.ModelAdmin):
     list_display = ('id', 'date', 'commodity', 'taobao_sales',
-                    'taobao_total_sales', 'jd_sales', 'jd_total_sales', 'date_created')
+                    'taobao_total_sales', 'jd_sales', 'jd_total_sales','ext_sales', 'date_created')
 
 
 class UserDistributionAdmin(admin.ModelAdmin):

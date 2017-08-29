@@ -23,6 +23,7 @@ from models import TakeCount
 from models import MediaFan
 from models import MediaData
 from models import MediaTag
+from models import GroupMember
 from models import Meltwater
 from models import ExchangeRate
 from models import Log
@@ -1056,17 +1057,17 @@ def competitor_data(request):
             temp = collections.OrderedDict()
             if source == 'all':
                 for item in res_temp:
-                    temp[item.commodity + ' 淘宝'] = item.taobao_total_sales
-                    temp[item.commodity + ' 京东'] = item.jd_total_sales
+                    temp[item.commodity + ' 淘宝'] = item.taobao_total_sales + item.ext_sales
+                    temp[item.commodity + ' 京东'] = item.jd_total_sales + item.ext_sales
                     items.add(item.commodity + ' 淘宝')
                     items.add(item.commodity + ' 京东')
             elif source == 'taobao':
                 for item in res_temp:
-                    temp[item.commodity + ' 淘宝'] = item.taobao_total_sales
+                    temp[item.commodity + ' 淘宝'] = item.taobao_total_sales + item.ext_sales
                     items.add(item.commodity + ' 淘宝')
             elif source == 'jd':
                 for item in res_temp:
-                    temp[item.commodity + ' 京东'] = item.jd_total_sales
+                    temp[item.commodity + ' 京东'] = item.jd_total_sales + item.ext_sales
                     items.add(item.commodity + ' 京东')
             data.append(temp)
         items = list(items)
@@ -1255,9 +1256,9 @@ def media_fans(request):
         index = []
         start_temp = datetime.datetime.strptime(start_time, "%Y-%m-%d")
         start_time = (start_temp - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
-        res = MediaFan.objects.filter(date__range=(start_time, end_time)).order_by('date')
+        res = MediaFan.objects.filter(date__range=(start_time, end_time))
         items = list(res.values_list('platform', flat=True).distinct())
-        res.order_by('date')
+        res = res.order_by('date')
         dates = res.dates('date', 'day')
         count = 0
         for date in dates:
@@ -1275,6 +1276,53 @@ def media_fans(request):
             'index': index,
             'type': type,
             'items': items
+        }
+        return JsonResponse(result, safe=False)
+    else:
+        return HttpResponse('Error.')
+
+# bi系统->新媒体监控->社区走势
+@csrf_exempt
+def group_members(request):
+    if request.method == 'POST':
+        return HttpResponse('Task submitted.')
+    elif request.method == 'GET':
+        para = request.GET
+        today = datetime.datetime.today()
+        start_time = (today - datetime.timedelta(days=6)).strftime('%Y-%m-%d')
+        end_time = (today + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
+        start_time = para.get('start_time', start_time)
+        end_time = para.get('end_time', end_time)
+        type = para.get('type', 'total')
+        data = []
+        index = []
+        start_temp = datetime.datetime.strptime(start_time, "%Y-%m-%d")
+        start_time = (start_temp - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
+        res = GroupMember.objects.filter(date__range=(start_time, end_time))
+        items = list(res.values_list('group_name', flat=True).distinct())
+        native_items = list(res.filter(is_native=1).values_list('group_name', flat=True).distinct())
+        selected = collections.OrderedDict()
+        for item in items:
+            selected[item] = (item in native_items)
+        res = res.order_by('date')
+        dates = res.dates('date', 'day')
+        count = 0
+        for date in dates:
+            if count > 0:
+                index.append(date.strftime('%m-%d'))
+            else:
+                count += 1
+            res_temp = res.filter(date=date).order_by('member_count')
+            temp = collections.OrderedDict()
+            for item in res_temp:
+                temp[item.group_name] = item.member_count
+            data.append(temp)
+        result = {
+            'data': data,
+            'index': index,
+            'type': type,
+            'items': items,
+            'selected': selected
         }
         return JsonResponse(result, safe=False)
     else:
@@ -1450,6 +1498,7 @@ def test(request):
         get_media_data()
         get_google_index()
         get_media_tag()
+        # get_group_members()
         return HttpResponse('success')
     else:
         return HttpResponse('Error.')

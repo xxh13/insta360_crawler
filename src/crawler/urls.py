@@ -69,6 +69,9 @@ urlpatterns = [
     # bi系统->新媒体监控->粉丝走势
     url(r'^media_fans/$', views.media_fans, name='media_fans'),
 
+    # bi系统->新媒体监控->社区走势
+    url(r'^group_members/$', views.group_members, name='group_members'),
+
     # bi系统->新媒体监控->热度走势
     url(r'^media_data/$', views.media_data, name='media_data'),
 

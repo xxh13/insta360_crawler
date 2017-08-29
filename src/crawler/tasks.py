@@ -20,6 +20,7 @@ from .models import ShareMode
 from .models import ShareCount
 from .models import TakeCount
 from .models import MediaFan
+from .models import GroupMember
 from .models import MediaData
 from .models import MediaTag
 from .models import TaobaoDetail
@@ -35,6 +36,7 @@ from .crawlers.videos_crawler.main import main as get_videos_info
 from .crawlers.amazon.amazon_crawler import main as amanzon_crawler
 from .crawlers.google_index.trends_compare import google_index
 from .crawlers.fans_crawler.main import main as fans_crawler
+from .crawlers.fans_crawler.group_main import main as group_crawler
 from .crawlers.media_crawler.main import main as media_crawler
 from .crawlers.media_crawler.tag_main import main as tag_crawler
 from .util.admin import password_updater
@@ -552,6 +554,26 @@ def get_fans():
         else:
             item['fans_increment'] = 0
         MediaFan.objects.update_or_create(date=item['date'], platform=item['platform'], defaults=item)
+    return 'Finished.'
+
+#社区成员数 对应model： GroupMember     （需要翻墙）
+@shared_task
+def get_group_members():
+    result = []
+    count = 0
+    while True:
+        try:
+            count += 1
+            result = group_crawler()
+            break
+        except:
+            print 'error'
+            if count >= 3:
+                break
+            time.sleep(5)
+    items = result
+    for item in items:
+        GroupMember.objects.update_or_create(date=item['date'], platform=item['platform'], group_id=item['group_id'], defaults=item)
     return 'Finished.'
 
 #新媒体互动数（热度） 对应model： MediaData  （需要翻墙）
