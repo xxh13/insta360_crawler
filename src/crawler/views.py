@@ -1080,45 +1080,6 @@ def competitor_data(request):
     else:
         return HttpResponse('Error.')
 
-# bi系统->Nano市场环境->30天销量/评论
-@csrf_exempt
-def competitor_sales(request):
-    if request.method == 'POST':
-        return HttpResponse('Task submitted.')
-    elif request.method == 'GET':
-        para = request.GET
-        today = datetime.datetime.today()
-        start_time = (today - datetime.timedelta(days=6)).strftime('%Y-%m-%d')
-        end_time = (today + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
-        start_time = para.get('start_time', start_time)
-        end_time = para.get('end_time', end_time)
-        data = []
-        index = []
-        res = CompetitorSales.objects.filter(date__range=(start_time, end_time)).order_by('date')
-        dates = res.dates('date', 'day')
-        for date in dates:
-            index.append(date.strftime('%m-%d'))
-            month_age = (date - datetime.timedelta(days=30)).strftime('%Y-%m-%d')
-            res_temp = res.filter(date=date)
-            temp = collections.OrderedDict()
-            for item in res_temp:
-                try:
-                    month_age_res = CompetitorSales.objects.get(date=month_age, commodity=item.commodity)
-                    jd_sales = item.jd_total_sales - month_age_res.jd_total_sales
-                except:
-                    jd_sales = int(item.jd_total_sales / 2)
-                if jd_sales < 0:
-                    jd_sales = 0
-                temp[item.commodity] = item.taobao_total_sales + int(jd_sales / 0.15)
-            data.append(temp)
-        result = {
-            'data': data,
-            'index': index
-        }
-        return JsonResponse(result, safe=False)
-    else:
-        return HttpResponse('Error.')
-
 #bi系统->Nano市场环境->亚马逊评论
 @csrf_exempt
 def global_sales(request):
@@ -1283,7 +1244,7 @@ def media_fans(request):
 
 # bi系统->新媒体监控->社区走势
 @csrf_exempt
-def group_members(request):
+def group_member(request):
     if request.method == 'POST':
         return HttpResponse('Task submitted.')
     elif request.method == 'GET':
