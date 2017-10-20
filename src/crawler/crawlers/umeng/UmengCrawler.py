@@ -15,9 +15,9 @@ class UmengCrawler:
     def __init__(self):
         self.host = 'mobile.umeng.com'
         self.username = 'develop@arashivision.com'
-        self.password = ')8x3CpA$'
+        self.password = '47756ffbee5f356ff8634021622a0d43b3cc046e3d45b319bca8a29593155c08c3c8c49cb0d6029dd8fd8a5c6f8151380a232a701d2277d5289680b373956b1732cb1907afb60c640ac4355eca8d16483b1fbc6eb6eee60df8c6ca9148a1ab91ff9d391626ef088804347c3f27df8e5d8a8f4b265ce596fbe600c2584e17495e'
         self.user_agent = 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:47.0) Gecko/20100101 Firefox/47.0'
-        self.cookie = ''
+        self.cookie = 'um_lang=zh; cn_a61627694930aa9c80cf_dplus=%7B%22distinct_id%22%3A%20%2215c2f219e5343a-0e41613148296c-323f5c0f-100200-15c2f219e54b94%22%2C%22sp%22%3A%20%7B%22%24_sessionid%22%3A%200%2C%22%24_sessionTime%22%3A%201495441609%2C%22%24dp%22%3A%200%2C%22%24_sessionPVTime%22%3A%201495441609%7D%2C%22initial_view_time%22%3A%20%221495436487%22%2C%22initial_referrer%22%3A%20%22http%3A%2F%2Fwww.umeng.com%2F%22%2C%22initial_referrer_domain%22%3A%20%22www.umeng.com%22%7D; l=Ap2dqkGOxKFi9LFgehKQBjMPLXOXutEM; aptk_uid=6d72bfdb39f95aa71b4b20dcff67d0b61500979866; umplus_uc_token=1Rar3Af1K0RqClMf3vu-UHw_640ee4f4a6e045e283fc2b5313115d3a; umplus_uc_loginid=develop%40arashivision.com; cn_1259827933_dplus=%7B%22distinct_id%22%3A%20%2215c2f219e5343a-0e41613148296c-323f5c0f-100200-15c2f219e54b94%22%2C%22sp%22%3A%20%7B%22%24_sessionid%22%3A%200%2C%22%24_sessionTime%22%3A%201508491602%2C%22%24dp%22%3A%200%2C%22%24_sessionPVTime%22%3A%201508491602%7D%2C%22initial_view_time%22%3A%20%221508490616%22%2C%22initial_referrer%22%3A%20%22http%3A%2F%2Fpassport.umeng.com%2Fuser%2Fproducts%22%2C%22initial_referrer_domain%22%3A%20%22passport.umeng.com%22%7D; cn_1262440121_dplus=%7B%22distinct_id%22%3A%20%2215c2f219e5343a-0e41613148296c-323f5c0f-100200-15c2f219e54b94%22%2C%22sp%22%3A%20%7B%22%24_sessionid%22%3A%200%2C%22%24_sessionTime%22%3A%201508492690%2C%22%24dp%22%3A%200%2C%22%24_sessionPVTime%22%3A%201508492690%2C%22utm_source%22%3A%20%22banner%22%7D%2C%22initial_view_time%22%3A%20%221508490493%22%2C%22initial_referrer%22%3A%20%22http%3A%2F%2Fwww.umeng.com%2F%22%2C%22initial_referrer_domain%22%3A%20%22www.umeng.com%22%7D; cna=9/yQEVjJDyQCAdOiUVw1VeHL; cn_1258498910_dplus=%7B%22distinct_id%22%3A%20%2215c2f219e5343a-0e41613148296c-323f5c0f-100200-15c2f219e54b94%22%2C%22sp%22%3A%20%7B%22%24recent_outside_referrer%22%3A%20%22%24direct%22%2C%22%24_sessionid%22%3A%200%2C%22%24_sessionTime%22%3A%201508492729%2C%22%24dp%22%3A%200%2C%22%24_sessionPVTime%22%3A%201508492729%7D%2C%22initial_view_time%22%3A%20%221495437365%22%2C%22initial_referrer%22%3A%20%22%24direct%22%2C%22initial_referrer_domain%22%3A%20%22%24direct%22%7D; isg=Ao6OVRb4WxBR-O__f7j_ImqP32Qi26RF3LOgbbjX4hFMGy91IJ_3GKTZJ3CN; umlid_56d95697e0f55a26b5000633=20171020; __utmt=1; cn_1259864772_dplus=%7B%22distinct_id%22%3A%20%2215c2f219e5343a-0e41613148296c-323f5c0f-100200-15c2f219e54b94%22%2C%22USER%22%3A%20%22develop%40arashivision.com%22%2C%22initial_view_time%22%3A%20%221495434670%22%2C%22initial_referrer%22%3A%20%22http%3A%2F%2Fmobile.umeng.com%2Fapps%22%2C%22initial_referrer_domain%22%3A%20%22mobile.umeng.com%22%2C%22%24recent_outside_referrer%22%3A%20%22%24direct%22%2C%22sp%22%3A%20%7B%22%E6%98%AF%E5%90%A6%E7%99%BB%E5%BD%95%22%3A%20false%2C%22%24_sessionid%22%3A%200%2C%22%24_sessionTime%22%3A%201508493297%2C%22%24dp%22%3A%200%2C%22%24_sessionPVTime%22%3A%201508493297%7D%7D; UM_distinctid=15c2f219e5343a-0e41613148296c-323f5c0f-100200-15c2f219e54b94; CNZZDATA1259864772=89266695-1508490106-http%253A%252F%252Fpassport.umeng.com%252F%7C1508490106; ummo_ss=BAh7CUkiGXdhcmRlbi51c2VyLnVzZXIua2V5BjoGRVRbCEkiCVVzZXIGOwBGWwZvOhNCU09OOjpPYmplY3RJZAY6CkBkYXRhWxFpW2kB2WlbaQGXaQHgaQH1aV9pK2kBtWkAaQtpOEkiGUp2SFpFRmMwaXlMUlQ2MmJDQ3lCBjsAVEkiFHVtcGx1c191Y190b2tlbgY7AEYiPTFSYXIzQWYxSzBScUNsTWYzdnUtVUh3XzY0MGVlNGY0YTZlMDQ1ZTI4M2ZjMmI1MzEzMTE1ZDNhSSIQX2NzcmZfdG9rZW4GOwBGSSIxdUFSeU5TTkJkYm81b2NpaXY3SUF4YnI5WEd3Z0JZRytxV3FwRkcxak9GUT0GOwBGSSIPc2Vzc2lvbl9pZAY7AFRJIiUwMmY3MTVhMmIzMWNmOWFkYjQxYWM4YTlkMjAxYjQ5NAY7AEY%3D--ca84417eba89cdfa11dbb29e9e7d1624c7c68466; __utma=151771813.6576068.1508492732.1508492732.1508492732.1; __utmb=151771813.8.9.1508492750086; __utmc=151771813; __utmz=151771813.1508492732.1.1.utmcsr=passport.umeng.com|utmccn=(referral)|utmcmd=referral|utmcct=/user/products;'
         self.headers = {}
         self.headers['User-Agent'] = self.user_agent
         self.headers['Host'] = self.host
@@ -26,7 +26,7 @@ class UmengCrawler:
         self.headers['Cache-Control'] = 'max-age=0'
         self.headers['Accept'] = '*/*'
         self.headers['Accept-Language'] = 'zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3'
-        self.headers['X-CSRF-Token'] = 'gnRA365zNecgXvbLpUca20a4uSLO40G/gFNp1sCqJZA='
+        self.headers['X-CSRF-Token'] = 'uARyNSNBdbo5ociiv7IAxbr9XGwgBYG+qWqpFG1jOFQ=/gFNp1sCqJZA='
         self.apps = {
             'nano': 'cf41008f4de85e761c647675',
             'air': 'ebb10037566d6b56c766c985'
@@ -49,25 +49,55 @@ class UmengCrawler:
         handler = urllib2.HTTPCookieProcessor(cookie)
         opener = urllib2.build_opener(handler)
 
-        values = {'token': token, 'username': self.username, 'password': self.password, 'website': 'umengplus',
-                  'sig': '', 'sessionid': '', 'app_id': '', 'url': ''}
+        values = {
+            'loginId': self.username,
+            'password2': self.password,
+            'checkCode': '',
+            'appName': 'youmeng',
+            'appEntrance': 'default',
+            'bizParams': '',
+            'ua': '099#KAFEc7E9EG5E6YTLEEEEE6twSXv7V6D1DXRqD6VqZRso+fPTguBIn6VcZXC6+fYBYRXjAIdBYc37DIgFDcZj+MtTYRwYgybTET/sudyl0yaSt3xRO9uRSf8D8lCgPow3YXc0dqSLE7EjllsllVRC4/l0Py80g6R0bKEnE7EKt37Bldcdt3bi4GFEJcBNlllPbaTk8yxPrMOm8OXFVovK8PchQUiNCo49E7EFD67EEwoTETillAlldsaSurhJby1TSV3W8OXgLybTET9llC3ldRaSt3ilG/uRSf8D8lCgPowm41qTETJll/llV/Wxlt8Dr08FSP8G4RbTET9llC3ldRaSt3ilL3uRSf8D8lCgPowm4K5TEEiStEE7JGFET6i5EE1lE7EFNIaHF7oTEEySl3llsyCzE7TxT1ywEF2So87YqIWoyeHSoZdYkfMl+wDzkLp6mCXGkLKo3jk36OT26HGbvFdWVwICRJ9yk8lDqwP+M6A0pu7WoZjDB0ANtkj26HA3nkps0kVZkUoTEja5R713aquYSpXfNV9c1e95zqbVcLSpr6hZDahG3MesD/rkPwoq+yLBbtUnHda3rM2QZiXaEm1dQs90FswcazOsrfCX/IS3rfCWnjcGabWjlWwxbwXp1u86bfXGrbn3dUhYZi2CAA14GX8IrLe6csy9O/WGc7U6zVOCvRoWAMZDSM9SPCbq1WcXU6pWbLP6rdu9uOIQAMZaZOeJqsw6LOhB/oW8PSUqr6nzLsEZLY/C4295KOj6Lc8TU67Qr5TtuQrDAO4QL5WYLeJqbLXR3y9Mr02ArMVtr6XaZLX4xSWDZRh9by8ccWyIbISMHlWusflLDzry3/lvSXwk8Azlapw5zKWBNdQpztx4Ca4W37uVnROfHsh6w9rBrtCS6WSTE1LSt3llsyaSt3iSE6iP/37mt377mXZdtl9StTTmsyaZR/iSFHBP/3MrJ7FE13iSEJv5+WmkOGFET/yZTEwyL25TEEi5D7EE6GFE19iS0llR/3iurioTETilla3ldOaSl871by1TSV3W8OXgLioTETillC3ldRaSlgTZby1TSV3W8OXgLjdTEEi5DEEEJGFET6i5EE1iE7ExllllluZa5w20PpZV+Pk2PVnVIGFEHuB4lll+XKRlZykV8MixZ28mVbv0YbW7JGFET6i5EEELE7EBVXBlluKX4/l0Py80g6R0e0B8Cf81azELE7EjllllllAh4/l0Py80g6R0bKE9E7EFD67EE1qTETJlllll4L+xlt8Dr08FSP8G4E==',
+            'hsid': '1e9bc7bacdcf45193faa7c688b1ca2e4',
+            'rdsToken': '',
+            'umidToken': '9f7b57fb270885cb6aa7d1aaac45f259dba7a08a',
+            'isRequiresHasTimeout': 'false',
+            'isRDSReady': 'true',
+            'isUMIDReady': 'isUMIDReady',
+            'umidGetStatusVal': '255',
+            'lrfcf': '',
+            'lang': 'zh_cn',
+            'scene': '',
+            'isMobile': 'false',
+            'screenPixel': '1366x768',
+            'navlanguage': 'zh-CN',
+            'navUserAgent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36',
+            'navAppVersion': '',
+            'navPlatform': '',
+            'token': '',
+            'nocAppKey': '',
+            'csessionid': '',
+            'sig': '',
+            'captchaToken': '',
+            '_csrf_token': '94mc6VOhSa3QP56XjC6IK2'
+        }
         headers = {}
+        headers['X-Requested-With'] = 'XMLHttpRequest'
         headers['User-Agent'] = self.user_agent
-        headers['Host'] = 'i.umeng.com'
+        headers['Host'] = 'passport.alibaba.com'
+        headers['Origin'] = 'https://passport.alibaba.com'
         headers['X-Requested-With'] = 'XMLHttpRequest'
         headers['Connection'] = 'keep-alive'
-        headers['Referer'] = 'https://i.umeng.com/'
+        headers['Referer'] = 'https://passport.alibaba.com/mini_login.htm?lang=zh_cn&appName=youmeng&appEntrance=default&styleType=auto&bizParams=&notLoadSsoView=true&notKeepLogin=false&isMobile=false&cssLink=https://passport.umeng.com/css/loginIframe.css&rnd=0.10927577253646747'
         headers['Accept'] = '*/*'
-        headers['Content-Length'] = '141'
         headers['Accept-Language'] = 'zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3'
         headers[
-            'Cookie'] = '"_uab_collina=147003374645454333577887; CNZZDATA1258498910=1811473854-1470033345-%7C' + date + '; l=Al5e4Lp4E3ELprr25VQtL1jijv-gjSKb; isg=AsDAv10dgz1iZH8ZBR9Gkm3Jkk61t6QTerYlFDpRHltstWLf4lv0o0RPu4eZ; cna=m6slEI92cRUCATo8eHdZ2zu1; pgv_pvi=9910472704; _ga=GA1.2.425559374.1470034774; um_lang=zh; cn_1259864772_dplus=%7B%22distinct_id%22%3A%20%221564f05caab5bc-0dfe620d9c6d14-13666c4a-1fa400-1564f05caac623%22%2C%22%E6%98%AF%E5%90%A6%E7%99%BB%E5%BD%95%22%3A%20false%2C%22%24_sessionid%22%3A%200%2C%22%24_sessionTime%22%3A%201471500672%2C%22%24dp%22%3A%200%2C%22%24_sessionPVTime%22%3A%201471500672%2C%22initial_view_time%22%3A%20%221470385261%22%2C%22initial_referrer%22%3A%20%22http%3A%2F%2Fmobile.umeng.com%2Fapps%2F7e71006215a55f0ed1313175%2Freports%2Frealtime_summary%22%2C%22initial_referrer_domain%22%3A%20%22mobile.umeng.com%22%2C%22%24recent_outside_referrer%22%3A%20%22%24direct%22%7D; UMPLUSCENTER=' + sessionid + '; __ufrom=https://i.umeng.com/user/products; pgv_si=s1276146688; cn_a61627694930aa9c80cf_dplus=%7B%22distinct_id%22%3A%20%2215644d6da2f6c4-0ab3e3fe06fb2c-13666c4a-1fa400-15644d6da30649%22%2C%22%24_sessionid%22%3A%201%2C%22%24_sessionTime%22%3A%201472107624%2C%22%24dp%22%3A%200%2C%22%24_sessionPVTime%22%3A%201472107624%2C%22initial_view_time%22%3A%20%221470033345%22%2C%22initial_referrer%22%3A%20%22%24direct%22%2C%22initial_referrer_domain%22%3A%20%22%24direct%22%2C%22%24recent_outside_referrer%22%3A%20%22%24direct%22%2C%22%E7%94%A8%E6%88%B7%E5%90%8D%22%3A%20%22develop%40arashivision.com%22%7D; umengplus_name=develop%40arashivision.com; umplusuuid=47df653d80020a28ea83af935ad8d6e0; umplusappid=umcenter"'
+            'Cookie'] = 't=8c2104b33f867314978f96da2f8a0ebf; _uab_collina=149579075934407755601457; l=Ao2N3XY1fYyFMIEwisLgeAJFHaMHZcE8; umdata_=70CF403AFFD707DF176342C07955D504071D3D712F4B45002F4EEB3197D2A03B38176EB3779BD52FCD43AD3E795C914C8C2179C0ABC2185A05246EC8E1B8CA84; v=0; cookie2=1e9bc7bacdcf45193faa7c688b1ca2e4; _tb_token_=e5a655781be1b; cna=9/yQEVjJDyQCAdOiUVw1VeHL; _umdata=BA335E4DD2FD504FDB20DB1838C74A33177126C1B6E55BEEC360D0D04DFD01DA81AB19C07EE20598CD43AD3E795C914CF0C3A6A1F8AEEFE87C3135A0A02F5B22; isg=At_f4Zou-n_1YP5j2EQ7wzBgbjMbkMWq9fiRWnEsSw7VAPyCexRxNtWWtqeE'
         data = urllib.urlencode(values)
-        request = urllib2.Request(url='https://i.umeng.com/login/ajax_do', data=data, headers=headers)
+        request = urllib2.Request(url='https://passport.alibaba.com/newlogin/login.do?fromSite=-2&appName=youmeng', data=data, headers=headers)
         result = opener.open(request)
         print result.read()
         for c in cookie:
-            self.cookie = self.cookie + c.name + '=' + c.value + ';'
+            self.cookie += c.name + '=' + c.value + ';'
         self.headers['Cookie'] = self.cookie
 
     # 获取新增用户
@@ -265,9 +295,21 @@ class UmengCrawler:
                     is_native = 1
                     if item['date'] == '香港' or item['date'] == '台湾' or item['date'] == '澳门':
                         is_native = 0
+                    try:
+                        active_rate = float(item['active_rate'])
+                    except:
+                        active_rate = 0
+                    try:
+                        launch_rate = float(item['launch_rate'])
+                    except:
+                        launch_rate = 0
+                    try:
+                        new_rate = float(item['install_rate'])
+                    except:
+                        new_rate = 0
                     temp = {'date': date, 'location': item['date'], 'active_user': item['active_data'],
-                            'active_rate': item['active_rate'], 'new_user': item['install_data'],
-                            'new_rate': item['install_rate'], 'launch_data': item['launch_data'],
+                            'active_rate': active_rate, 'new_user': item['install_data'],
+                            'new_rate': new_rate, 'launch_data': launch_rate,
                             'launch_rate': item['launch_rate'], 'is_native': is_native, 'product': app}
                     result.append(temp)
                 country = self.getUserCountryDistribution(date, date, appid)
@@ -308,6 +350,7 @@ class UmengCrawler:
         try:
             response = urllib2.urlopen(request)
             jsonData = response.read()
+            print jsonData
             result = json.loads(jsonData, encoding="utf-8")
             datas = result['datas']
             versions = []
@@ -531,4 +574,4 @@ class UmengCrawler:
 
 if __name__ == "__main__":
     crawler = UmengCrawler()
-    # print crawler.getShareCount('2017-02-25', '2017-02-27')
+    print crawler.getTakeCount('2017-09-25', '2017-09-27')

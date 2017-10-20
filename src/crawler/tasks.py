@@ -340,11 +340,15 @@ def get_share_mode():
                 device = int(i['device'])
             except:
                 device = 0
+            try:
+                count_per_launch = float(i['count_per_launch'])
+            except:
+                count_per_launch = 0
             temp = {
                 'mode': mode,
                 'count': i['count'],
                 'device': device,
-                'count_per_launch': i['count_per_launch']
+                'count_per_launch': count_per_launch
             }
             ShareMode.objects.update_or_create(date=i['date'],
                                                product=product,
@@ -385,10 +389,14 @@ def get_share_count():
                     device = int(i['device'])
                 except:
                     device = 0
+                try:
+                    count_per_launch = float(i['count_per_launch'])
+                except:
+                    count_per_launch = 0
                 temp = {
                     'success_count': i['count'],
                     'success_device': device,
-                    'success_count_per_launch': i['count_per_launch']
+                    'success_count_per_launch': count_per_launch
                 }
                 ShareCount.objects.update_or_create(date=i['date'],
                                                       version=version,
@@ -401,10 +409,14 @@ def get_share_count():
                     device = int(i['device'])
                 except:
                     device = 0
+                try:
+                    count_per_launch = float(i['count_per_launch'])
+                except:
+                    count_per_launch = 0
                 temp = {
                     'try_count': i['count'],
                     'try_device': device,
-                    'try_count_per_launch': i['count_per_launch']
+                    'try_count_per_launch': count_per_launch
                 }
                 ShareCount.objects.update_or_create(date=i['date'],
                                                       version=version,
@@ -418,7 +430,7 @@ def get_share_count():
 def get_take_count():
     today = datetime.datetime.today()
     end_date = today.strftime('%Y-%m-%d')
-    start_date = (today - datetime.timedelta(days=5)).strftime('%Y-%m-%d')
+    start_date = (today - datetime.timedelta(days=4)).strftime('%Y-%m-%d')
     result = '[]'
     count = 0
     while True:
@@ -444,10 +456,14 @@ def get_take_count():
                     device = int(i['device'])
                 except:
                     device = 0
+                try:
+                    count_per_launch = float(i['count_per_launch'])
+                except:
+                    count_per_launch = 0
                 temp = {
                     'img_count': i['count'],
                     'img_device': device,
-                    'img_count_per_launch': i['count_per_launch']
+                    'img_count_per_launch': count_per_launch
                 }
                 TakeCount.objects.update_or_create(date=i['date'],product=product,
                                                       version=version,
@@ -458,10 +474,14 @@ def get_take_count():
                     device = int(i['device'])
                 except:
                     device = 0
+                try:
+                    count_per_launch = float(i['count_per_launch'])
+                except:
+                    count_per_launch = 0
                 temp = {
                     'video_count': i['count'],
                     'video_device': device,
-                    'video_count_per_launch': i['count_per_launch']
+                    'video_count_per_launch': count_per_launch
                 }
                 TakeCount.objects.update_or_create(date=i['date'],product=product,
                                                       version=version,
@@ -471,7 +491,7 @@ def get_take_count():
 #app用户分布 对应model： UserDistribution ， 其中港澳台算国外，中国减掉港澳台的数据
 @shared_task
 def get_user_distribution():
-    delta = 4
+    delta = 3
     today = datetime.datetime.today()
     end_date = today.strftime('%Y-%m-%d')
     start_date = (today - datetime.timedelta(days=delta)).strftime('%Y-%m-%d')
@@ -633,7 +653,7 @@ def get_media_tag():
 def get_meltwater():
     today = datetime.datetime.today()
     end_date = today.strftime('%Y-%m-%d')
-    start_date = (today - datetime.timedelta(days=6)).strftime('%Y-%m-%d')
+    start_date = (today - datetime.timedelta(days=7)).strftime('%Y-%m-%d')
     result = []
     count = 0
     while True:
