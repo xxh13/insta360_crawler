@@ -4,7 +4,6 @@
 from Commodity_new import Commodity
 
 import datetime
-import time
 import requests
 import socket
 import json
@@ -37,7 +36,8 @@ class JDCrawler:
             'insta360 Air': 'insta360 Air',
             'Gear 360': 'Gear 360 全景相机',
             'theta': 'Ricoh theta',
-            'LG 360 CAM': 'LG 360 CAM'
+            'LG 360 CAM': 'LG 360 CAM',
+            'insta360 One': 'insta360 One'
         }
         self.today = datetime.datetime.now().strftime('%Y-%m-%d')
 
