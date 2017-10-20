@@ -309,15 +309,27 @@ class UmengCrawler:
                         new_rate = 0
                     temp = {'date': date, 'location': item['date'], 'active_user': item['active_data'],
                             'active_rate': active_rate, 'new_user': item['install_data'],
-                            'new_rate': new_rate, 'launch_data': launch_rate,
-                            'launch_rate': item['launch_rate'], 'is_native': is_native, 'product': app}
+                            'new_rate': new_rate, 'launch_data': item['launch_data'],
+                            'launch_rate': launch_rate, 'is_native': is_native, 'product': app}
                     result.append(temp)
                 country = self.getUserCountryDistribution(date, date, appid)
                 for item in country:
+                    try:
+                        active_rate = float(item['active_rate'])
+                    except:
+                        active_rate = 0
+                    try:
+                        launch_rate = float(item['launch_rate'])
+                    except:
+                        launch_rate = 0
+                    try:
+                        new_rate = float(item['install_rate'])
+                    except:
+                        new_rate = 0
                     temp = {'date': date, 'location': item['date'], 'active_user': item['active_data'],
-                            'active_rate': item['active_rate'], 'new_user': item['install_data'],
-                            'new_rate': item['install_rate'], 'launch_data': item['launch_data'],
-                            'launch_rate': item['launch_rate'], 'is_native': 0, 'product': app}
+                            'active_rate': active_rate, 'new_user': item['install_data'],
+                            'new_rate': new_rate, 'launch_data': item['launch_data'],
+                            'launch_rate': launch_rate, 'is_native': 0, 'product': app}
                     result.append(temp)
         jsonResult = json.dumps(result)
         return jsonResult
