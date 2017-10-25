@@ -1305,7 +1305,12 @@ def media_tag(request):
         index = []
         start_temp = datetime.datetime.strptime(start_time, "%Y-%m-%d")
         start_time = (start_temp - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
-        res = MediaTag.objects.filter(date__range=(start_time, end_time)).order_by('date')
+        res = MediaTag.objects.filter(date__range=(start_time, end_time))
+        items = list(res.values_list('platform','tag').distinct())
+        item_list = []
+        for item in items:
+            item_list.append(item[0] + '#' + item[1])
+        res = res.order_by('date')
         dates = res.dates('date', 'day')
         count = 0
         for date in dates:
@@ -1320,7 +1325,8 @@ def media_tag(request):
             data.append(temp)
         result = {
             'data': data,
-            'index': index
+            'index': index,
+            'items': item_list
         }
         return JsonResponse(result, safe=False)
     else:
@@ -1457,7 +1463,7 @@ def test(request):
     elif request.method == 'GET':
         get_fans()
         get_media_data()
-        get_google_index()
+        # get_google_index()
         get_media_tag()
         # get_group_members()
         return HttpResponse('success')
