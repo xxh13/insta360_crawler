@@ -109,6 +109,7 @@ class UmengCrawler:
         try:
             response = urllib2.urlopen(request)
             jsonData = response.read()
+            print jsonData
             result = json.loads(jsonData, encoding="utf-8")
             return result['stats']
         except urllib2.URLError, e:
@@ -126,6 +127,7 @@ class UmengCrawler:
         try:
             response = urllib2.urlopen(request)
             jsonData = response.read()
+            print jsonData
             result = json.loads(jsonData, encoding="utf-8")
             # print result['stats']
             return result['stats']
@@ -144,6 +146,7 @@ class UmengCrawler:
         try:
             response = urllib2.urlopen(request)
             jsonData = response.read()
+            print jsonData
             result = json.loads(jsonData, encoding="utf-8")
             return result['summary']['value']
         except urllib2.URLError, e:
@@ -170,6 +173,7 @@ class UmengCrawler:
                         'duration': duration, 'product': app}
                 result.append(temp)
         jsonResult = json.dumps(result)
+        print jsonResult
         return jsonResult
 
 
@@ -196,6 +200,7 @@ class UmengCrawler:
                 if hasattr(e, "reason"):
                     print e.reason
         jsonResult = json.dumps(result)
+        print jsonResult
         return jsonResult
 
     # 错误率
@@ -344,7 +349,17 @@ class UmengCrawler:
         try:
             response = urllib2.urlopen(request)
             jsonData = response.read()
+            print jsonData
+            # try:
             result = json.loads(jsonData, encoding="utf-8")
+            # except:
+                # print 'http://mobile.umeng.com/apps/' + appid + '/events/load_table_data?page=1&per_page=99999&start_date=' + start_date + '&end_date=' + end_date + '&versions[]=' + version + '&channels[]=&stats=event_group_trend&event_group_id=' + event_group_id,
+                # exit()
+            for item in result['stats']:
+                try:
+                    item['count_per_launch'] = float(item['count_per_launch'])
+                except:
+                    item['count_per_launch'] = 0
             return result['stats']
         except urllib2.URLError, e:
             if hasattr(e, "code"):
@@ -586,4 +601,4 @@ class UmengCrawler:
 
 if __name__ == "__main__":
     crawler = UmengCrawler()
-    print crawler.getTakeCount('2017-09-25', '2017-09-27')
+    print crawler.getShareChannel('2017-10-25', '2017-10-26')

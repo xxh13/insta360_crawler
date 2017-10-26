@@ -267,7 +267,7 @@ def get_error():
 def get_share_channel():
     today = datetime.datetime.today()
     end_date = today.strftime('%Y-%m-%d')
-    start_date = (today - datetime.timedelta(days=5)).strftime('%Y-%m-%d')
+    start_date = (today - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
     result = '[]'
     count = 0
     while True:
@@ -314,7 +314,7 @@ def get_share_channel():
 def get_share_mode():
     today = datetime.datetime.today()
     end_date = today.strftime('%Y-%m-%d')
-    start_date = (today - datetime.timedelta(days=5)).strftime('%Y-%m-%d')
+    start_date = (today - datetime.timedelta(days=2)).strftime('%Y-%m-%d')
     result = '[]'
     count = 0
     while True:
@@ -362,7 +362,7 @@ def get_share_mode():
 def get_share_count():
     today = datetime.datetime.today()
     end_date = today.strftime('%Y-%m-%d')
-    start_date = (today - datetime.timedelta(days=4)).strftime('%Y-%m-%d')
+    start_date = (today - datetime.timedelta(days=2)).strftime('%Y-%m-%d')
     result = '[]'
     count = 0
     while True:
@@ -430,7 +430,7 @@ def get_share_count():
 def get_take_count():
     today = datetime.datetime.today()
     end_date = today.strftime('%Y-%m-%d')
-    start_date = (today - datetime.timedelta(days=4)).strftime('%Y-%m-%d')
+    start_date = (today - datetime.timedelta(days=2)).strftime('%Y-%m-%d')
     result = '[]'
     count = 0
     while True:
@@ -491,7 +491,7 @@ def get_take_count():
 #app用户分布 对应model： UserDistribution ， 其中港澳台算国外，中国减掉港澳台的数据
 @shared_task
 def get_user_distribution():
-    delta = 3
+    delta = 2
     today = datetime.datetime.today()
     end_date = today.strftime('%Y-%m-%d')
     start_date = (today - datetime.timedelta(days=delta)).strftime('%Y-%m-%d')
