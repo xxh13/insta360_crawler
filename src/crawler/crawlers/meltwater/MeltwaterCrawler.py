@@ -65,6 +65,7 @@ class MeltwaterCrawler:
             'password': 'Insta360'
         }
         req = requests.post(url, data=payload, headers=headers, verify=False, allow_redirects=False)
+        print req.text
         temp = req.cookies['gydaToken']
         temp = unquote(temp)
         temp = json.loads(temp)
@@ -156,5 +157,5 @@ class MeltwaterCrawler:
 
 if __name__ == '__main__':
     crawler = MeltwaterCrawler()
-    crawler.main('2017-04-26', '2017-05-02')
+    crawler.main('2017-09-26', '2017-10-02')
 

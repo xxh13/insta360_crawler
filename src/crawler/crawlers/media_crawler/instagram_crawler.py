@@ -50,7 +50,7 @@ def get_tag_count(tag):
     url = 'https://www.instagram.com/explore/tags/' + str(tag) + '/'
     response = requests.get(url=url, verify=False)
     page = response.text
-    pattern = re.compile("window._sharedData = (.+);</script>", re.S)
+    pattern = re.compile("window._sharedData = (.+?);</script>", re.S)
     items = re.findall(pattern, page)
     jsonData = json.loads(items[0])
     count = jsonData['entry_data']['TagPage'][0]['tag']['media']['count']
@@ -58,5 +58,5 @@ def get_tag_count(tag):
     return count
 
 if __name__ == "__main__":
-    # get_by_api()
-    get_tag_count('insta360')
+    get_by_api()
+    # get_tag_count('insta360')

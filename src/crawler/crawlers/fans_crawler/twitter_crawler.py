@@ -9,8 +9,7 @@ import urllib
 from functools import wraps
 
 #第三方接口
-def get_by_request():
-    username = 'insta360'
+def get_by_request(username='insta360'):
     url = 'https://cdn.syndication.twimg.com/widgets/followbutton/info.json?screen_names=' + username
     request = urllib2.Request(url = url)
     response = urllib2.urlopen(request)

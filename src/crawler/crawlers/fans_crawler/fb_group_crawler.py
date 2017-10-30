@@ -17,10 +17,10 @@ class FbGroupCrawler:
         cap["phantomjs.page.settings.localToRemoteUrlAccessEnabled"] = True
         cap["userAgent"] = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:47.0) Gecko/20100101 Firefox/47.0"
         cap["XSSAuditingEnabled"] = True
-        # driver = webdriver.PhantomJS(desired_capabilities=cap,
-        #                                   service_args=['--ignore-ssl-errors=true', '--ssl-protocol=any',
-        #                                                 '--web-security=true'])
-        self.driver = webdriver.Chrome()
+        self.driver = webdriver.PhantomJS(desired_capabilities=cap,
+                                          service_args=['--ignore-ssl-errors=true', '--ssl-protocol=any',
+                                                        '--web-security=true'])
+        # self.driver = webdriver.Chrome()
         self.driver.get('https://www.facebook.com/')
         element = self.driver.find_element_by_id('email')
         element.send_keys('15850786305')

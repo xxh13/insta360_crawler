@@ -8,7 +8,9 @@ import time
 import json
 import datetime
 import requests
-
+import sys
+reload(sys)
+sys.setdefaultencoding("utf-8")
 app_key = 'AIzaSyBg_mtqCgH3mhrTFPVOqDnNeN8wVVO_s5I'
 class YoutubeCrawler:
     def __init__(self):
@@ -96,15 +98,17 @@ def get_tag_count(tag):
     yesterday = (today - oneday).strftime('%Y-%m-%d')
     date = yesterday + 'T00:00:00Z'
     url = 'https://www.googleapis.com/youtube/v3/search?part=snippet&key=' + app_key + '&q=%23' + tag + '&publishedAfter=' + date
-    request = urllib2.Request(url=url)
-    response = urllib2.urlopen(request)
-    page = response.read()
+    # request = urllib2.Request(url=url)
+    # response = urllib2.urlopen(request)
+    # page = response.read()
+    response = requests.get(url=url, verify=False)
+    page = response.text
     data = json.loads(page, encoding="utf-8")
     count = data['pageInfo']['totalResults']
     print count
     return count
 
 if __name__ == "__main__":
-    # c = YoutubeCrawler()
-    # c.main()
-    get_tag_count('insta360')
+    c = YoutubeCrawler()
+    c.main()
+    # get_tag_count('insta360')

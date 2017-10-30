@@ -30,6 +30,7 @@ def get_by_request():
     request = urllib2.Request(url = url,data = data, headers = headers)
     response = urllib2.urlopen(request)
     page = response.read()
+    print page
     now = time.mktime(datetime.date.today().timetuple())
     week_ago = now - (3600 * 24 * 7)
     today = datetime.datetime.now().strftime('%Y-%m-%d')

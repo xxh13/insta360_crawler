@@ -7,13 +7,20 @@ import urllib2
 import json
 import time
 import datetime
+import requests
 
+app_id = '143580116255494'
+app_secret = '62772cd2ae4727853b36d722fcb9e43d'
+# app_id = '1586202924770913'
+# app_secret = '2232dc879a06f476e6b8af45d256a3c7'
+# app_id = '163680667532581'
+# app_secret = '7f5cedfb05643f115af57a6f120fd213'
+# app_id = '1598022290502419'
+# app_secret = 'f0fc5a210b5531987cbc671a6c3d864f'
+access_token = app_id + '|' + app_secret
 
 def get_by_api():
-    app_id = '1598022290502419'
-    app_secret = 'f0fc5a210b5531987cbc671a6c3d864f'
-    access_token = app_id + '|' + app_secret
-    username = 'Insta360Camera'
+    username = 'Insta360Official'
     url = 'https://graph.facebook.com/' + username + '/posts?fields=shares,message,comments.limit(0).summary(true),likes.limit(0).summary(true),created_time,id,link&limit=100&access_token=' + access_token
     headers = {}
     headers['Host'] = 'graph.facebook.com'
@@ -27,9 +34,12 @@ def get_by_api():
     like_total = 0
     comment_total = 0
     while True:
-        request = urllib2.Request(url = url, headers = headers)
-        response = urllib2.urlopen(request)
-        page = response.read()
+        time.sleep(3)
+        # request = urllib2.Request(url = url, headers = headers)
+        # response = urllib2.urlopen(request)
+        # page = response.read()
+        response = requests.get(url=url, headers=headers, verify=False)
+        page = response.text
         jsonData = json.loads(page, encoding="utf-8")
         data = jsonData['data']
         for item in data:
@@ -43,6 +53,8 @@ def get_by_api():
             break
         paging = jsonData['paging'] if jsonData.has_key('paging') else {}
         url = paging['next'] if paging.has_key('next') else ''
+        if url == '':
+            break
     result = {
         'platform': 'facebook',
         'date': today,
@@ -55,6 +67,7 @@ def get_by_api():
     jsonResult = json.dumps(result)
     print  jsonResult
     return jsonResult
+
 
 if __name__ == '__main__':
     get_by_api()

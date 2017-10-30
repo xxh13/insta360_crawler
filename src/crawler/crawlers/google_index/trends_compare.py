@@ -26,7 +26,7 @@ end_date = now.strftime('%Y-%m-%d')
 #查询日期必须是最近三十天
 def google_index():
     ssl.wrap_socket = sslwrap(ssl.wrap_socket)
-    keys = ['insta360', 'samsung gear 360', 'theta s', 'Giroptic', 'OZO']
+    keys = ['insta360', 'samsung gear 360', 'theta s', 'Giroptic', 'GoPro Fusion']
     result = get_google_trend(keys)
     jsonResult = json.dumps(result)
     print jsonResult

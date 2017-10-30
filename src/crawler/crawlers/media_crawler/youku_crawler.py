@@ -8,7 +8,6 @@ import urllib
 import json
 import time
 import requests
-import collections
 import datetime
 import hashlib
 
@@ -57,7 +56,10 @@ def get_tag_count(tag):
     page = response.read()
     data = json.loads(page, encoding="utf-8")
     # print page
-    count = data['total']
+    try:
+        count = data['total']
+    except:
+        count = 0
     print count
     return count
 

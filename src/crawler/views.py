@@ -1461,10 +1461,10 @@ def test(request):
     if request.method == 'POST':
         return HttpResponse('Task submitted.')
     elif request.method == 'GET':
-        get_fans()
-        get_media_data()
+        get_fans_native()
+        get_media_data_native()
+        get_media_tag_native()
         # get_google_index()
-        get_media_tag()
         # get_group_members()
         return HttpResponse('success')
     else:

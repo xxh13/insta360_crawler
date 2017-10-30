@@ -29,12 +29,11 @@ class JDCrawler:
         self.commodityList = []
         self.totalPage = 0
         user_agent = 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:47.0) Gecko/20100101 Firefox/47.0'
-        self.headers = {'User-Agent': user_agent}
         self.cap = webdriver.DesiredCapabilities.PHANTOMJS
         self.cap["phantomjs.page.settings.resourceTimeout"] = 1000
         self.cap["phantomjs.page.settings.loadImages"] = False
         self.cap["phantomjs.page.settings.localToRemoteUrlAccessEnabled"] = True
-        self.cap["userAgent"] = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:47.0) Gecko/20100101 Firefox/47.0"
+        self.cap["userAgent"] = user_agent
         self.cap["XSSAuditingEnabled"] = True
         self.driver = webdriver.PhantomJS(desired_capabilities=self.cap,
                                           service_args=['--ignore-ssl-errors=true', '--ssl-protocol=any',

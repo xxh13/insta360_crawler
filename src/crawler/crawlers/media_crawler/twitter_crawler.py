@@ -114,5 +114,5 @@ def OAuth():
     return result
 
 if __name__ == '__main__':
-    # get_by_api()
-    get_tag_count('insta360')
+    get_by_api()
+    # get_tag_count('insta360')

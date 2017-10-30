@@ -549,15 +549,42 @@ def get_user_distribution():
 
     return 'Finished.'
 
-#新媒体粉丝数 对应model： MediaFan     （需要翻墙）
+#新媒体粉丝数 对应model： MediaFan
 @shared_task
-def get_fans():
+def get_fans_native():
     result = '[]'
     count = 0
     while True:
         try:
             count += 1
-            result = fans_crawler()
+            result = fans_crawler(True)
+            break
+        except:
+            print 'error'
+            if count >= 3:
+                break
+            time.sleep(5)
+    items = json.loads(result)
+    for item in items:
+        date = item['date']
+        platform = item['platform']
+        old = MediaFan.objects.filter(date__lt=date, platform=platform).order_by('-date').first()
+        if (old != None):
+          item['fans_increment'] = item['fans'] - old.fans
+        else:
+            item['fans_increment'] = 0
+        MediaFan.objects.update_or_create(date=item['date'], platform=item['platform'], defaults=item)
+    return 'Finished.'
+
+#新媒体粉丝数 对应model： MediaFan     （需要翻墙）
+@shared_task
+def get_fans_abroad():
+    result = '[]'
+    count = 0
+    while True:
+        try:
+            count += 1
+            result = fans_crawler(False)
             break
         except:
             print 'error'
@@ -598,13 +625,13 @@ def get_group_members():
 
 #新媒体互动数（热度） 对应model： MediaData  （需要翻墙）
 @shared_task
-def get_media_data():
+def get_media_data_abroad():
     result = '[]'
     count = 0
     while True:
         try:
             count += 1
-            result = media_crawler()
+            result = media_crawler(False)
             break
         except:
             print 'error'
@@ -618,15 +645,68 @@ def get_media_data():
         MediaData.objects.update_or_create(date=date, platform=platform, defaults=item)
     return 'Finished.'
 
-#新媒体粉丝数 对应model： MediaFan     （需要翻墙）
+#新媒体互动数（热度） 对应model： MediaData
 @shared_task
-def get_media_tag():
+def get_media_data_native():
     result = '[]'
     count = 0
     while True:
         try:
             count += 1
-            result = tag_crawler()
+            result = media_crawler(True)
+            break
+        except:
+            print 'error'
+            if count >= 3:
+                break
+            time.sleep(5)
+    items = json.loads(result)
+    for item in items:
+        date = item['date']
+        platform = item['platform']
+        MediaData.objects.update_or_create(date=date, platform=platform, defaults=item)
+    return 'Finished.'
+
+
+#新媒体标签内容数 对应model： MediaTag
+@shared_task
+def get_media_tag_native():
+    result = '[]'
+    count = 0
+    while True:
+        try:
+            count += 1
+            result = tag_crawler(True)
+            break
+        except:
+            print 'error'
+            if count >= 3:
+                break
+            time.sleep(5)
+    items = json.loads(result)
+    for item in items:
+        if item['platform'] == 'twitter' or item['platform'] == 'youku' or item['platform'] == 'youtube' or item['platform'] == 'facebook':
+            today = datetime.datetime.strptime(item['date'], "%Y-%m-%d")
+            oneday = datetime.timedelta(days=1)
+            yesterday = (today - oneday).strftime('%Y-%m-%d')
+            try:
+                old = MediaTag.objects.get(date=yesterday, platform=item['platform'], tag=item['tag'])
+                new_count = old.count + item['count']
+                item['count'] = new_count
+            except:
+                pass
+        MediaTag.objects.update_or_create(date=item['date'], platform=item['platform'], tag=item['tag'],defaults=item)
+    return 'Finished.'
+
+#新媒体标签内容数 对应model： MediaTag      （需要翻墙）
+@shared_task
+def get_media_tag_abroad():
+    result = '[]'
+    count = 0
+    while True:
+        try:
+            count += 1
+            result = tag_crawler(False)
             break
         except:
             print 'error'
