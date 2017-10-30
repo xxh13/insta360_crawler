@@ -29,8 +29,6 @@ from models import ExchangeRate
 from models import Log
 from models import TaobaoDetail
 from tasks import *
-from tasks import get_fans as f
-from tasks import get_google_index as g
 from util.dict import media_dict
 from util.exchange_query import main as exchange_query
 from view.views_admin import *
