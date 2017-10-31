@@ -267,7 +267,7 @@ def get_error():
 def get_share_channel():
     today = datetime.datetime.today()
     end_date = today.strftime('%Y-%m-%d')
-    start_date = (today - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
+    start_date = (today - datetime.timedelta(days=2)).strftime('%Y-%m-%d')
     result = '[]'
     count = 0
     while True:
@@ -686,15 +686,10 @@ def get_media_tag_native():
     items = json.loads(result)
     for item in items:
         if item['platform'] == 'twitter' or item['platform'] == 'youku' or item['platform'] == 'youtube' or item['platform'] == 'facebook':
-            today = datetime.datetime.strptime(item['date'], "%Y-%m-%d")
-            oneday = datetime.timedelta(days=1)
-            yesterday = (today - oneday).strftime('%Y-%m-%d')
-            try:
-                old = MediaTag.objects.get(date=yesterday, platform=item['platform'], tag=item['tag'])
+            old = MediaTag.objects.filter(date__lt=item['date'], platform=item['platform'], tag=item['tag']).order_by('-date').first()
+            if old != None:
                 new_count = old.count + item['count']
                 item['count'] = new_count
-            except:
-                pass
         MediaTag.objects.update_or_create(date=item['date'], platform=item['platform'], tag=item['tag'],defaults=item)
     return 'Finished.'
 
@@ -716,15 +711,10 @@ def get_media_tag_abroad():
     items = json.loads(result)
     for item in items:
         if item['platform'] == 'twitter' or item['platform'] == 'youku' or item['platform'] == 'youtube' or item['platform'] == 'facebook':
-            today = datetime.datetime.strptime(item['date'], "%Y-%m-%d")
-            oneday = datetime.timedelta(days=1)
-            yesterday = (today - oneday).strftime('%Y-%m-%d')
-            try:
-                old = MediaTag.objects.get(date=yesterday, platform=item['platform'], tag=item['tag'])
+            old = MediaTag.objects.filter(date__lt=item['date'], platform=item['platform'], tag=item['tag']).order_by('-date').first()
+            if old != None:
                 new_count = old.count + item['count']
                 item['count'] = new_count
-            except:
-                pass
         MediaTag.objects.update_or_create(date=item['date'], platform=item['platform'], tag=item['tag'],defaults=item)
     return 'Finished.'
 
@@ -791,10 +781,17 @@ import random
 def fill_fans_data(start_date, end_date):
     start = datetime.datetime.strptime(start_date, '%Y-%m-%d').date()
     end = datetime.datetime.strptime(end_date, '%Y-%m-%d').date()
-    platformsQuery = MediaFan.objects.filter(date__range=(start_date, end_date)).values('platform').distinct()
-    platforms = []
-    for item in platformsQuery:
-        platforms.append(item['platform'])
+    # platformsQuery = MediaFan.objects.filter(date__range=(start_date, end_date)).values('platform').distinct()
+    platforms = [
+        'twitte@insta360japan',
+        'youtube',
+        'twitter',
+        'instagram',
+        'facebook',
+        'weibo'
+    ]
+    # for item in platformsQuery:
+    #     platforms.append(item['platform'])
     for platform in platforms:
         start_item = MediaFan.objects.get(platform=platform,date=start_date)
         end_item = MediaFan.objects.get(platform=platform, date=end_date)
@@ -810,3 +807,29 @@ def fill_fans_data(start_date, end_date):
                 'fans': fans
             }
             MediaFan.objects.update_or_create(platform=platform,date=date,defaults=temp)
+
+@shared_task
+def fill_tag_data(start_date, end_date):
+    start = datetime.datetime.strptime(start_date, '%Y-%m-%d').date()
+    end = datetime.datetime.strptime(end_date, '%Y-%m-%d').date()
+    platforms = [
+        'youtube',
+        'twitter',
+        'instagram'
+    ]
+    for platform in platforms:
+        start_item = MediaTag.objects.get(platform=platform,date=start_date)
+        end_item = MediaTag.objects.get(platform=platform, date=end_date)
+        increment = end_item.count - start_item.count
+        delta = (end - start).days
+        avg = int(increment / delta)
+        deviation = abs(int(avg * 0.3))
+        count = start_item.count
+        for i in range(1, delta):
+            date = (start + datetime.timedelta(days=i)).strftime('%Y-%m-%d')
+            count += (avg + random.randint(- deviation, deviation))
+            temp = {
+                'count': count,
+                'tag': 'insta360'
+            }
+            MediaTag.objects.update_or_create(platform=platform,date=date,defaults=temp)
