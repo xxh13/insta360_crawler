@@ -86,17 +86,21 @@ def admin_power(request):
         groups = []
         for group in groups_all:
             group_name = group.name
+            try:
+                group_name = group_dict[group_name]
+            except:
+                pass
             if group in user_groups:
                 temp = {
                     'name': group_name,
                     'value': True,
-                    'remark': group_dict[group_name]
+                    'remark': group_name
                 }
             else:
                 temp = {
                     'name': group_name,
                     'value': False,
-                    'remark': group_dict[group_name]
+                    'remark': group_name
                 }
             groups.append(temp)
         return render(request, 'admin/power.html', {

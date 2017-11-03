@@ -19,7 +19,7 @@ def get_media_platform(is_native):
         ]
     else:
         return [
-            'weibo',
+            # 'weibo',
             'youtube',
             'facebook',
             'twitter',

@@ -14,6 +14,7 @@ media_dict = {
 group_dict = {
 
     'nano_activation': 'BI->设备激活情况',
+    'nano_index': 'BI->市场指数',
     'nano_history': 'BI->历史总数',
     'nano_link': 'BI->购买链接',
     'nano_market': 'BI->市场环境',
