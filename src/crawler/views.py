@@ -1468,3 +1468,17 @@ def test(request):
         return HttpResponse('success')
     else:
         return HttpResponse('Error.')
+
+
+@csrf_exempt
+def test_taobao(request):
+    if request.method == 'POST':
+        return HttpResponse('Task submitted.')
+    elif request.method == 'GET':
+        para = request.GET
+        id = para.get('id', '557713697214')
+        result = test_tb(id)
+        print result
+        return JsonResponse(result, safe=False)
+    else:
+        return HttpResponse('Error.')

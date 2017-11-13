@@ -104,4 +104,6 @@ urlpatterns = [
 
     url(r'^test/$', views.test, name='test'),
 
+    url(r'^test_taobao/$', views.test_taobao, name='test_taobao'),
+
 ]

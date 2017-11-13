@@ -118,6 +118,14 @@ def get_google_index():
         GoogleIndex.objects.update_or_create(date=item['date'], key=item['key'], defaults=item)
     return 'Finished.'
 
+
+@shared_task
+def test_tb(commodity_id):
+    crawler = TaobaoCrawler()
+    result = crawler.test(commodity_id='557713697214')
+    return result
+
+
 #淘宝销量 对应model： CompetitorSales, TaobaoDetail
 @shared_task
 def get_taobao_sales():

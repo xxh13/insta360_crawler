@@ -364,6 +364,69 @@ class TaobaoCrawler:
                 i -= 1
             i += 1
 
+    def test(self, commodity_id):
+        headers = {}
+        headers[
+            'User-Agent'] = "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Mobile Safari/537.36"
+        headers[
+            'Cookie'] = 'hng=CN%7Czh-CN%7CCNY%7C156; thw=cn; mt=np=&ci=-1_1; tg=0; cookie2=3c36c717cbb0a194d49e12cf38c88356; v=0; _m_h5_tk=7ee15e8952f08972c26f45eeeca15b4e_1510392498435; _m_h5_tk_enc=b253e19743f022b3a44e9c2115026040; miid=5439150942065526079; tk_trace=oTRxOWSBNwn9dPy4KVJVbutfzK5InlkjwbWpxHegXyGxPdWTLVRjn23RuZzZtB1ZgD6Khe0jl%2BAoo68rryovRBE2Yp933GccTPwH%2FTbWVnqEfudSt0ozZPG%2BkA1iKeVv2L5C1tkul3c1pEAfoOzBoBsNsJySRNrnHDGjf1Hnpz9gf4dnIT8QWU7ciZ0OYMsyxJFRtO1duEaHenqRGVdI%2BMdBGL3WFEsKFWGlix2LkBmdkQsEAhtqr3G3Eu9Emp%2FuYS14G4QkKGdCFJH%2Bl7ZF%2Fm814SDveZorOqshSmJpauJPPmVWFAs12QNwG5PENsMaEd%2FL%2FTevEUpLGw%2FO1Wgh6Q%3D%3D; ockeqeudmj=rD9O1Lg%3D; munb=1870927604; WAPFDFDTGFG=%2B4cMKKP%2B8PI%2BNx%2FFaCH2SrcKis1cvUo%3D; _w_app_lg=19; unb=1870927604; sg=34d; t=b0371a03700d20ec6895c7d30a03d1d1; _l_g_=Ug%3D%3D; skt=8019948e5525831f; uc1=cookie21=VFC%2FuZ9aiKCaj7AzMHh1&cookie15=Vq8l%2BKCLz3%2F65A%3D%3D&cookie14=UoTde9UjMpTgMw%3D%3D; cookie1=B0FmTptZQGkC%2BY5bz35ar0krn9mVBKjxAs9NIjBhO64%3D; uc3=vt3=F8dBzLKOyVDiOohVon4%3D&id2=UonciUs0wvLz%2Bg%3D%3D&nk2=CNu7fvUK%2FEvBzGe9&lg2=V32FPkk%2Fw0dUvg%3D%3D&sg2=VFQmloNtynToEuMeFQKLTZ21PXTH85EtuHZVkHtdn%2FQ%3D; tracknick=klqbtnsns123; uss=UoCJip6mFcI4%2F1ZCab6RVSI5pox%2FeVK1g%2BKNBNRuiupKinWAd2H%2Bn0O1Xeo%3D; lgc=klqbtnsns123; _cc_=UIHiLt3xSw%3D%3D; _nk_=klqbtnsns123; cookie17=UonciUs0wvLz%2Bg%3D%3D; ntm=0; _tb_token_=f3e3e3713736e; cna=wmF4ErZl6FQCAdOiUVXIc7XF; isg=Avz8Cq13iolvtb2iNVuPdTDBzZxuXaFyrsfZJNZ9COfKoZwr_gVwr3IX8_Mm'
+        headers['Host'] = "h5api.m.taobao.com"
+        headers['Accept-Encoding'] = 'gzip, deflate, br'
+        headers['Accept'] = "*/*"
+        headers['Accept-Language'] = "zh-CN,zh;q=0.8"
+        headers['Cache-Contro'] = 'no-cache'
+        headers['Connection'] = 'keep-alive'
+        headers['Pragma'] = 'no-cache'
+        headers['Connection'] = 'keep-alive'
+        url = 'https://h5api.m.taobao.com/h5/mtop.taobao.detail.getdetail/6.0/'
+        query = {
+            'jsv': '2.4.8',
+            'appKey': '12574478',
+            't': str(int(time.time() * 1000)),
+            'sign': '5f3dfec84e6c09f2a2743400d7f32f58',
+            'api': 'mtop.taobao.detail.getdetail',
+            'v': '6.0',
+            'ttid': '2016@taobao_h5_2.0.0',
+            'isSec': '0',
+            'ecode': '0',
+            'AntiFlood': 'true',
+            'AntiCreep': 'true',
+            'H5Request': 'true',
+            'type': 'jsonp',
+            'dataType': 'jsonp'
+        }
+        exParams = {
+            'id': str(commodity_id),
+            'sourceType': 'item',
+            'suid': '2926e2e4-ccae-421e-84e9-e1a9b7bd0f26',
+            'ut_sk': '1.V6Mwg25poloDAD3CW5DH4joq_21646297_1510390502559.TaoPassword-WeiXin.1',
+            'cpp': '1',
+            'shareurl': 'true',
+            'spm': 'a313p.22.180.78132684739',
+            'short_name': 'h.EDYSLv',
+            'app': 'chrome'
+        }
+        param_str = ''
+        for index in exParams:
+            param_str += index + '=' + exParams[index] + '&'
+        headers['Referer'] = 'https://h5.m.taobao.com/awp/core/detail.htm' + param_str
+        data = {
+            'exParams': json.dumps(exParams),
+            'itemNumId': str(commodity_id)
+        }
+        query['data'] = json.dumps(data).replace(' ', '')
+        res = requests.get(url, headers=headers, params=query)
+        print res.url
+        logger.info(res.url)
+        result = res.text
+        print result
+        logger.info(result)
+        return {
+            'url': res.url,
+            'result': result
+        }
+
+
 if __name__ == "__main__":
     crawler = TaobaoCrawler()
     crawler.main()
