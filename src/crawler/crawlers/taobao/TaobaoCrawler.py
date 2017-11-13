@@ -13,12 +13,28 @@ import re
 import sys
 import socket
 import requests
+import logging
 
 reload(sys)
 sys.setdefaultencoding("utf-8")
 timeout = 9999
 socket.setdefaulttimeout(timeout)
 
+
+# 创建一个logger
+logger = logging.getLogger('mylogger')
+logger.setLevel(logging.DEBUG)
+
+# 再创建一个handler，用于输出到控制台
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)
+
+# 定义handler的输出格式
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+ch.setFormatter(formatter)
+
+# 给logger添加handler
+logger.addHandler(ch)
 
 class TaobaoCrawler:
     def __init__(self):
@@ -282,13 +298,13 @@ class TaobaoCrawler:
             exParams = {
                 'id': str(commodity.id),
                 'sourceType': 'item',
-                # 'suid': '2926e2e4-ccae-421e-84e9-e1a9b7bd0f26',
-                # 'ut_sk': '1.V6Mwg25poloDAD3CW5DH4joq_21646297_1510390502559.TaoPassword-WeiXin.1',
-                # 'cpp': '1',
-                # 'shareurl': 'true',
-                # 'spm': 'a313p.22.180.78132684739',
-                # 'short_name': 'h.EDYSLv',
-                # 'app': 'chrome'
+                'suid': '2926e2e4-ccae-421e-84e9-e1a9b7bd0f26',
+                'ut_sk': '1.V6Mwg25poloDAD3CW5DH4joq_21646297_1510390502559.TaoPassword-WeiXin.1',
+                'cpp': '1',
+                'shareurl': 'true',
+                'spm': 'a313p.22.180.78132684739',
+                'short_name': 'h.EDYSLv',
+                'app': 'chrome'
             }
             param_str = ''
             for index in exParams:
@@ -302,8 +318,10 @@ class TaobaoCrawler:
             try:
                 res = requests.get(url,headers=headers,params=query)
                 print res.url
+                logger.info(res.url)
                 result = res.text
                 print result
+                logger.info(result)
                 result = json.loads(result)
                 result1 = json.loads(result['data']['apiStack'][0]['value'], encoding="utf-8")
                 sales = result1['item']['sellCount']
@@ -313,8 +331,10 @@ class TaobaoCrawler:
                 try:
                     res = requests.get(url, headers=headers, params=query)
                     print res.url
+                    logger.info(res.url)
                     result = res.text
                     print result
+                    logger.info(result)
                     result = json.loads(result)
                     result1 = json.loads(result['data']['apiStack'][0]['value'], encoding="utf-8")
                     sales = result1['item']['sellCount']
