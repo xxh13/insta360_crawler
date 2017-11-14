@@ -38,7 +38,8 @@ class JDCrawler:
             'theta': 'Ricoh theta',
             'LG 360 CAM': 'LG 360 CAM',
             'insta360 One': 'insta360 One',
-            'insta360 Pro': 'insta360 Pro'
+            'insta360 Pro': 'insta360 Pro',
+            '得图plus全景相机': '得图plus全景相机'
         }
         self.today = datetime.datetime.now().strftime('%Y-%m-%d')
 
