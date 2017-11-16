@@ -1150,50 +1150,62 @@ def dtalk_login(request):
         return HttpResponse('Task submitted.')
     elif request.method == 'GET':
         para = request.GET
-        username = 'jack'
-        password = 'slow fuck'
-        if para.__contains__('username'):
-            username = para.__getitem__('username')
-        if para.__contains__('password'):
-            password = para.__getitem__('password')
-        url = 'http://account.arashivision.com/user/getUserToken'
-        values = {
-            'jobnumber': username,
-            'password': password
-        }
-        data = urllib.urlencode(values)
-        req = urllib2.Request(url=url, data=data)
-        try:
-            res_data = urllib2.urlopen(req)
-        except urllib2.HTTPError, e:
-            print e.code
-            print e.reason
-            user = authenticate(username=username, password=password)
-            if user is not None and user.is_active:
-                username = user.get_username()
-                res = []
-                groups = user.groups.all()
-                for group in groups:
-                    res.append(group.name)
-                return JsonResponse({'result': True, 'username': username, 'group': res}, safe=False)
-            else:
-                return JsonResponse({'result': False}, safe=False)
-        data = json.loads(res_data.read())
-        jobnumber = data['jobNumber']
-        name = data['name']
-        try:
-            user = User.objects.get(username=jobnumber)
-            user.set_password(password)
-            user.first_name = name
-            user.save()
-        except:
-            user = User.objects.create_user(jobnumber, email=None, password=password)
-            user.first_name = name
-            user.save()
+        username = para.get('username', 'jack')
+        password = para.get('password', 'slowfuck')
+        verified = para.get('verified', 'false')
+
+        if verified == 'false':
+            url = 'http://account.arashivision.com/user/getUserToken'
+            values = {
+                'jobnumber': username,
+                'password': password
+            }
+            data = urllib.urlencode(values)
+            req = urllib2.Request(url=url, data=data)
+            try:
+                res_data = urllib2.urlopen(req)
+            except urllib2.HTTPError, e:
+                print e.code
+                print e.reason
+                user = authenticate(username=username, password=password)
+                if user is not None and user.is_active:
+                    username = user.get_username()
+                    res = []
+                    groups = user.groups.all()
+                    for group in groups:
+                        res.append(group.name)
+                    return JsonResponse({'result': True, 'username': username, 'group': res}, safe=False)
+                else:
+                    return JsonResponse({'result': False}, safe=False)
+            data = json.loads(res_data.read())
+            jobnumber = data['jobNumber']
+            name = data['name']
+            try:
+                user = User.objects.get(username=jobnumber)
+                user.set_password(password)
+                user.first_name = name
+                user.save()
+            except:
+                user = User.objects.create_user(jobnumber, email=None, password=password)
+                user.first_name = name
+                user.save()
+        else:
+            jobnumber = username
+            try:
+                user = User.objects.get(username=jobnumber)
+            except:
+                user = User.objects.create_user(jobnumber, email=None, password=jobnumber)
+                user.first_name = jobnumber
+                user.save()
+            name = user.get_short_name()
+            if name == '':
+                name = user.get_username()
+
         res = []
         groups = user.groups.all()
         for group in groups:
             res.append(group.name)
+
         return JsonResponse({'result': True, 'username': name, 'group': res}, safe=False)
     else:
         return HttpResponse('Error.')
